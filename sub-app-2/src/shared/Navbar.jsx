@@ -6,8 +6,6 @@ import { Link, useNavigate } from 'react-router-dom';
 
 /*Navbar*/
 const NavMenu = () => {
-    const navigate = useNavigate();
-
     return(
         <Navbar expand="lg" className="navbar-light bg-light">
         <Navbar.Brand as={Link} to="/" className="navbar-brand">FoodBank</Navbar.Brand>
