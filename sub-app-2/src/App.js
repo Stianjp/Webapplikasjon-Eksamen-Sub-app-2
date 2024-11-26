@@ -1,8 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Index from './Home/Index';
+import NavMenu from './shared/Navbar';
+import Home from './Home/Home';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
-import NavMenu from './shared/Navbar';
 
 function App() {
   return (
@@ -11,7 +11,7 @@ function App() {
       <NavMenu />
       <main className="flex-grow-1 p-3">
           <Routes>
-            <Route path="/" element={<Index />} />
+            <Route path="/" element={<Home />} />
             <Route path="/products" element={<Products />} />
             <Route path="/products/my" element={<MyProducts />} />
             <Route path="/products/new" element={<CreateProduct />} />
