@@ -1,11 +1,11 @@
 import Index from './Home/Index';
 import './App.css';
-import NavMenu from './shared/Navbar';
+import Sidebar from './Shared/Sidebar';
 
 function App() {
   return (
     <div className='App'>
-      <NavMenu />
+      <Sidebar />
       <Index />
     </div>
   );
