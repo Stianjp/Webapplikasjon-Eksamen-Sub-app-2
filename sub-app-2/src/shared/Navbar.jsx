@@ -6,6 +6,7 @@ import { Link, useNavigate } from 'react-router-dom';
 
 /*Navbar*/
 const NavMenu = () => {
+    
     return(
         <Navbar expand="lg" className="navbar-light bg-light">
         <Navbar.Brand as={Link} to="/" className="navbar-brand">FoodBank</Navbar.Brand>
@@ -15,14 +16,14 @@ const NavMenu = () => {
                 <Nav.Link as={Link} to="/">Home</Nav.Link>
                 
                 <NavDropdown title="Products" id="products-dropdown">
-                    <NavDropdown.Item as={Link} to="/products">
+                    <NavDropdown.Item as={Link} to="/Products">
                         All products
                     </NavDropdown.Item>
                     <NavDropdown.Divider />
-                    <NavDropdown.Item as={Link} to="/products/add">
+                    <NavDropdown.Item as={Link} to="/Products/add">
                         Add item
                     </NavDropdown.Item>
-                    <NavDropdown.Item as={Link} to="/products/my">
+                    <NavDropdown.Item as={Link} to="/Products/my">
                         My products
                     </NavDropdown.Item>
                 </NavDropdown>
