@@ -7,7 +7,7 @@ import CreateProduct from './Products/CreateProduct';
 import Account from './Home/Account';
 import Privacy from './Home/Privacy';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import './App.css';
+import './styles/App.css';
 
 function App() {
   return (

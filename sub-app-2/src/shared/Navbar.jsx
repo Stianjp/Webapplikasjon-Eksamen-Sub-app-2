@@ -2,6 +2,7 @@
 import React from 'react';
 import { Nav, Navbar, NavDropdown } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
+import '../styles/NavMenu.css';
 
 
 /*Navbar*/
