@@ -1,0 +1,87 @@
+.sidebar {
+  min-height: 100vh;
+  width: 250px;
+  background-color: var(--bg-sidebar);
+  padding: 20px;
+  border-right: 1px solid var(--border-color);
+  position: fixed;
+  left: 0;
+  top: 0;
+}
+
+.navbar-brand {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--text-primary);
+}
+
+.nav-link {
+  color: var(--text-primary);
+  padding: 8px 16px;
+  width: 100%;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.nav-link:hover {
+  background-color: var(--nav-hover);
+  border-radius: var(--border-radius-sm);
+}
+
+.dropdown-menu {
+  width: 100%;
+  position: static !important;
+  border: none;
+  background-color: transparent;
+  padding-left: 1rem;
+}
+
+.dropdown-item {
+  padding: 8px 16px;
+  color: var(--text-primary);
+}
+
+.dropdown-item:hover {
+  background-color: var(--nav-hover);
+  border-radius: var(--border-radius-sm);
+}
+
+/* Nav Pills Specific Styles */
+.nav-pills .nav-link {
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  font-weight: 500;
+}
+
+.nav-pills .nav-link:hover {
+  background-color: var(--primary-green);
+  color: var(--text-white) !important;
+}
+
+.nav-pills .nav-link.active {
+  background-color: var(--primary-green);
+  color: var(--text-white);
+}
+
+.nav-pills .dropdown-menu {
+  background-color: var(--bg-sidebar);
+  border: none;
+}
+
+.nav-pills .dropdown-item {
+  color: var(--text-primary);
+  padding: 10px 20px;
+}
+
+.nav-pills .dropdown-item:hover {
+  background-color: var(--primary-green);
+  color: var(--text-white);
+}
+
+@media (max-width: 991px) {
+  .sidebar {
+      width: 100%;
+      position: static;
+      min-height: auto;
+  }
+}
