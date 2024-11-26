@@ -8,6 +8,7 @@ import { Link, useNavigate } from 'react-router-dom';
 const NavMenu = () => {
     
     return(
+        <div className="sidebar">
         <Navbar expand="lg" className="navbar-light bg-light">
         <Navbar.Brand as={Link} to="/" className="navbar-brand">FoodBank</Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -40,6 +41,7 @@ const NavMenu = () => {
             </Nav>
         </Navbar.Collapse>
     </Navbar>
+    </div>
   );
 };
 

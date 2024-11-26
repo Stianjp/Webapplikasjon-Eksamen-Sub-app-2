@@ -12,9 +12,9 @@ import './App.css';
 function App() {
   return (
     <Router>
-    <div className='App d-flex'>
+    <div className='d-flex'>
       <NavMenu />
-      <main className="flex-grow-1 p-3">
+      <main className="main-content">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/Products/ProductPage" element={<ProductsPage />} />

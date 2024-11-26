@@ -5,7 +5,7 @@ const ProductsPage = () => {
     return(
         <Container> 
             <div className="AllProducts">
-                <h1>Products Page</h1>;
+                <h1>Products Page</h1>
             </div>
         </Container>
     );
