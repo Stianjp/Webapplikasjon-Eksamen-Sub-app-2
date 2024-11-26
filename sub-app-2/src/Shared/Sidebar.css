@@ -1,24 +1,19 @@
 /*CSS for only the Sidebar*/
-
 .nav-pills .nav-link {
-    color: #333; /* Standard tekstfarge */
-    text-decoration: none; /* Fjern understreking */
+    color: var(--text-black); 
+    text-decoration: none; /* Remove underscore */
     transition: background-color 0.3s ease, color 0.3s ease; /* Smooth hover */
-    font-weight: 500; /* Valgfritt: Endre tykkelse */
-    text-decoration: none; /* Fjern understreking */
   }
-
   
   .nav-pills .nav-link:hover {
-    background-color: #4caf50; /* Grønn bakgrunn */
-    color: white !important; /* Hvit tekst */
+    background-color: #4caf50; 
+    transform: translateX(2px); /*Adding effect when hover */
   }
   
   .nav-pills .nav-link.active {
     background-color: #4caf50; /* Grønn bakgrunn for aktiv link */
     color: white; /* Hvit tekst for aktiv link */
   }
-  
 
 .nav-pills .dropdown-menu {
     background-color: #f8f9fa; /* Matcher sidebar-bakgrunnen */
@@ -26,18 +21,50 @@
   }
   
   .nav-pills .dropdown-item {
-    color: #333;
+    color: var(--text-black);
     padding: 10px 20px;
   }
   
   .nav-pills .dropdown-item:hover {
     background-color: #4caf50; /* Grønn hover-effekt */
-    color: white;
+    transform: translateX(2px); /*Adding effect when hover */
   }
   
-  
   .nav-pills .nav-link:hover {
-    color: #ffffff; /* Endre farge ved hover */
-    text-decoration: none; /* Fjern understreking ved hover */
+    transform: translateX(2px); /*Adding effect when hover */
+  }
+  
+
+  /*For icons*/
+  .icon{
+    color: var(--text-primary);
+    margin-right: 10px; /* Adding space between the icon and the text*/
+    width: 20px; 
+    height: 20px; 
+    vertical-align: middle;
+    transition: all 0.3s ease;
+  }
+
+  /* Log out - buttom */
+  .logout-button {
+    position: relative; /* Making sure the buttom is all the way down in the sidebar */
+  }
+  
+  .btn-danger{
+    border: none;
+    transition: all 0.3s ease;
+    color: var(--text-black);
+  }
+
+  .btn-danger .btn {
+    font-weight: bold;
+    border: none;
+    
+  }
+  
+  .btn-danger:hover {
+    background-color: rgb(255, 0, 0);
+    color: var(--text-black);
+    transform: translateX(2px); /*Adding effect when hover */
   }
   
