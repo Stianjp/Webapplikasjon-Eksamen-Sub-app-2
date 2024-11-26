@@ -1,7 +1,7 @@
 import React from 'react';
 import { Container } from 'react-bootstrap';
 
-const ProductsPage = () => {
+const Privacy = () => {
     return(
         <Container>
             <div className="Privacy">
@@ -35,4 +35,4 @@ const ProductsPage = () => {
     );
 };
 
-export default ProductsPage;
+export default Privacy;
