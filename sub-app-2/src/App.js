@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Sidebar from './shared/Sidebar';
+import Sidebar from './Shared/Sidebar';
 import Home from './Home/Home';
 import ProductPage from './Products/ProductPage';
 import MyProducts from './Products/MyProducts';
