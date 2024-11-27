@@ -1,15 +1,24 @@
-.main-content{
-  margin-left: 250;
-  padding: 20px;
-  width: calc(100% - 250px);
+/* Ensure the App takes full height */
+.App {
+  display: flex;
+  flex-direction: row; /* Row layout for larger screens */
+  height: 100vh; /* Full viewport height */
 }
 
+/* Content area styling */
+.content {
+  flex-grow: 1; /* Allow the content to take up the remaining space */
+  padding: 20px; /* Add padding for getting some better spacing */
+  overflow-y: auto; /* Ensure scrollable content if necessary */
+}
+
+/* Adjust for small screens */
 @media (max-width: 991px) {
-  .main-content {
-      margin-left: 0;
-      width: 100%;
+  .App {
+    flex-direction: column; /* Stack sidebar (navbar) and content vertically */
   }
 }
+
 
 
 
