@@ -10,7 +10,6 @@ import BowlSolid from '../icons/bowl-food-solid.svg';
 import Home from '../icons/house-solid.svg';
 import LogoGreen from '../icons/LogoGreen.svg';
 import AccountGear from '../icons/gear-solid.svg';
-import PrivacyIcon from '../icons/bowl-food-solid.svg';
 import MyAccount from '../icons/gauge-solid.svg';
 import Logout from '../icons/right-to-bracket-solid.svg';
 
