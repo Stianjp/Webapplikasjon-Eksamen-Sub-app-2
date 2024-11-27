@@ -2,9 +2,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Events;
-using Sub_App_1.DAL;
-using Sub_App_1.DAL.Interfaces;
-using Sub_App_1.DAL.Repositories;
+using api.DAL;
+using api.DAL.Interfaces;
+using api.DAL.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
