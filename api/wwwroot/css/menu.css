@@ -1,0 +1,42 @@
+
+
+/* Adjust sidebar when on the Menu page */
+.menu-page .sidebar-content .sidebar {
+    width: 100%;
+    position: static; /* Remove fixed positioning */
+    height: auto; /* Let the height be determined by content */
+  }
+  
+  .menu-page .main-content {
+    margin-left: 0;
+  }
+  
+  .menu-page #margin {
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Hide the navbar on the Menu page if desired */
+  .menu-page .navbar {
+    display: none;
+  }
+  
+  /* Adjust navigation styles for better visibility */
+  .menu-page .sidebar .nav-link {
+    font-size: 1.2rem;
+    padding: 0.75rem 1rem;
+  }
+  
+  /* Optional: Center the sidebar content */
+  .menu-page .sidebar {
+    margin: 0 auto;
+  }
+  
+  /* Ensure images are appropriately sized */
+  .menu-page .sidebar img {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+  }
+  
+  
