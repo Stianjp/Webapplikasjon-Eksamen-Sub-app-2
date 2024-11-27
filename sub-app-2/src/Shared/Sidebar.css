@@ -1,70 +1,85 @@
-/*CSS for only the Sidebar*/
-.nav-pills .nav-link {
-    color: var(--text-black); 
-    text-decoration: none; /* Remove underscore */
-    transition: background-color 0.3s ease, color 0.3s ease; /* Smooth hover */
+/* General Navbar and Sidebar Styles */
+.navbar {
+  height: auto; /* Adjust height for both navbar and sidebar */
+}
+
+.navbar-nav .nav-link {
+  text-align: left;
+  font-size: 1rem;
+  padding: 10px 15px;
+  border-bottom: 1px solid #e0e0e0; /* Separator line between links */
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Space between icon and text */
+}
+
+.navbar-nav .nav-link:hover {
+  background-color: #f8f9fa; /* Light gray background on hover */
+  color: #4caf50; /* Green text on hover */
+  text-decoration: none; /* Remove underline */
+}
+.nav-pills .dropdown-item:hover {
+  background-color: #4caf50; /* Grønn hover-effekt */
+  transform: translateX(2px); /*Adding effect when hover */
+}
+
+/* Icons inside links */
+.icon {
+  margin-right: 10px;
+  width: 20px;
+  height: 20px;
+}
+
+/* Logout button styles */
+.logout-button {
+  margin-top: auto; /* Push logout button to the bottom */
+  padding: 10px 20px;
+}
+
+/* Sidebar styles for large screens */
+@media (min-width: 992px) {
+  .d-lg-flex {
+    display: flex !important; /* Show sidebar on large screens */
   }
-  
+  .d-lg-none {
+    display: none !important; /* Hide navbar on large screens */
+  }
+
+  .navbar {
+    height: 100%; /* Full height sidebar */
+    flex-direction: column; /* Vertical layout for sidebar */
+  }
+
+  .nav-pills .nav-link {
+    width: 100%; /* Full-width links in sidebar */
+    padding: 10px 20px; /* Better spacing */
+  }
+
   .nav-pills .nav-link:hover {
-    background-color: #4caf50; 
-    transform: translateX(2px); /*Adding effect when hover */
+    background-color: #4caf50; /* Green background on hover */
+    color: white; /* White text on hover */
   }
-  
-  .nav-pills .nav-link.active {
-    background-color: #4caf50; /* Grønn bakgrunn for aktiv link */
-    color: white; /* Hvit tekst for aktiv link */
+}
+
+/* Navbar styles for small screens */
+@media (max-width: 991px) {
+  .d-lg-none {
+    display: block !important; /* Show navbar on small screens */
   }
 
-.nav-pills .dropdown-menu {
-    background-color: #f8f9fa; /* Matcher sidebar-bakgrunnen */
-    border: none;
-  }
-  
-  .nav-pills .dropdown-item {
-    color: var(--text-black);
-    padding: 10px 20px;
-  }
-  
-  .nav-pills .dropdown-item:hover {
-    background-color: #4caf50; /* Grønn hover-effekt */
-    transform: translateX(2px); /*Adding effect when hover */
-  }
-  
-  .nav-pills .nav-link:hover {
-    transform: translateX(2px); /*Adding effect when hover */
-  }
-  
-
-  /*For icons*/
-  .icon{
-    color: var(--text-primary);
-    margin-right: 10px; /* Adding space between the icon and the text*/
-    width: 20px; 
-    height: 20px; 
-    vertical-align: middle;
-    transition: all 0.3s ease;
+  .d-lg-flex {
+    display: none !important; /* Hide sidebar on small screens */
   }
 
-  /* Log out - buttom */
-  .logout-button {
-    position: relative; /* Making sure the buttom is all the way down in the sidebar */
-  }
-  
-  .btn-danger{
-    border: none;
-    transition: all 0.3s ease;
-    color: var(--text-black);
+  .navbar {
+    flex-direction: row; /* Horizontal layout for navbar */
+    justify-content: space-between; /* Logo on the left, toggle on the right */
+    width: 100%;
+    padding: 0 15px; /* Padding for the navbar */
   }
 
-  .btn-danger .btn {
-    font-weight: bold;
-    border: none;
-    
+  .navbar-nav .nav-link {
+    border-bottom: none; /* Remove separator lines */
+    padding: 10px 0; /* Adjust padding for better spacing */
   }
-  
-  .btn-danger:hover {
-    background-color: rgb(255, 0, 0);
-    color: var(--text-black);
-    transform: translateX(2px); /*Adding effect when hover */
-  }
-  
+}

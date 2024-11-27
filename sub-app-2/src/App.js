@@ -24,9 +24,9 @@ function App() {
             <Route path="/account" element={<Account />} />
             <Route path="/privacy" element={<Privacy />} />
           </Routes>
-        </main>
-        </div>
-        </Router>
+      </main>
+    </div>
+    </Router>
   );
 }
 
