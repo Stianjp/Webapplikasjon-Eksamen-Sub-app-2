@@ -99,7 +99,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 // API routes
-app.MapControllers();
+app.MapControllerRoute(name: "api", pattern: "{controller}/{action=Index}/{id?}");
 
 app.Lifetime.ApplicationStopped.Register(Log.CloseAndFlush);
 
