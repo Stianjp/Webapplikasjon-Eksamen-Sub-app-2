@@ -1,8 +1,8 @@
-namespace Sub_App_1.DAL.Repositories;
+namespace api.DAL.Repositories;
 
 using Microsoft.EntityFrameworkCore;
-using Sub_App_1.Models;
-using Sub_App_1.DAL.Interfaces;
+using api.Models;
+using api.DAL.Interfaces;
 
 public class ProductRepository : IProductRepository
 {

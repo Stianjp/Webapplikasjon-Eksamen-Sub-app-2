@@ -1,9 +1,9 @@
-namespace Sub_App_1.DAL;
+namespace api.DAL;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Identity;
-using Sub_App_1.Models;
+using api.Models;
 
 public static class DBInit
 {

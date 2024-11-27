@@ -1,4 +1,4 @@
-namespace Sub_App_1.Models;
+namespace api.Models;
 
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;

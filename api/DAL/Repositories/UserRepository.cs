@@ -1,9 +1,9 @@
-namespace Sub_App_1.DAL.Repositories;
+namespace api.DAL.Repositories;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Sub_App_1.DAL.Interfaces;
+using api.DAL.Interfaces;
 using System.Security.Claims;
 
 public class UserRepository : IUserRepository

@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;  // For Any() extension method
-using Sub_App_1.Models;
+using api.Models;
 
-namespace Sub_App_1.ViewModels
+namespace api.ViewModels
 {
     public class ProductFormViewModel
     {

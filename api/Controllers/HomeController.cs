@@ -1,10 +1,10 @@
-namespace Sub_App_1.Controllers;
+namespace api.Controllers;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
-using Sub_App_1.Models;
-using Sub_App_1.ViewModels;
+using api.Models;
+using api.ViewModels;
 
 public class HomeController : Controller
 {

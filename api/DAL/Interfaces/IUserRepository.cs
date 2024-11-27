@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 
-namespace Sub_App_1.DAL.Interfaces
+namespace api.DAL.Interfaces
 {
     public interface IUserRepository
     {

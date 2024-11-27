@@ -1,6 +1,6 @@
-namespace Sub_App_1.DAL.Interfaces;
+namespace api.DAL.Interfaces;
 
-using Sub_App_1.Models;
+using api.Models;
 
 public interface IProductRepository
 {

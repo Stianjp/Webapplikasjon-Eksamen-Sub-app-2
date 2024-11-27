@@ -1,9 +1,9 @@
-namespace Sub_App_1.Controllers;
+namespace api.Controllers;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Sub_App_1.Models;
+using api.Models;
 
 [Authorize(Roles = UserRoles.Administrator)]
 public class AdminController : Controller {

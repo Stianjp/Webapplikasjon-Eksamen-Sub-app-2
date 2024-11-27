@@ -1,8 +1,8 @@
-namespace Sub_App_1.DAL;
+namespace api.DAL;
 
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Sub_App_1.Models;
+using api.Models;
 
 public class ApplicationDbContext : IdentityDbContext
 {

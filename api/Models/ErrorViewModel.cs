@@ -1,4 +1,4 @@
-namespace Sub_App_1.Models;
+namespace api.Models;
 
 public class ErrorViewModel
 {

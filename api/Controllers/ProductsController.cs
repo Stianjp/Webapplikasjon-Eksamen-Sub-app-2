@@ -1,14 +1,14 @@
-namespace Sub_App_1.Controllers;
+namespace api.Controllers;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
-using Sub_App_1.Models;
-using Sub_App_1.ViewModels;
+using api.Models;
+using api.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Sub_App_1.DAL.Interfaces;
+using api.DAL.Interfaces;
 
 public class ProductsController : Controller
 {
@@ -49,6 +49,7 @@ public class ProductsController : Controller
     }
 
     // GET: Products (available to all, including not logged in users)
+    [HttpGet]
     public async Task<IActionResult> Productsindex()
     {
         var products = await _productRepository.GetAllProductsAsync();
@@ -56,17 +57,20 @@ public class ProductsController : Controller
     }
 
     // GET: Products/Details/{id}
+    [HttpGet]
     public async Task<IActionResult> Details(int id)
     {
         var product = await _productRepository.GetProductByIdAsync(id);
 
         if (product == null)
         {
-            return NotFound();
+            return BadRequest("Product not found");
         }
         return View(product);
     }
+
 // GET: Products/Create
+[HttpPost]
 [Authorize(Roles = UserRoles.FoodProducer + "," + UserRoles.Administrator)]
 public IActionResult Create()
 {
@@ -135,6 +139,7 @@ public async Task<IActionResult> Create(ProductFormViewModel viewModel)
 }
 
 // GET: Products/Edit/{id}
+[HttpGet]
 [Authorize(Roles = UserRoles.FoodProducer + "," + UserRoles.Administrator)]
 public async Task<IActionResult> Edit(int id)
 {
@@ -218,7 +223,7 @@ public async Task<IActionResult> Edit(int id, ProductFormViewModel viewModel)
 }
 
 
-
+    [HttpGet]
     // GET: Products/Delete/{id} (only FoodProducers and Admins can delete products)
     [Authorize(Roles = UserRoles.FoodProducer + "," + UserRoles.Administrator)]
     public async Task<IActionResult> Delete(int id)
@@ -295,6 +300,7 @@ public async Task<IActionResult> Edit(int id, ProductFormViewModel viewModel)
         return writer.ToString();
     }
 
+    [HttpGet]
     // GET: Products/Index with sorting functionality
     public async Task<IActionResult> Index(string sortOrder, string currentSort, string sortDirection)
     {
@@ -341,6 +347,7 @@ public async Task<IActionResult> Edit(int id, ProductFormViewModel viewModel)
         return View("ProductsIndex", productsQuery.ToList());
     }
 
+    [HttpGet]
     // GET: Products/UserProducts
     [Authorize(Roles = UserRoles.FoodProducer + "," + UserRoles.Administrator)]
     public async Task<IActionResult> UserProducts(string category)

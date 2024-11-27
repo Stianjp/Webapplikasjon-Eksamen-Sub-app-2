@@ -1,8 +1,8 @@
-namespace Sub_App_1.Controllers;
+namespace api.Controllers;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Sub_App_1.Models;
+using api.Models;
 
 public class AccountController : Controller {
     private readonly UserManager<IdentityUser> _userManager;
