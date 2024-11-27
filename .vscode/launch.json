@@ -1,6 +1,7 @@
 {
     "version": "0.2.0",
     "configurations": [
+        
         {
            "name": ".NET Core Launch (web)", // Name of the launch configuration as shown in the debug panel
             "type": "coreclr", // Type of the debugger to use, in this case, .NET Core CLR (Common Language Runtime)
