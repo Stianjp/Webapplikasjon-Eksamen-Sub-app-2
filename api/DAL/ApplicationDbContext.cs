@@ -6,15 +6,18 @@ using api.Models;
 
 public class ApplicationDbContext : IdentityDbContext
 {
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+     : base(options) { 
+        Database.EnsureCreated(); // Makes sure of that the database is created
+     }
 
     public DbSet<Product> Products { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
+    //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    //{
         // Use Lazy Loading Proxies
         // optionsBuilder.UseLazyLoadingProxies();
-    }
+    //}
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

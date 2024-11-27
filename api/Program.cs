@@ -37,7 +37,7 @@ builder.Services.AddSwaggerGen();
 
 // Add ApplicationDbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection") + ";Cache=Shared"),
+    options.UseSqlite(builder.Configuration.GetConnectionString("ApplicationDbContextConnection") + ";Cache=Shared"),
     ServiceLifetime.Scoped);
 
 // Register Identity services
@@ -56,6 +56,8 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 // Register repositories
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+builder.Services.AddControllers();
 
 // Add CORS policy for API
 builder.Services.AddCors(options =>
