@@ -4306,19 +4306,19 @@
     ]
   },
   "packageFolders": {
-    "/Users/nazliq/.nuget/packages/": {}
+    "C:\\Users\\tbaus\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/nazliq/Documents/Webapplikasjon-Eksamen-del2/Webapplikasjon-Eksamen-Sub-app-2/api/api.csproj",
+      "projectUniqueName": "C:\\Users\\tbaus\\OneDrive\\Dokumenter\\GitHub\\Webapplikasjon-Eksamen-Sub-app-2\\api\\api.csproj",
       "projectName": "api",
-      "projectPath": "/Users/nazliq/Documents/Webapplikasjon-Eksamen-del2/Webapplikasjon-Eksamen-Sub-app-2/api/api.csproj",
-      "packagesPath": "/Users/nazliq/.nuget/packages/",
-      "outputPath": "/Users/nazliq/Documents/Webapplikasjon-Eksamen-del2/Webapplikasjon-Eksamen-Sub-app-2/api/obj/",
+      "projectPath": "C:\\Users\\tbaus\\OneDrive\\Dokumenter\\GitHub\\Webapplikasjon-Eksamen-Sub-app-2\\api\\api.csproj",
+      "packagesPath": "C:\\Users\\tbaus\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\tbaus\\OneDrive\\Dokumenter\\GitHub\\Webapplikasjon-Eksamen-Sub-app-2\\api\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/Users/nazliq/.nuget/NuGet/NuGet.Config"
+        "C:\\Users\\tbaus\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
@@ -4421,7 +4421,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.401/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.403/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
