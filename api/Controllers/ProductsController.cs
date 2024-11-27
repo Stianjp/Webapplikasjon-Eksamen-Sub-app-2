@@ -46,7 +46,7 @@ public class ProductsAPIController : Controller
     public ProductsAPIController(IProductRepository productRepository)
     {
         _productRepository = productRepository;
-        _logger = null;
+        _logger = _logger;
     
     }
 
