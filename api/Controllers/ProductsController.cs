@@ -46,7 +46,7 @@ public class ProductsAPIController : Controller
     public ProductsAPIController(IProductRepository productRepository)
     {
         _productRepository = productRepository;
-        _logger = null;
+        _logger = _logger;
     
     }
 
@@ -150,7 +150,7 @@ public async Task<IActionResult> Create(ProductFormViewModel viewModel)
 }
 
 // GET: Products/Edit/{id}
-[HttpGet]
+[HttpGet("Edit")]
 [Authorize(Roles = UserRoles.FoodProducer + "," + UserRoles.Administrator)]
 public async Task<IActionResult> Edit(int id)
 {
@@ -173,7 +173,7 @@ public async Task<IActionResult> Edit(int id)
 }
 
 // POST: Products/Edit/{id}
-[HttpPost]
+[HttpPost("Update")]
 [ValidateAntiForgeryToken]
 [Authorize(Roles = UserRoles.FoodProducer + "," + UserRoles.Administrator)]
 public async Task<IActionResult> Edit(int id, ProductFormViewModel viewModel)
@@ -234,7 +234,7 @@ public async Task<IActionResult> Edit(int id, ProductFormViewModel viewModel)
 }
 
 
-    [HttpGet]
+    [HttpGet("GetDelete")]
     // GET: Products/Delete/{id} (only FoodProducers and Admins can delete products)
     [Authorize(Roles = UserRoles.FoodProducer + "," + UserRoles.Administrator)]
     public async Task<IActionResult> Delete(int id)
@@ -311,7 +311,7 @@ public async Task<IActionResult> Edit(int id, ProductFormViewModel viewModel)
         return writer.ToString();
     }
 
-    [HttpGet]
+    [HttpGet("Index")]
     // GET: Products/Index with sorting functionality
     public async Task<IActionResult> Index(string sortOrder, string currentSort, string sortDirection)
     {
@@ -358,7 +358,7 @@ public async Task<IActionResult> Edit(int id, ProductFormViewModel viewModel)
         return View("ProductsIndex", productsQuery.ToList());
     }
 
-    [HttpGet]
+    [HttpGet("UserProducts")]
     // GET: Products/UserProducts
     [Authorize(Roles = UserRoles.FoodProducer + "," + UserRoles.Administrator)]
     public async Task<IActionResult> UserProducts(string category)

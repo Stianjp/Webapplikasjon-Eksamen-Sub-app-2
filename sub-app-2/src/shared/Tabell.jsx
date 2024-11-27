@@ -1,38 +1,54 @@
 import React, { useState } from "react";
 import { Table } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 
-const Tabell = ({
-    data, 
-    currentSort, 
-    onSort, 
-    isAdmin = false, 
+// Makes a dynamic tabell that can be used on other pages
+const Tabell = ({ 
+    products, 
+    apiUrl,
+    isAdmin = false,
     isProducer = false,
-    currentUserId = null, 
-    onEdit,
-    onDelete,
-    onRowClick
+    currentUserId = null
 }) => {
+    const navigate = useNavigate();
+    const [currentSort, setCurrentSort] = useState({ key: null, direction: 'asc' });
+
     const columns = [
         { key: 'name', label: 'Name' },
-        { key: 'category', label: 'Category' },
+        { key: 'categoryList', label: 'Category' },
         { key: 'description', label: 'Description' },
-        { key: 'calories', label: 'Calories (kcal)' },
-        { key: 'protein', label: 'Protein (g)' },
-        { key: 'fat', label: 'Fat (g)' },
-        { key: 'carbohydrates', label: 'Carbohydrates (g)' }
+        { key: 'calories', label: 'Calories' },
+        { key: 'protein', label: 'Protein' },
+        { key: 'fat', label: 'Fat' },
+        { key: 'carbohydrates', label: 'Carbohydrates' }
     ];
 
+    //Metode for å sortere kan hende dette bør ligge i backend-, som det alt gjør i controlleren product
     const handleSort = (key) => {
         const direction = 
             currentSort.key === key && currentSort.direction === 'asc' 
                 ? 'desc' 
                 : 'asc';
-        onSort(key, direction);
+        setCurrentSort({ key, direction });
     };
 
     const renderSortIcon = (key) => {
         if (currentSort.key !== key) return null;
         return <span>{currentSort.direction === 'asc' ? '▲' : '▼'}</span>;
+    };
+
+    const handleEdit = (e, productId) => {
+        e.stopPropagation();
+        navigate(`/edit-product/${productId}`);
+    };
+
+    const handleDelete = (e, productId) => {
+        e.stopPropagation();
+        navigate(`/delete-product/${productId}`);
+    };
+
+    const handleRowClick = (productId) => {
+        navigate(`/product-details/${productId}`);
     };
 
     return (
@@ -47,14 +63,14 @@ const Tabell = ({
                             </div>
                         </th>
                     ))}
-                    {(isAdmin || isProducer) && <th>Actions</th>}
+                    {(isAdmin || isProducer) && <th>Actions</th>} 
                 </tr>
             </thead>
             <tbody>
-                {data.map(item => (
+                {products && products.map(item => (
                     <tr 
                         key={item.id} 
-                        onClick={() => onRowClick(item.id)}
+                        onClick={() => handleRowClick(item.id)}
                         style={{ cursor: 'pointer' }}
                     >
                         <td>{item.name}</td>
@@ -71,13 +87,13 @@ const Tabell = ({
                             <td onClick={e => e.stopPropagation()}>
                                 <button 
                                     className="btn btn-primary btn-sm me-2"
-                                    onClick={() => onEdit(item.id)}
+                                    onClick={(e) => handleEdit(e, item.id)}
                                 >
                                     Edit
                                 </button>
                                 <button 
                                     className="btn btn-danger btn-sm"
-                                    onClick={() => onDelete(item.id)}
+                                    onClick={(e) => handleDelete(e, item.id)}
                                 >
                                     Delete
                                 </button>
@@ -91,5 +107,3 @@ const Tabell = ({
 };
 
 export default Tabell;
-
-  
