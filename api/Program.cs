@@ -76,14 +76,23 @@ builder.WebHost.ConfigureKestrel((context, options) =>
 
 var app = builder.Build();
 
-// Seed the database
-await DBInit.SeedAsync(app);
+
 
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    // Seed the database
+    await DBInit.SeedAsync(app);
+    app.UseSwagger(c =>
+    {
+        c.SerializeAsV2 = false;
+    });
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Your API V1");
+        // Set Swagger UI at the root
+        c.RoutePrefix = "swagger";
+    });
 }
 else
 {

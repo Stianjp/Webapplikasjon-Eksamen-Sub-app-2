@@ -10,9 +10,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using api.DAL.Interfaces;
 
-public class ProductsController : Controller
+
+[ApiController]
+[Route("api[controller]")]
+public class ProductsAPIController : Controller
 {
     private readonly IProductRepository _productRepository;
+
+    private readonly ILogger<ProductsAPIController> _logger;
 
     // Define the list of available categories
     private readonly List<string> _availableCategories = new List<string> {
@@ -38,9 +43,11 @@ public class ProductsController : Controller
         "None"
     };
 
-    public ProductsController(IProductRepository productRepository)
+    public ProductsAPIController(IProductRepository productRepository)
     {
         _productRepository = productRepository;
+        _logger = null;
+    
     }
 
     private bool IsAdmin()
@@ -49,15 +56,19 @@ public class ProductsController : Controller
     }
 
     // GET: Products (available to all, including not logged in users)
-    [HttpGet]
+    [HttpGet("Productsindex")]
     public async Task<IActionResult> Productsindex()
     {
         var products = await _productRepository.GetAllProductsAsync();
-        return View(products);
+        if(products == null){
+            _logger.LogError("[ProductsAPIController] Products list not found while");
+            return NotFound("Products list not found");
+        }
+        return Ok(products);
     }
 
     // GET: Products/Details/{id}
-    [HttpGet]
+    [HttpGet("{id} details")]
     public async Task<IActionResult> Details(int id)
     {
         var product = await _productRepository.GetProductByIdAsync(id);
@@ -66,7 +77,7 @@ public class ProductsController : Controller
         {
             return BadRequest("Product not found");
         }
-        return View(product);
+        return Ok(product);
     }
 
 // GET: Products/Create
