@@ -1,0 +1,52 @@
+:root {
+    /* Brand Colors */
+    --primary-green: #37B24D;  /* Used in active nav, buttons and highlights */
+    --primary-green-hover: #2f9641;  /* Darker shade for hover states */
+    --secondery-blue: #34AFF7 ;
+    --secondery-blue-hover:#7ac6f2 ;
+    --other-yellow: #FFD43A;
+    --other-yellow-hover: #dcb013;
+    --danger-red: #FF6B6B; 
+    --grey-color: #788497;
+  
+  
+    /* Background Colors */
+    --bg-primary: #EDF0F7;     /* Main background */
+    --bg-sidebar: #e1ebf5;    /* Sidebar background */
+  
+    /* Text Colors */
+    --text-primary: #2D3748;   /* Main text color - dark navy */
+    --text-secondary: #718096; /* Secondary text - used in some labels */
+    --text-light: #A0AEC0;    /* Lighter text for less emphasis */
+    --text-white: #FFFFFF; /*White for buttons */
+    --text-black: #000000; /*Black color for buttons */
+  
+    /* Border Colors */
+    --border-color: #aebbcf;  /* Used for input fields, separators */
+
+    /* New border radius variables */
+    --border-radius-sm: 4px;
+    --border-radius-md: 8px;
+    --border-radius-lg: 12px;
+  
+    /* Status Colors */
+    --success-green: var(--primary-green);  /* Save/success actions */
+
+    
+    /* Component Specific */
+    --input-bg: #FFFFFF;
+    --input-border: #E2E8F0;
+    --input-focus: #37B24D;
+    --input-placeholder: #8795a7;
+    
+    /* Navigation Colors */
+    --nav-active: #37B24D;    /* Active navigation item */
+    --nav-hover: #F7FAFC;     /* Hover state for nav items */
+  
+    /* Shadow */
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05);
+
+  
+  }
+  

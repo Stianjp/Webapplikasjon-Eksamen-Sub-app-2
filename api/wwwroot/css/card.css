@@ -1,0 +1,36 @@
+/* Card component style */
+
+.card {
+    height: auto;
+    margin-bottom: 30px;
+    border-radius: 0.5rem;
+    background-color: var(--bg-sidebar);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+}
+
+.card-title {
+    font-size: 1.5rem;
+    font-weight: 500;
+}
+
+.form-control:focus {
+    box-shadow: none;
+    border-color: var(--input-focus);
+}
+
+
+.alert ul {
+    margin-bottom: 0;
+    padding-left: 20px; /* Indents list items */
+}
+
+@media (max-width: 767.98px) {
+    .card-title {
+        font-size: 1.25rem;
+    }
+
+    .container {
+        padding: 10px; /* Adds padding for mobile */
+    }
+}
