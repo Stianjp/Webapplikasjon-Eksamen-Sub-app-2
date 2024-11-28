@@ -42,11 +42,10 @@ public class Product
 
     public string? Allergens { get; set; }
 
-    // Foreign Key to the producer
-    [Required]
-    [ForeignKey("Producer")]
-    public string? ProducerId { get; set; }
+    // Foreign Key to the producer (nullable)
+    public string? ProducerId { get; set; } // Nullable foreign key
 
-    // Remove [Required] attribute from Producer
+    // Navigation property for producer
+    [ForeignKey(nameof(ProducerId))]
     public IdentityUser? Producer { get; set; }
 }

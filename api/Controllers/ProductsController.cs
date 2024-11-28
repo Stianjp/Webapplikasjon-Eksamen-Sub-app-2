@@ -1,4 +1,4 @@
-namespace api.Controllers;
+namespace Sub_App_1.Controllers;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,14 +10,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using api.DAL.Interfaces;
 
-
-[ApiController]
-[Route("api[controller]")]
-public class ProductsAPIController : Controller
+public class ProductsController : Controller
 {
     private readonly IProductRepository _productRepository;
-
-    private readonly ILogger<ProductsAPIController> _logger;
 
     // Define the list of available categories
     private readonly List<string> _availableCategories = new List<string> {
@@ -43,95 +38,180 @@ public class ProductsAPIController : Controller
         "None"
     };
 
-    public ProductsAPIController(IProductRepository productRepository)
+    public ProductsController(IProductRepository productRepository)
     {
         _productRepository = productRepository;
-        _logger = _logger;
-    
     }
+
 
     private bool IsAdmin()
     {
-        return User.IsInRole(UserRoles.Administrator);
+        return User?.IsInRole(UserRoles.Administrator) ?? false;
     }
 
+
     // GET: Products (available to all, including not logged in users)
-    [HttpGet("Productsindex")]
     public async Task<IActionResult> Productsindex()
     {
         var products = await _productRepository.GetAllProductsAsync();
-        if(products == null){
-            _logger.LogError("[ProductsAPIController] Products list not found while");
-            return NotFound("Products list not found");
-        }
-        return Ok(products);
+        return View(products);
     }
 
     // GET: Products/Details/{id}
-    [HttpGet("{id} details")]
     public async Task<IActionResult> Details(int id)
     {
         var product = await _productRepository.GetProductByIdAsync(id);
 
         if (product == null)
         {
-            return BadRequest("Product not found");
+            return NotFound();
         }
-        return Ok(product);
+        return View(product);
+    }
+    // GET: Products/Create
+    [Authorize(Roles = UserRoles.FoodProducer + "," + UserRoles.Administrator)]
+    public IActionResult Create()
+    {
+        ViewBag.AllergenOptions = _availableAllergens;
+        ViewBag.CategoryOptions = _availableCategories;
+        var viewModel = new ProductFormViewModel
+        {
+            ProducerId = User.FindFirstValue(ClaimTypes.NameIdentifier)
+        };
+        return View(viewModel);
     }
 
-// GET: Products/Create
-[HttpPost]
-[Authorize(Roles = UserRoles.FoodProducer + "," + UserRoles.Administrator)]
-public IActionResult Create()
-{
-    ViewBag.AllergenOptions = _availableAllergens;
-    ViewBag.CategoryOptions = _availableCategories;
-    var viewModel = new ProductFormViewModel
+
+    // POST: Products/Create
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize(Roles = UserRoles.FoodProducer + "," + UserRoles.Administrator)]
+    public async Task<IActionResult> Create(ProductFormViewModel viewModel)
     {
-        ProducerId = User.FindFirstValue(ClaimTypes.NameIdentifier)
-    };
-    return View(viewModel);
-}
-
-
-// POST: Products/Create
-[HttpPost]
-[ValidateAntiForgeryToken]
-[Authorize(Roles = UserRoles.FoodProducer + "," + UserRoles.Administrator)]
-public async Task<IActionResult> Create(ProductFormViewModel viewModel)
-{
-    try
-    {
-        viewModel.ProducerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        if (string.IsNullOrEmpty(viewModel.ProducerId))
+        try
         {
-            return BadRequest("Producer ID is invalid.");
+            viewModel.ProducerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(viewModel.ProducerId))
+            {
+                TempData["ErrorMessage"] = "Unable to determine your producer account. Please log in again.";
+                return RedirectToAction("Index");
+            }
+
+            // Handle CategoryList
+            if (viewModel.CategoryList == null || !viewModel.CategoryList.Any())
+            {
+                ModelState.AddModelError("CategoryList", "Please select at least one category.");
+                ViewBag.AllergenOptions = _availableAllergens;
+                ViewBag.CategoryOptions = _availableCategories;
+                return View(viewModel);
+            }
+
+            if (ModelState.IsValid)
+            {
+                var product = viewModel.ToProduct();
+                await _productRepository.CreateProductAsync(product);
+                return RedirectToAction(nameof(Productsindex));
+            }
+
+            // Log ModelState errors
+            foreach (var modelState in ModelState.Values)
+            {
+                foreach (var error in modelState.Errors)
+                {
+                    Console.WriteLine("ModelState Error: " + error.ErrorMessage);
+                }
+            }
+
+            ViewBag.AllergenOptions = _availableAllergens;
+            ViewBag.CategoryOptions = _availableCategories;
+            return View(viewModel);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex}");
+            ModelState.AddModelError("", "An error occurred while creating the product.");
+            ViewBag.AllergenOptions = _availableAllergens;
+            ViewBag.CategoryOptions = _availableCategories;
+            return View(viewModel);
+        }
+    }
+
+    // GET: Products/Edit/{id}
+    [Authorize(Roles = UserRoles.FoodProducer + "," + UserRoles.Administrator)]
+    public async Task<IActionResult> Edit(int id)
+    {
+        var product = await _productRepository.GetProductByIdAsync(id);
+
+        if (product == null)
+        {
+            return NotFound();
+        }
+
+        if (!IsAdmin() && product.ProducerId != User.FindFirstValue(ClaimTypes.NameIdentifier))
+        {
+            return Forbid();
+        }
+
+        var viewModel = ProductFormViewModel.FromProduct(product);
+        ViewBag.AllergenOptions = _availableAllergens;
+        ViewBag.CategoryOptions = _availableCategories;
+        return View(viewModel);
+    }
+
+    // POST: Products/Edit/{id}
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize(Roles = UserRoles.FoodProducer + "," + UserRoles.Administrator)]
+    public async Task<IActionResult> Edit(int id, ProductFormViewModel viewModel)
+    {
+        if (id != viewModel.Id)
+        {
+            return BadRequest();
+        }
+
+        var product = await _productRepository.GetProductByIdAsync(id);
+
+        if (product == null)
+        {
+            return NotFound();
+        }
+
+        if (!IsAdmin() && product.ProducerId != User.FindFirstValue(ClaimTypes.NameIdentifier))
+        {
+            return Forbid();
         }
 
         // Handle CategoryList
         if (viewModel.CategoryList == null || !viewModel.CategoryList.Any())
         {
             ModelState.AddModelError("CategoryList", "Please select at least one category.");
-             ViewBag.AllergenOptions = _availableAllergens;
+            ViewBag.AllergenOptions = _availableAllergens;
             ViewBag.CategoryOptions = _availableCategories;
             return View(viewModel);
         }
 
         if (ModelState.IsValid)
         {
-            var product = viewModel.ToProduct();
-            await _productRepository.CreateProductAsync(product);
-            return RedirectToAction(nameof(Productsindex));
-        }
-
-        // Log ModelState errors
-        foreach (var modelState in ModelState.Values)
-        {
-            foreach (var error in modelState.Errors)
+            try
             {
-                Console.WriteLine("ModelState Error: " + error.ErrorMessage);
+                viewModel.UpdateProduct(product);
+                await _productRepository.UpdateProductAsync(product);
+                return RedirectToAction(nameof(Productsindex));
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (await _productRepository.GetProductByIdAsync(id) == null)
+                {
+                    return NotFound();
+                }
+                throw;
+            }
+            catch (Exception ex)
+            {
+                // Log the error
+                Console.WriteLine($"Error updating product: {ex}");
+                ModelState.AddModelError("", "An error occurred while updating the product.");
             }
         }
 
@@ -139,102 +219,9 @@ public async Task<IActionResult> Create(ProductFormViewModel viewModel)
         ViewBag.CategoryOptions = _availableCategories;
         return View(viewModel);
     }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Error: {ex}");
-        ModelState.AddModelError("", "An error occurred while creating the product.");
-        ViewBag.AllergenOptions = _availableAllergens;
-        ViewBag.CategoryOptions = _availableCategories;
-        return View(viewModel);
-    }
-}
-
-// GET: Products/Edit/{id}
-[HttpGet("Edit")]
-[Authorize(Roles = UserRoles.FoodProducer + "," + UserRoles.Administrator)]
-public async Task<IActionResult> Edit(int id)
-{
-    var product = await _productRepository.GetProductByIdAsync(id);
-
-    if (product == null)
-    {
-        return NotFound();
-    }
-
-    if (!IsAdmin() && product.ProducerId != User.FindFirstValue(ClaimTypes.NameIdentifier))
-    {
-        return Forbid();
-    }
-
-    var viewModel = ProductFormViewModel.FromProduct(product);
-    ViewBag.AllergenOptions = _availableAllergens;
-    ViewBag.CategoryOptions = _availableCategories;
-    return View(viewModel);
-}
-
-// POST: Products/Edit/{id}
-[HttpPost("Update")]
-[ValidateAntiForgeryToken]
-[Authorize(Roles = UserRoles.FoodProducer + "," + UserRoles.Administrator)]
-public async Task<IActionResult> Edit(int id, ProductFormViewModel viewModel)
-{
-    if (id != viewModel.Id)
-    {
-        return BadRequest();
-    }
-
-    var product = await _productRepository.GetProductByIdAsync(id);
-
-    if (product == null)
-    {
-        return NotFound();
-    }
-
-    if (!IsAdmin() && product.ProducerId != User.FindFirstValue(ClaimTypes.NameIdentifier))
-    {
-        return Forbid();
-    }
-
-    // Handle CategoryList
-    if (viewModel.CategoryList == null || !viewModel.CategoryList.Any())
-    {
-        ModelState.AddModelError("CategoryList", "Please select at least one category.");
-        ViewBag.AllergenOptions = _availableAllergens;
-        ViewBag.CategoryOptions = _availableCategories;
-        return View(viewModel);
-    }
-
-    if (ModelState.IsValid)
-    {
-        try
-        {
-            viewModel.UpdateProduct(product);
-            await _productRepository.UpdateProductAsync(product);
-            return RedirectToAction(nameof(Productsindex));
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            if (await _productRepository.GetProductByIdAsync(id) == null)
-            {
-                return NotFound();
-            }
-            throw;
-        }
-        catch (Exception ex)
-        {
-            // Log the error
-            Console.WriteLine($"Error updating product: {ex}");
-            ModelState.AddModelError("", "An error occurred while updating the product.");
-        }
-    }
-
-    ViewBag.AllergenOptions = _availableAllergens;
-    ViewBag.CategoryOptions = _availableCategories;
-    return View(viewModel);
-}
 
 
-    [HttpGet("GetDelete")]
+
     // GET: Products/Delete/{id} (only FoodProducers and Admins can delete products)
     [Authorize(Roles = UserRoles.FoodProducer + "," + UserRoles.Administrator)]
     public async Task<IActionResult> Delete(int id)
@@ -254,7 +241,7 @@ public async Task<IActionResult> Edit(int id, ProductFormViewModel viewModel)
     }
 
     // POST: Products/Delete/{id}
-    [HttpPost("{id} Delete")]
+    [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
     [Authorize(Roles = UserRoles.FoodProducer + "," + UserRoles.Administrator)]
     public async Task<IActionResult> DeleteConfirmed(int id)
@@ -311,7 +298,6 @@ public async Task<IActionResult> Edit(int id, ProductFormViewModel viewModel)
         return writer.ToString();
     }
 
-    [HttpGet("Index")]
     // GET: Products/Index with sorting functionality
     public async Task<IActionResult> Index(string sortOrder, string currentSort, string sortDirection)
     {
@@ -358,7 +344,6 @@ public async Task<IActionResult> Edit(int id, ProductFormViewModel viewModel)
         return View("ProductsIndex", productsQuery.ToList());
     }
 
-    [HttpGet("UserProducts")]
     // GET: Products/UserProducts
     [Authorize(Roles = UserRoles.FoodProducer + "," + UserRoles.Administrator)]
     public async Task<IActionResult> UserProducts(string category)

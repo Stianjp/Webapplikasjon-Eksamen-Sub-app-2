@@ -68,7 +68,7 @@ public class AccountController : Controller {
         }
 
         // Prevent the use of the username "Admin" and similar
-        var reservedUsernames = new[] { "Admin", "Administrator", "Superuser", "Root" }; // reserved usernames
+        var reservedUsernames = new[] { "Admin", "Administrator", "Superuser", "Root", "Default_Producer" }; // reserved usernames
         if (reservedUsernames.Contains(username, StringComparer.OrdinalIgnoreCase)) {
             ModelState.AddModelError(string.Empty, "The username is reserved and cannot be used.");
             return View("Index", ModelState);
