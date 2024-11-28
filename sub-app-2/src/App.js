@@ -8,6 +8,7 @@ import DeleteProduct from './Products/DeleteProduct';
 import ProductDetails from './Products/ProductDetails';
 import Account from './Home/Account';
 import Privacy from './Home/Privacy';
+import AdminUsers from './admin/AdminUsers';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './styles/App.css';
 
@@ -27,6 +28,7 @@ function App() {
             <Route path="/edit-product/:id" element={<CreateProduct />} /> {/* We gona reuse CreateProduct for editing no need for new component, still need to make the logic for it */}
             <Route path="/delete-product/:id" element={<DeleteProduct />} /> {/*Needs to create a new ProductDelet component*/}
             <Route path="/account" element={<Account />} />
+            <Route path='/admin/users' element={<AdminUsers />} />
             <Route path="/privacy" element={<Privacy />} />
           </Routes>
       </main>
