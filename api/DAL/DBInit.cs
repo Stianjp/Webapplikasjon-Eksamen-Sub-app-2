@@ -5,8 +5,16 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Identity;
 using api.Models;
 
+/// <summary>
+/// Provides database initialization and seeding logic, including roles, users, and sample products.
+/// </summary>
 public static class DBInit
 {
+    /// <summary>
+    /// Seeds the database with roles, admin users, a default producer, and sample products.
+    /// </summary>
+    /// <param name="app">The application builder to create a service scope.</param>
+    /// <returns>A task representing the asynchronous seeding operation.</returns>
     public static async Task SeedAsync(IApplicationBuilder app)
     {
         try
@@ -15,7 +23,7 @@ public static class DBInit
             var context = serviceScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             var roleManager = serviceScope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             var userManager = serviceScope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
-            
+
             context.Database.EnsureCreated();
 
             // Seed roles and admin user
@@ -82,6 +90,11 @@ public static class DBInit
         }
     }
 
+    /// <summary>
+    /// Ensures the required roles exist in the system.
+    /// </summary>
+    /// <param name="roleManager">The role manager to manage roles.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
     private static async Task EnsureRolesExistAsync(RoleManager<IdentityRole> roleManager)
     {
         var roles = new[] { UserRoles.RegularUser, UserRoles.FoodProducer, UserRoles.Administrator };
@@ -95,6 +108,11 @@ public static class DBInit
         }
     }
 
+    /// <summary>
+    /// Ensures an admin user exists in the system.
+    /// </summary>
+    /// <param name="userManager">The user manager to manage users.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
     private static async Task EnsureAdminUserExistsAsync(UserManager<IdentityUser> userManager)
     {
         var adminUser = await userManager.FindByNameAsync("Admin");
@@ -126,6 +144,11 @@ public static class DBInit
         }
     }
 
+    /// <summary>
+    /// Ensures a default producer user exists in the system.
+    /// </summary>
+    /// <param name="userManager">The user manager to manage users.</param>
+    /// <returns>The default producer user.</returns>
     private static async Task<IdentityUser> EnsureDefaultProducerExistsAsync(UserManager<IdentityUser> userManager)
     {
         var producerUsername = "Default_Producer";

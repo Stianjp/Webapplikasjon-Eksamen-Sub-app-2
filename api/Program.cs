@@ -8,9 +8,15 @@ using api.DAL.Interfaces;
 using api.DAL.Repositories;
 using System.Text;
 
+/// <summary>
+/// Configures and runs the application.
+/// </summary>
 var builder = WebApplication.CreateBuilder(args);
 
-// Use Serilog for logging
+// Configure Serilog logging
+/// <summary>
+/// Sets up Serilog for logging, including configuration from appsettings.json and output to the console.
+/// </summary>
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
@@ -23,7 +29,9 @@ builder.Host.UseSerilog((context, services, configuration) => configuration
     .Enrich.FromLogContext()
     .WriteTo.Console());
 
-// Add services to the container
+/// <summary>
+/// Adds essential services to the container, including controllers, JSON options, Swagger, and Identity services.
+/// </summary>
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -31,15 +39,21 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.WriteIndented = true; // Pretty JSON
     });
 
-// Swagger
+/// <summary>
+/// Configures Swagger for API documentation.
+/// </summary>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Add ApplicationDbContext
+/// <summary>
+/// Adds the application database context using SQLite as the database provider.
+/// </summary>
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Register Identity services
+/// <summary>
+/// Configures ASP.NET Core Identity with custom password requirements.
+/// </summary>
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 {
     options.Password.RequireDigit = true;
@@ -51,7 +65,9 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
 
-// Add JWT Authentication
+/// <summary>
+/// Configures JWT authentication with token validation parameters.
+/// </summary>
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -67,11 +83,15 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-// Register repositories
+/// <summary>
+/// Registers the repository interfaces with their implementations.
+/// </summary>
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
-// Add CORS Policy
+/// <summary>
+/// Configures CORS policies to allow specific origins for the React frontend.
+/// </summary>
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("ReactCorsPolicy", policy =>
@@ -84,7 +104,9 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Ensure database creation and seed data
+/// <summary>
+/// Ensures database creation and seeds initial data.
+/// </summary>
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
@@ -92,7 +114,9 @@ using (var scope = app.Services.CreateScope())
     await DBInit.SeedAsync(app);
 }
 
-// Configure middleware
+/// <summary>
+/// Configures middleware for development and production environments.
+/// </summary>
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -104,12 +128,25 @@ else
     app.UseHsts();
 }
 
+/// <summary>
+/// Configures middleware for routing, CORS, authentication, and authorization.
+/// </summary>
 app.UseRouting();
 app.UseCors("ReactCorsPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
+
+/// <summary>
+/// Maps controller routes.
+/// </summary>
 app.MapControllers();
 
+/// <summary>
+/// Ensures Serilog flushes logs on application stop.
+/// </summary>
 app.Lifetime.ApplicationStopped.Register(Log.CloseAndFlush);
 
+/// <summary>
+/// Runs the application.
+/// </summary>
 app.Run();
