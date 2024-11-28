@@ -43,6 +43,8 @@ To test the application, the following default accounts are available:
 - Username: Default_Producer
 - Password: OsloMet2024
 
+However, you are able to create/register your own account(s) aswell!
+
 ## Related Projects
 
 The corresponding Sub-App-1 repository can be found here:
