@@ -7,9 +7,10 @@ using api.Models;
 public class ApplicationDbContext : IdentityDbContext
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-     : base(options) { 
-        Database.EnsureCreated(); // Makes sure of that the database is created
-     }
+     : base(options)
+    {
+        Database.EnsureCreated();
+    }
 
     public DbSet<Product> Products { get; set; }
 
