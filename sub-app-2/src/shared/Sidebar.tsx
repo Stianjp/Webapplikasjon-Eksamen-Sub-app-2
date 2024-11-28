@@ -12,6 +12,7 @@ import LogoGreen from '../icons/LogoGreen.svg';
 import AccountGear from '../icons/gear-solid.svg';
 import MyAccount from '../icons/gauge-solid.svg';
 import Logout from '../icons/right-to-bracket-solid.svg';
+import { FaUsersCog } from "react-icons/fa";
 
 const Sidebar: React.FC = () => {
   const [open, setOpen] = useState(false); // State for toggling the navbar on small screens
@@ -51,6 +52,9 @@ const Sidebar: React.FC = () => {
             </Nav.Link>
             <Nav.Link as={Link} to="/privacy" className="border-bottom p-2">
               <img src={EyeSolid} alt="Privacy" className="icon" /> Privacy
+            </Nav.Link>
+            <Nav.Link as={Link} to="/admin/users" className='border-bottom p-2'><FaUsersCog className='icon' />
+                Admin
             </Nav.Link>
             <Nav.Link as={Link} to="/logout" className="text-danger p-3">
               <img src={Logout} alt="Logout" className="icon" /> Logout
@@ -104,6 +108,8 @@ const Sidebar: React.FC = () => {
               <NavDropdown.Item as={Link} to="/privacy">
                 <img src={EyeSolid} alt="Privacy" className="icon" /> Privacy
               </NavDropdown.Item>
+              <NavDropdown.Item as={Link} to="/admin/users"><FaUsersCog className='icon'></FaUsersCog>
+                Admin</NavDropdown.Item>
             </NavDropdown>
           <div className="logout-button mt-auto p-3 border-top">
             <button className="btn btn-danger d-flex align-items-center w-100">
