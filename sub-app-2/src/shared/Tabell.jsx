@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Table } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 
-// Makes a dynamic tabell that can be used on other pages
+// Makes a dynamic tabell that can be used on other pages, 
 const Tabell = ({ 
     products, 
     apiUrl,
@@ -39,16 +39,18 @@ const Tabell = ({
 
     const handleEdit = (e, productId) => {
         e.stopPropagation();
-        navigate(`/edit-product/${productId}`);
+        navigate(`/edit-product/${productId}`);// Ved å legge til $ kan vi forsikre at den trykker basert på innlogget bruker
     };
+    
 
     const handleDelete = (e, productId) => {
         e.stopPropagation();
-        navigate(`/delete-product/${productId}`);
+        navigate(`/delete-product/${productId}`);// Ved å legge til $ kan vi forsikre at den trykker basert på innlogget bruker
     };
 
+
     const handleRowClick = (productId) => {
-        navigate(`/product-details/${productId}`);
+        navigate(`/product-details/${productId}`); // Ved å legge til $ kan vi forsikre at den trykker basert på innlogget bruker
     };
 
     return (

@@ -1,0 +1,1 @@
+import { mockProducts, API_URL } from './mockDataProducts';
