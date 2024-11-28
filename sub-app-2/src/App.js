@@ -4,6 +4,8 @@ import Home from './Home/Home';
 import ProductPage from './Products/ProductPage';
 import MyProducts from './Products/MyProducts';
 import CreateProduct from './Products/CreateProduct';
+import DeleteProduct from './Products/DeleteProduct';
+import DeleteProduct from './Products/ProductDetails';
 import Account from './Home/Account';
 import Privacy from './Home/Privacy';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -21,6 +23,9 @@ function App() {
             <Route path="/products" element={<ProductPage />} />
             <Route path="/products/my" element={<MyProducts />} />
             <Route path="/products/add" element={<CreateProduct />} />
+            <Route path="/product-details/:id" element={<ProductDetails />} /> {/* id means its based on userRole, will show you buttons to edit or delet product like in sub-app-1*/}
+            <Route path="/edit-product/:id" element={<CreateProduct />} /> {/* We gona reuse CreateProduct for editing no need for new component, still need to make the logic for it */}
+            <Route path="/delete-product/:id" element={<DeleteProduct />} /> {/*Needs to create a new ProductDelet component*/}
             <Route path="/account" element={<Account />} />
             <Route path="/privacy" element={<Privacy />} />
           </Routes>
