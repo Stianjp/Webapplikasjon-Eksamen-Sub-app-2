@@ -2,7 +2,6 @@
 .navbar {
   height: auto; /* Adjust height for both navbar and sidebar */
 }
-
 .navbar-nav .nav-link {
   text-align: left;
   font-size: 1rem;
