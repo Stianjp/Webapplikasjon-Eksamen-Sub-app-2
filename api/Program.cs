@@ -24,7 +24,7 @@ builder.Host.UseSerilog((context, services, configuration) => configuration
     .WriteTo.Console());
 
 // Add services to the container
-builder.Services.AddControllers()
+builder.Services.AddControllers() // Only use controllers
     .AddNewtonsoftJson(options =>
     {
         options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
@@ -32,7 +32,7 @@ builder.Services.AddControllers()
 
 // Add ApplicationDbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection") + ";Cache=Shared"));
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection") + ";Cache=Shared"), ServiceLifetime.Scoped);
 
 // Register Identity services
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
@@ -90,17 +90,15 @@ builder.WebHost.ConfigureKestrel((context, options) =>
 
 var app = builder.Build();
 
-// Ensure the database is created
+// Ensure the database is created and seeded
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     context.Database.EnsureCreated();
+    await DBInit.SeedAsync(app);
 }
 
-// Seed the database
-await DBInit.SeedAsync(app);
-
-// Configure the HTTP request pipeline
+// Configure middleware
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -109,19 +107,17 @@ if (app.Environment.IsDevelopment())
 else
 {
     app.UseExceptionHandler("/Home/Error");
-    app.UseHsts(); // Force HTTPS
+    app.UseHsts();
 }
 
+// testing
+//app.UseHttpsRedirection(); 
 
-app.UseHttpsRedirection();
-app.UseStaticFiles();
-app.UseRouting();
-app.UseCors("ReactCorsPolicy"); // Enable CORS for React
-app.UseAuthentication(); // Add authentication middleware
-app.UseAuthorization();
-
-// Map API controllers
-app.MapControllers();
+app.UseRouting(); // Enables routing for API endpoints
+app.UseCors("ReactCorsPolicy"); // Apply CORS policy
+app.UseAuthentication(); // Handles JWT or other authentication
+app.UseAuthorization(); // Enforces authorization policies
+app.MapControllers(); // Maps attributes [Route] or [HttpGet] to API endpoints
 
 // Ensure proper logging cleanup
 app.Lifetime.ApplicationStopped.Register(Log.CloseAndFlush);

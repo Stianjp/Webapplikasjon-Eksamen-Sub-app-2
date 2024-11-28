@@ -1,153 +1,93 @@
 namespace api.Controllers;
 
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using api.Models;
 
 [Authorize(Roles = UserRoles.Administrator)]
-public class AdminController : Controller {
+[Route("api/[controller]")]
+[ApiController]
+public class AdminController : ControllerBase
+{
     private readonly UserManager<IdentityUser> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
 
-    public AdminController(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager) {
+    public AdminController(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
+    {
         _userManager = userManager;
         _roleManager = roleManager;
     }
 
-    // GET /Admin/UserManager
-    public async Task<IActionResult> UserManager() {
+    // GET: api/Admin/UserManager
+    [HttpGet("usermanager")]
+    public async Task<IActionResult> GetUsers()
+    {
         var users = _userManager.Users.ToList();
         var userWithRoles = new List<UserWithRolesViewModel>();
 
-        foreach (var user in users) {
-            if (user.UserName != null){
-                var roles = await _userManager.GetRolesAsync(user);
-                userWithRoles.Add(new UserWithRolesViewModel {
+        foreach (var user in users)
+        {
+            var roles = await _userManager.GetRolesAsync(user);
+            userWithRoles.Add(new UserWithRolesViewModel
+            {
                 UserId = user.Id,
-                Username = user.UserName,
+                Username = user.UserName ?? string.Empty,
                 Roles = roles
             });
-
-            }
-          
         }
 
-        return View(userWithRoles); // pass the list of users with their roles to the view
+        return Ok(userWithRoles);
     }
 
-    // GET /Admin/EditUser/{id}
-   
-    public async Task<IActionResult> EditUser(string id) 
+    // GET: api/Admin/EditUser/{id}
+    [HttpGet("edituser/{id}")]
+    public async Task<IActionResult> GetUser(string id)
     {
-    var user = await _userManager.FindByIdAsync(id);
-    if (user == null) 
-    {
-        return NotFound();
-    }
+        var user = await _userManager.FindByIdAsync(id);
+        if (user == null) return NotFound(new { message = "User not found." });
 
-    // Handle potential null username
-    string userName;
-    if (user.UserName == null)
-    {
-        userName = string.Empty;
-    }
-    else
-    {
-        userName = user.UserName;
-    }
+        var roles = await _userManager.GetRolesAsync(user);
 
-    // Get and convert roles to list
-    var roles = await _userManager.GetRolesAsync(user);
-    var rolesList = roles.ToList();
-
-    var model = new UserWithRolesViewModel {
-        UserId = user.Id,
-        Username = userName,
-        Roles = rolesList
-    };
-
-    // Handle potential null role names in ViewBag
-    var allRoles = new List<string>();
-    foreach (var role in _roleManager.Roles)
-    {
-        if (role.Name != null)
+        var model = new UserWithRolesViewModel
         {
-            allRoles.Add(role.Name);
-        }
-    }
-    ViewBag.AllRoles = allRoles;
+            UserId = user.Id,
+            Username = user.UserName ?? string.Empty,
+            Roles = roles.ToList()
+        };
 
-    return View(model); 
+        var allRoles = _roleManager.Roles.Select(r => r.Name).Where(r => r != null).ToList();
+
+        return Ok(new { user = model, allRoles });
     }
 
-    // POST /Admin/EditUser
-    [HttpPost]
-    public async Task<IActionResult> EditUser(UserWithRolesViewModel model, List<string> roles) {
+    // PUT: api/Admin/EditUser
+    [HttpPut("edituser")]
+    public async Task<IActionResult> UpdateUserRoles([FromBody] UserWithRolesViewModel model)
+    {
         var user = await _userManager.FindByIdAsync(model.UserId);
-        if (user == null) {
-            return NotFound();
-        }
+        if (user == null) return NotFound(new { message = "User not found." });
 
         var currentRoles = await _userManager.GetRolesAsync(user);
-        var result = await _userManager.RemoveFromRolesAsync(user, currentRoles);
+        var removeResult = await _userManager.RemoveFromRolesAsync(user, currentRoles);
+        if (!removeResult.Succeeded) return BadRequest(new { message = "Error removing user roles." });
 
-        if (!result.Succeeded) {
-            ViewBag.Error = "Error removing user roles.";
-            return View(model);
-        }
+        var addResult = await _userManager.AddToRolesAsync(user, model.Roles);
+        if (!addResult.Succeeded) return BadRequest(new { message = "Error adding roles to user." });
 
-        result = await _userManager.AddToRolesAsync(user, roles);
-
-        if (!result.Succeeded) {
-            ViewBag.Error = "Error adding roles.";
-            return View(model);
-        }
-        ViewBag.Message = "User roles updated successfully!";
-        return RedirectToAction("UserManager");
+        return Ok(new { message = "User roles updated successfully!" });
     }
 
-    // POST /Admin/DeleteUser/{id}
-    public async Task<IActionResult> DeleteUser(string id) {
+    // DELETE: api/Admin/DeleteUser/{id}
+    [HttpDelete("deleteuser/{id}")]
+    public async Task<IActionResult> DeleteUser(string id)
+    {
         var user = await _userManager.FindByIdAsync(id);
-        if (user == null) {
-            return NotFound();
-        }
+        if (user == null) return NotFound(new { message = "User not found." });
 
         var result = await _userManager.DeleteAsync(user);
-        if (result.Succeeded) {
-            ViewBag.Message = "User deleted successfully!";
-        } else {
-            ViewBag.Error = "Error deleting user.";
-        }
+        if (!result.Succeeded) return BadRequest(new { message = "Error deleting user." });
 
-        return RedirectToAction("UserManager");
+        return Ok(new { message = "User deleted successfully!" });
     }
-     // POST /Admin/DeleteUser
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> DeleteUserConfirmed(string id)
-    {
-    if (string.IsNullOrEmpty(id))
-    {
-        TempData["Error"] = "Invalid user ID.";
-        return RedirectToAction("UserManager");
-    }
-
-    var user = await _userManager.FindByIdAsync(id);
-    if (user == null)
-    {
-        return NotFound(); // Handle null user here
-    }
-
-    var result = await _userManager.DeleteAsync(user);
-    if (result == null || !result.Succeeded)
-    {
-        TempData["Error"] = result == null ? "An unexpected error occurred." : "Error deleting user.";
-        return RedirectToAction("UserManager");
-    }
-
-    TempData["Message"] = "User deleted successfully!";
-    return RedirectToAction("UserManager");
-}
 }
