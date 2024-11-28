@@ -24,15 +24,17 @@ builder.Host.UseSerilog((context, services, configuration) => configuration
     .WriteTo.Console());
 
 // Add services to the container
-builder.Services.AddControllers() // Only use controllers
-    .AddNewtonsoftJson(options =>
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
     {
-        options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+        options.JsonSerializerOptions.WriteIndented = true; // Pretty JSON
     });
+
 
 // Add ApplicationDbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection") + ";Cache=Shared"), ServiceLifetime.Scoped);
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Register Identity services
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
@@ -42,29 +44,25 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
     options.Password.RequireNonAlphanumeric = false;
     options.Password.RequireUppercase = true;
     options.Password.RequiredLength = 8;
-    options.Password.RequiredUniqueChars = 1;
 })
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
 
 // Add JWT Authentication
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
     {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
-        ValidAudience = builder.Configuration["JWT:ValidAudience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
-    };
-});
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
+            ValidAudience = builder.Configuration["JWT:ValidAudience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
+        };
+    });
 
 // Register repositories
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
@@ -75,22 +73,15 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("ReactCorsPolicy", policy =>
     {
-        policy.WithOrigins(builder.Configuration["CORS:AllowedOrigins"]
-                            .Split(',', StringSplitOptions.RemoveEmptyEntries))
+        policy.WithOrigins(builder.Configuration["CORS:AllowedOrigins"].Split(','))
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
 });
 
-// Configure Kestrel
-builder.WebHost.ConfigureKestrel((context, options) =>
-{
-    options.Configure(context.Configuration.GetSection("Kestrel"));
-});
-
 var app = builder.Build();
 
-// Ensure the database is created and seeded
+// Ensure database creation and seed data
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
@@ -110,16 +101,12 @@ else
     app.UseHsts();
 }
 
-// testing
-//app.UseHttpsRedirection(); 
+app.UseRouting();
+app.UseCors("ReactCorsPolicy");
+app.UseAuthentication();
+app.UseAuthorization();
+app.MapControllers();
 
-app.UseRouting(); // Enables routing for API endpoints
-app.UseCors("ReactCorsPolicy"); // Apply CORS policy
-app.UseAuthentication(); // Handles JWT or other authentication
-app.UseAuthorization(); // Enforces authorization policies
-app.MapControllers(); // Maps attributes [Route] or [HttpGet] to API endpoints
-
-// Ensure proper logging cleanup
 app.Lifetime.ApplicationStopped.Register(Log.CloseAndFlush);
 
 app.Run();

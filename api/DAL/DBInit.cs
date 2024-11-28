@@ -15,7 +15,7 @@ public static class DBInit
             var context = serviceScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             var roleManager = serviceScope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             var userManager = serviceScope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
-
+            
             context.Database.EnsureCreated();
 
             // Seed roles and admin user
@@ -73,13 +73,12 @@ public static class DBInit
                 };
 
                 context.Products.AddRange(products);
-                context.SaveChanges();
+                await context.SaveChangesAsync();
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"An error occurred during seeding: {ex.Message}");
-            throw;
         }
     }
 
@@ -98,14 +97,13 @@ public static class DBInit
 
     private static async Task EnsureAdminUserExistsAsync(UserManager<IdentityUser> userManager)
     {
-        var adminUsername = "Admin";
-        var adminUser = await userManager.FindByNameAsync(adminUsername);
+        var adminUser = await userManager.FindByNameAsync("Admin");
 
         if (adminUser == null)
         {
             adminUser = new IdentityUser
             {
-                UserName = adminUsername,
+                UserName = "Admin",
             };
 
             var result = await userManager.CreateAsync(adminUser, "OsloMet2024");
