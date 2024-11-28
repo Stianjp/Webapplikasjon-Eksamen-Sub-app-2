@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Form } from 'react-bootstrap';
 import Tabell from '../shared/Tabell';
-
-const API_URL = 'http://localhost:?'; // Replace with your actual URL
+import { mockProducts, API_URL } from './mockDataProducts';
 
 const ProductsPage = () => {
-    const [products, setProducts] = useState([]);
+    const [products, setProducts] = useState(mockProducts); // Initialize with mock data
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
@@ -16,6 +15,8 @@ const ProductsPage = () => {
     const currentUserId = "123"; // Replace with actual user ID
 
     const fetchProducts = async () => {
+        // Comment out the API fetch for now and use mock data
+        /* 
         setLoading(true);
         setError(null);
 
@@ -32,10 +33,12 @@ const ProductsPage = () => {
         } finally {
             setLoading(false);
         }
+        */
     };
 
     useEffect(() => {
-        fetchProducts();
+        // Uncomment this when ready to use real API
+        // fetchProducts();
     }, []);
 
     // Filter products based on search query

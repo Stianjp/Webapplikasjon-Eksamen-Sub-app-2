@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Form } from 'react-bootstrap';
 import Tabell from '../shared/Tabell';
-
+import { mockProducts, API_URL } from './mockDataProducts';
 
 const MyProducts = () => {
-    const [products, setProducts] = useState([]);
+    // Initialize with filtered mock data for current user
+    const currentUserId = "123";
+    const initialProducts = mockProducts.filter(p => p.producerId === currentUserId);
+    
+    const [products, setProducts] = useState(initialProducts);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
-
-    // Dette bør komme fra din auth context/service
-    const currentUserId = "123"; // Replace with actual logged-in user ID bør gjøres i backend?
 
     // Filter products based on search query
     const filteredProducts = products.filter(product =>
@@ -19,11 +20,13 @@ const MyProducts = () => {
     );
     
     const fetchMyProducts = async () => {
+        // Comment out API fetch for now and use mock data
+        /* 
         setLoading(true);
         setError(null);
 
         try {
-            const response = await fetch(`${API_URL}/api/itemapi/myitems/${currentUserId}`); // Baserer seg på at man har et eget endpoint i apien som gir brukeren egen produkter ut
+            const response = await fetch(`${API_URL}/api/itemapi/myitems/${currentUserId}`);
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
@@ -35,16 +38,17 @@ const MyProducts = () => {
         } finally {
             setLoading(false);
         }
+        */
     };
 
     useEffect(() => {
-        fetchMyProducts();
+        // Uncomment when ready to use real API
+        // fetchMyProducts();
     }, []);
-
 
     return (
         <Container>
-               <div className="MyProducts">
+            <div className="MyProducts">
                 <h1>My Products</h1>
                 
                 <Form.Group className="mb-3">
