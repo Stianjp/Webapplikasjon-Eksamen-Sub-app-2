@@ -5,8 +5,7 @@ import { mockProducts, API_URL } from './mockDataProducts';
 const ProductsDetails = () => {
     return (
         <Container>
-            
-
+        
         </Container>
     );
 } ;
