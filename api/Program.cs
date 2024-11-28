@@ -31,6 +31,9 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.WriteIndented = true; // Pretty JSON
     });
 
+// Swagger
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 // Add ApplicationDbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
