@@ -13,12 +13,6 @@ public class ApplicationDbContext : IdentityDbContext
 
     public DbSet<Product> Products { get; set; }
 
-    //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    //{
-        // Use Lazy Loading Proxies
-        // optionsBuilder.UseLazyLoadingProxies();
-    //}
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

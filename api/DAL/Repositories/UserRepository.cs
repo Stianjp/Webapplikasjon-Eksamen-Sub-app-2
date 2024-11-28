@@ -23,7 +23,8 @@ public class UserRepository : IUserRepository
 
     public async Task<SignInResult> LoginAsync(string username, string password)
     {
-        if (string.IsNullOrEmpty(username)){
+        if (string.IsNullOrEmpty(username))
+        {
             throw new ArgumentNullException(nameof(username));
         }
         return await _signInManager.PasswordSignInAsync(username, password, isPersistent: false, lockoutOnFailure: false);
@@ -38,12 +39,13 @@ public class UserRepository : IUserRepository
     {
         var user = new IdentityUser { UserName = username };
         return await _userManager.CreateAsync(user, password);
-    }   
+    }
 
     public async Task<IdentityUser> FindByNameAsync(string username)
     {
         var user = await _userManager.FindByEmailAsync(username);
-        if( user == null){
+        if (user == null)
+        {
             throw new Exception($"User with username {username} not found");
         }
         return user;
@@ -93,7 +95,7 @@ public class UserRepository : IUserRepository
             // Or return a new IdentityUser() if you prefer
         }
         return user;
-        
+
     }
 
     public async Task<List<IdentityUser>> GetAllUsersAsync()
