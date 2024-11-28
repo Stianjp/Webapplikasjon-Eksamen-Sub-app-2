@@ -1,0 +1,84 @@
+/* General Navbar and Sidebar Styles */
+.navbar {
+  height: auto; /* Adjust height for both navbar and sidebar */
+}
+.navbar-nav .nav-link {
+  text-align: left;
+  font-size: 1rem;
+  padding: 10px 15px;
+  border-bottom: 1px solid #e0e0e0; /* Separator line between links */
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Space between icon and text */
+}
+
+.navbar-nav .nav-link:hover {
+  background-color: #f8f9fa; /* Light gray background on hover */
+  color: #4caf50; /* Green text on hover */
+  text-decoration: none; /* Remove underline */
+}
+.nav-pills .dropdown-item:hover {
+  background-color: #4caf50; /* Grønn hover-effekt */
+  transform: translateX(2px); /*Adding effect when hover */
+}
+
+/* Icons inside links */
+.icon {
+  margin-right: 10px;
+  width: 20px;
+  height: 20px;
+}
+
+/* Logout button styles */
+.logout-button {
+  margin-top: auto; /* Push logout button to the bottom */
+  padding: 10px 20px;
+}
+
+/* Sidebar styles for large screens */
+@media (min-width: 992px) {
+  .d-lg-flex {
+    display: flex !important; /* Show sidebar on large screens */
+  }
+  .d-lg-none {
+    display: none !important; /* Hide navbar on large screens */
+  }
+
+  .navbar {
+    height: 100%; /* Full height sidebar */
+    flex-direction: column; /* Vertical layout for sidebar */
+  }
+
+  .nav-pills .nav-link {
+    width: 100%; /* Full-width links in sidebar */
+    padding: 10px 20px; /* Better spacing */
+  }
+
+  .nav-pills .nav-link:hover {
+    background-color: #4caf50; /* Green background on hover */
+    color: white; /* White text on hover */
+  }
+}
+
+/* Navbar styles for small screens */
+@media (max-width: 991px) {
+  .d-lg-none {
+    display: block !important; /* Show navbar on small screens */
+  }
+
+  .d-lg-flex {
+    display: none !important; /* Hide sidebar on small screens */
+  }
+
+  .navbar {
+    flex-direction: row; /* Horizontal layout for navbar */
+    justify-content: space-between; /* Logo on the left, toggle on the right */
+    width: 100%;
+    padding: 0 15px; /* Padding for the navbar */
+  }
+
+  .navbar-nav .nav-link {
+    border-bottom: none; /* Remove separator lines */
+    padding: 10px 0; /* Adjust padding for better spacing */
+  }
+}
