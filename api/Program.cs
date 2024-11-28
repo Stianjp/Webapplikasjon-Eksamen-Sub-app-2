@@ -32,7 +32,7 @@ builder.Services.AddControllers()
 
 // Add ApplicationDbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("ApplicationDbContextConnection") + ";Cache=Shared"), ServiceLifetime.Scoped);
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection") + ";Cache=Shared"));
 
 // Register Identity services
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
@@ -47,23 +47,22 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
 
-// Configure JWT Authentication
+// Add JWT Authentication
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 }).AddJwtBearer(options =>
 {
-    var jwtSettings = builder.Configuration.GetSection("JWT");
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = jwtSettings["ValidIssuer"],
-        ValidAudience = jwtSettings["ValidAudience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Secret"]))
+        ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
+        ValidAudience = builder.Configuration["JWT:ValidAudience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
     };
 });
 
@@ -71,12 +70,13 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
-// Configure CORS for React frontend
+// Add CORS Policy
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("ReactCorsPolicy", policy =>
     {
-        policy.WithOrigins("http://localhost:3000")
+        policy.WithOrigins(builder.Configuration["CORS:AllowedOrigins"]
+                            .Split(',', StringSplitOptions.RemoveEmptyEntries))
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
@@ -90,17 +90,13 @@ builder.WebHost.ConfigureKestrel((context, options) =>
 
 var app = builder.Build();
 
-// Seed the database (only in development)
 if (app.Environment.IsDevelopment())
-{
-    await DBInit.SeedAsync(app);
-}
-
-// Configure the HTTP request pipeline
-if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
+    app.UseSwagger();
+    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1"));
+    await DBInit.SeedAsync(app);
 }
 
 app.UseHttpsRedirection();

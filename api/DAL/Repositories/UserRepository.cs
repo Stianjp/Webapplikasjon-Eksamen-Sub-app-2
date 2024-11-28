@@ -38,7 +38,7 @@ public class UserRepository : IUserRepository
     {
         var user = new IdentityUser { UserName = username };
         return await _userManager.CreateAsync(user, password);
-    }
+    }   
 
     public async Task<IdentityUser> FindByNameAsync(string username)
     {
