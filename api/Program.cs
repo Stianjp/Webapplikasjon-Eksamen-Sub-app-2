@@ -7,6 +7,8 @@ using api.DAL;
 using api.DAL.Interfaces;
 using api.DAL.Repositories;
 using System.Text;
+using Microsoft.OpenApi.Models;
+using System.Reflection;
 
 /// <summary>
 /// Configures and runs the application.
@@ -43,7 +45,22 @@ builder.Services.AddControllers()
 /// Configures Swagger for API documentation.
 /// </summary>
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "FoodStack (Sub-App-2) | API",
+        Version = "v1"
+    });
+
+    // Include XML comments
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    c.IncludeXmlComments(xmlPath, includeControllerXmlComments: true);
+
+    // Support for annotations like [FromBody]
+    c.SupportNonNullableReferenceTypes();
+});
 
 /// <summary>
 /// Adds the application database context using SQLite as the database provider.
