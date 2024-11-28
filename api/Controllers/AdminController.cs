@@ -5,6 +5,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using api.Models;
 
+/// <summary>
+/// Provides administrative functionalities for managing users and roles.
+/// Requires the user to have the Administrator role.
+/// </summary>
 [Authorize(Roles = UserRoles.Administrator)]
 [Route("api/[controller]")]
 [ApiController]
@@ -19,7 +23,13 @@ public class AdminController : ControllerBase
         _roleManager = roleManager;
     }
 
-    // GET: api/Admin/UserManager
+    /// <summary>
+    /// Retrieves a list of all users along with their assigned roles.
+    /// </summary>
+    /// <returns>
+    /// A list of users with their roles.
+    /// </returns>
+    /// <response code="200">Returns the list of users with roles.</response>
     [HttpGet("usermanager")]
     public async Task<IActionResult> GetUsers()
     {
@@ -40,7 +50,15 @@ public class AdminController : ControllerBase
         return Ok(userWithRoles);
     }
 
-    // GET: api/Admin/EditUser/{id}
+    /// <summary>
+    /// Retrieves details for a specific user, including their roles.
+    /// </summary>
+    /// <param name="id">The ID of the user.</param>
+    /// <returns>
+    /// The user's details and all available roles.
+    /// </returns>
+    /// <response code="200">Returns the user's details and roles.</response>
+    /// <response code="404">If the user is not found.</response>
     [HttpGet("edituser/{id}")]
     public async Task<IActionResult> GetUser(string id)
     {
@@ -61,7 +79,16 @@ public class AdminController : ControllerBase
         return Ok(new { user = model, allRoles });
     }
 
-    // PUT: api/Admin/EditUser
+    /// <summary>
+    /// Updates the roles of a specific user.
+    /// </summary>
+    /// <param name="model">The user ID and the new roles to assign.</param>
+    /// <returns>
+    /// A success message if roles are updated successfully.
+    /// </returns>
+    /// <response code="200">If the user's roles are updated successfully.</response>
+    /// <response code="404">If the user is not found.</response>
+    /// <response code="400">If there is an error updating the roles.</response>
     [HttpPut("edituser")]
     public async Task<IActionResult> UpdateUserRoles([FromBody] UserWithRolesViewModel model)
     {
@@ -78,7 +105,16 @@ public class AdminController : ControllerBase
         return Ok(new { message = "User roles updated successfully!" });
     }
 
-    // DELETE: api/Admin/DeleteUser/{id}
+    /// <summary>
+    /// Deletes a specific user by ID.
+    /// </summary>
+    /// <param name="id">The ID of the user to delete.</param>
+    /// <returns>
+    /// A success message if the user is deleted successfully.
+    /// </returns>
+    /// <response code="200">If the user is deleted successfully.</response>
+    /// <response code="404">If the user is not found.</response>
+    /// <response code="400">If there is an error deleting the user.</response>
     [HttpDelete("deleteuser/{id}")]
     public async Task<IActionResult> DeleteUser(string id)
     {

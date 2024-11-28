@@ -6,6 +6,9 @@ using System.Security.Claims;
 using api.Models;
 using api.DAL.Interfaces;
 
+/// <summary>
+/// Handles operations related to products, including creation, retrieval, updating, and deletion.
+/// </summary>
 [Route("api/[controller]")]
 [ApiController]
 public class ProductsController : ControllerBase
@@ -26,12 +29,19 @@ public class ProductsController : ControllerBase
         _productRepository = productRepository;
     }
 
+    /// <summary>
+    /// Checks if the current user has the Administrator role.
+    /// </summary>
+    /// <returns>True if the user is an administrator; otherwise, false.</returns>
     private bool IsAdmin()
     {
         return User?.IsInRole(UserRoles.Administrator) ?? false;
     }
 
-    // GET: api/Products
+    /// <summary>
+    /// Retrieves all products.
+    /// </summary>
+    /// <returns>A list of all products.</returns>
     [HttpGet]
     [AllowAnonymous]
     public async Task<IActionResult> GetAllProducts()
@@ -40,7 +50,11 @@ public class ProductsController : ControllerBase
         return Ok(products);
     }
 
-    // GET: api/Products/{id}
+    /// <summary>
+    /// Retrieves details of a specific product by ID.
+    /// </summary>
+    /// <param name="id">The ID of the product.</param>
+    /// <returns>The product details if found; otherwise, a 404 response.</returns>
     [HttpGet("{id}")]
     [AllowAnonymous]
     public async Task<IActionResult> GetProductDetails(int id)
@@ -54,7 +68,11 @@ public class ProductsController : ControllerBase
         return Ok(product);
     }
 
-    // POST: api/Products
+    /// <summary>
+    /// Creates a new product.
+    /// </summary>
+    /// <param name="product">The product to create.</param>
+    /// <returns>The created product details and its URI if successful.</returns>
     [HttpPost]
     [Authorize(Roles = UserRoles.FoodProducer + "," + UserRoles.Administrator)]
     public async Task<IActionResult> CreateProduct([FromBody] Product product)
@@ -78,7 +96,12 @@ public class ProductsController : ControllerBase
         }
     }
 
-    // PUT: api/Products/{id}
+    /// <summary>
+    /// Updates an existing product.
+    /// </summary>
+    /// <param name="id">The ID of the product to update.</param>
+    /// <param name="updatedProduct">The updated product details.</param>
+    /// <returns>A 204 response if successful; otherwise, an error response.</returns>
     [HttpPut("{id}")]
     [Authorize(Roles = UserRoles.FoodProducer + "," + UserRoles.Administrator)]
     public async Task<IActionResult> UpdateProduct(int id, [FromBody] Product updatedProduct)
@@ -112,7 +135,11 @@ public class ProductsController : ControllerBase
         }
     }
 
-    // DELETE: api/Products/{id}
+    /// <summary>
+    /// Deletes an existing product.
+    /// </summary>
+    /// <param name="id">The ID of the product to delete.</param>
+    /// <returns>A 204 response if successful; otherwise, an error response.</returns>
     [HttpDelete("{id}")]
     [Authorize(Roles = UserRoles.FoodProducer + "," + UserRoles.Administrator)]
     public async Task<IActionResult> DeleteProduct(int id)
@@ -139,7 +166,10 @@ public class ProductsController : ControllerBase
         return NoContent();
     }
 
-    // GET: api/Products/Categories
+    /// <summary>
+    /// Retrieves the list of available product categories.
+    /// </summary>
+    /// <returns>A list of available product categories.</returns>
     [HttpGet("categories")]
     [AllowAnonymous]
     public IActionResult GetAvailableCategories()
@@ -147,7 +177,11 @@ public class ProductsController : ControllerBase
         return Ok(_availableCategories);
     }
 
-    // GET: api/Products/UserProducts
+    /// <summary>
+    /// Retrieves products created by the current user.
+    /// </summary>
+    /// <param name="category">An optional category to filter the products by.</param>
+    /// <returns>A list of products created by the user, filtered by category if provided.</returns>
     [HttpGet("user-products")]
     [Authorize(Roles = UserRoles.FoodProducer + "," + UserRoles.Administrator)]
     public async Task<IActionResult> GetUserProducts([FromQuery] string? category = null)

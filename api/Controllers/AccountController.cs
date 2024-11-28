@@ -8,6 +8,9 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 
+/// <summary>
+/// Handles account-related actions, such as login, registration, password changes, and account deletion.
+/// </summary>
 [ApiController]
 [Route("api/[controller]")]
 public class AccountController : ControllerBase
@@ -29,6 +32,11 @@ public class AccountController : ControllerBase
         _configuration = configuration;
     }
 
+    /// <summary>
+    /// Logs a user in and generates a JWT token.
+    /// </summary>
+    /// <param name="model">The login credentials, including username and password.</param>
+    /// <returns>A JWT token and roles if successful; otherwise, an unauthorized response.</returns>
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest model)
     {
@@ -44,6 +52,11 @@ public class AccountController : ControllerBase
         return Ok(new { token, roles });
     }
 
+    /// <summary>
+    /// Registers a new user with optional role assignment.
+    /// </summary>
+    /// <param name="model">The registration details, including username, password, and role.</param>
+    /// <returns>A success message if registration is successful; otherwise, a bad request response.</returns>
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest model)
     {
@@ -74,6 +87,10 @@ public class AccountController : ControllerBase
         return Ok(new { message = "User registered successfully." });
     }
 
+    /// <summary>
+    /// Logs the current user out.
+    /// </summary>
+    /// <returns>A success message indicating the user has logged out.</returns>
     [HttpPost("logout")]
     public async Task<IActionResult> Logout()
     {
@@ -81,6 +98,11 @@ public class AccountController : ControllerBase
         return Ok(new { message = "Logged out successfully." });
     }
 
+    /// <summary>
+    /// Changes the password of the currently logged-in user.
+    /// </summary>
+    /// <param name="model">The password change details, including current, new, and confirmation passwords.</param>
+    /// <returns>A success message if the password is changed; otherwise, an error response.</returns>
     [HttpPost("changepassword")]
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest model)
     {
@@ -96,6 +118,11 @@ public class AccountController : ControllerBase
         return Ok(new { message = "Password changed successfully." });
     }
 
+    /// <summary>
+    /// Deletes the account of the currently logged-in user.
+    /// </summary>
+    /// <param name="model">The account deletion details, including the user's password for confirmation.</param>
+    /// <returns>A success message if the account is deleted; otherwise, an error response.</returns>
     [HttpDelete("deleteaccount")]
     public async Task<IActionResult> DeleteAccount([FromBody] DeleteAccountRequest model)
     {
@@ -112,6 +139,12 @@ public class AccountController : ControllerBase
         return Ok(new { message = "Account deleted successfully." });
     }
 
+    /// <summary>
+    /// Generates a JWT token for a user with their roles.
+    /// </summary>
+    /// <param name="user">The user for whom the token is being generated.</param>
+    /// <param name="roles">The roles associated with the user.</param>
+    /// <returns>A JWT token as a string.</returns>
     private string GenerateJwtToken(IdentityUser user, IList<string> roles)
     {
         var authClaims = new List<Claim>
