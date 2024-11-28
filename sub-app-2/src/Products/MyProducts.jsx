@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Form } from 'react-bootstrap';
-import { Tabell } from '../shared/Tabell';
+import Tabell from '../shared/Tabell';
 
 
 const MyProducts = () => {
@@ -11,6 +11,12 @@ const MyProducts = () => {
 
     // Dette bør komme fra din auth context/service
     const currentUserId = "123"; // Replace with actual logged-in user ID bør gjøres i backend?
+
+    // Filter products based on search query
+    const filteredProducts = products.filter(product =>
+        product.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.description?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
     
     const fetchMyProducts = async () => {
         setLoading(true);

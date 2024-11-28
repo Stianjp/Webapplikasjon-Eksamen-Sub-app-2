@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Form } from 'react-bootstrap';
-import { Tabell } from './shared/Tabell';
+import Tabell from '../shared/Tabell';
 
 const API_URL = 'http://localhost:?'; // Replace with your actual URL
 
