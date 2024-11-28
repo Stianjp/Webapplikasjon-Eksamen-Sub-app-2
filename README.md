@@ -1,23 +1,50 @@
-# Webapplikasjon-Eksamen-Sub-app-2
-REACT
+# Web Application: Sub-App-2
 
-How to run the react app
-Need to install all the react -script packeg
+This is a React web application with a .NET Core 8 backend, developed as part of a web application project (exam). The application includes functionality for administrators and producers, with predefined default accounts for testing purposes.
 
-npm build
-npm start- for running 
+## Prerequisites
 
-Remebr when running or installing other packeges this need to be done in the right folder ((sub-app-2))
+Ensure you have the following installed on your system:
+- Node.js (v22.11.0)
+- npm (v10.9.0)
+- .NET Core SDK 8
 
+## Installation
 
-#Terminal
-Må ha: 
+1. Clone the repository:
+git clone <repository-url>
+cd Webapplikasjon-Eksamen-Sub-app-2
+
+2. Install the necessary npm packages:
 npm install
 
-sjekk om du har node: 
-node --version 
+3. Build the .NET Core backend:
+dotnet build
 
-For å starte npm run build 
+## Running the Application
 
-Starte prosjektet via localhost 3000:
-npm start 
+1. Start the .NET Core backend:
+dotnet run
+
+2. Start the React frontend:
+npm start
+
+The application will be available at http://localhost:3000.
+
+## Default Accounts
+
+To test the application, the following default accounts are available:
+
+1. Admin Account
+- Username: Admin
+- Password: OsloMet2024
+
+2. Default Producer Account
+- Username: Default_Producer
+- Password: OsloMet2024
+
+## Related Projects
+
+The corresponding Sub-App-1 repository can be found here:
+
+https://github.com/Stianjp/Webapplikasjon-Eksamen-Sub-app-1
