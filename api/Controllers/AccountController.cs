@@ -1,186 +1,208 @@
-namespace api.Controllers;
-
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using api.Models;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using Microsoft.IdentityModel.Tokens;
 
-public class AccountController : Controller {
-    private readonly UserManager<IdentityUser> _userManager;
-    private readonly SignInManager<IdentityUser> _signInManager;
-    private readonly RoleManager<IdentityRole> _roleManager;
+namespace api.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class AccountController : ControllerBase
+    {
+        private readonly UserManager<IdentityUser> _userManager;
+        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IConfiguration _configuration;
 
-    public AccountController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, RoleManager<IdentityRole> roleManager) {
-        _userManager = userManager;
-        _signInManager = signInManager;
-        _roleManager = roleManager;
-    }
-
-    // /Account/Index
-    public IActionResult Index() {
-
-        return View();
-    }
-
-   
-
-    [HttpPost]
-    public async Task<IActionResult> Login(string username, string password) {
-        // Perform the sign-in attempt
-        var result = await _signInManager.PasswordSignInAsync(username, password, isPersistent: false, lockoutOnFailure: false);
-
-        if (result.Succeeded) {
-            // Get the user and their roles after successful login
-            var user = await _userManager.FindByNameAsync(username);
-            if(user != null) {
-                var roles = await _userManager.GetRolesAsync(user);
-
-                // Check if the user has any roles
-                if (roles.Any()) {
-                    // redirect to the products page if the user has a role
-                    return RedirectToAction("Productsindex", "Products");
-                } else {
-                    // eedirect to the home page if the user has no roles
-                    return RedirectToAction("Index", "Home");
-                }
-            } else {
-                return RedirectToAction("Index", "Home");
-            }
-        }
-        // If login failed, show an error message
-        ViewBag.Error = "Invalid username or password.";
-        return View("Index");
-    }
-
-    // /Account/Logout
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Logout() {
-        await _signInManager.SignOutAsync();
-        return RedirectToAction("Index", "Home");
-    }
-
-    // /Account/Register
-    [HttpPost]
-    public async Task<IActionResult> Register(string username, string password, string confirmPassword, string role) {
-        if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(confirmPassword)) {
-            ModelState.AddModelError(string.Empty, "Username, password, and password confirmation cannot be null or empty.");
-            return View("Index", ModelState);
+        public AccountController(
+            UserManager<IdentityUser> userManager,
+            SignInManager<IdentityUser> signInManager,
+            RoleManager<IdentityRole> roleManager,
+            IConfiguration configuration)
+        {
+            _userManager = userManager;
+            _signInManager = signInManager;
+            _roleManager = roleManager;
+            _configuration = configuration;
         }
 
-        // Prevent the use of the username "Admin" and similar
-        var reservedUsernames = new[] { "Admin", "Administrator", "Superuser", "Root", "Default_Producer" }; // reserved usernames
-        if (reservedUsernames.Contains(username, StringComparer.OrdinalIgnoreCase)) {
-            ModelState.AddModelError(string.Empty, "The username is reserved and cannot be used.");
-            return View("Index", ModelState);
-        }
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginRequest model)
+        {
+            var result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, false, false);
 
-        if (password != confirmPassword) {
-            ModelState.AddModelError(string.Empty, "Passwords do not match.");
-            return View("Index", ModelState);
-        }
-
-        var user = new IdentityUser {
-            UserName = username
-        };
-        var result = await _userManager.CreateAsync(user, password); // create user (attempt)
-
-        if (result.Succeeded) {
-            // Prevent users from assigning themselves the "Administrator" role during registration
-            if (role == UserRoles.Administrator) {
-                await _userManager.DeleteAsync(user); // rollback user creation
-                ModelState.AddModelError(string.Empty, "You are not allowed to assign the Administrator role.");
-                ViewBag.Error = "Error during registration.";
-                return View("Index", ModelState);
+            if (!result.Succeeded)
+            {
+                return Unauthorized(new { message = "Invalid username or password." });
             }
 
-            if (string.IsNullOrEmpty(role)) {
-                await _userManager.AddToRoleAsync(user, UserRoles.RegularUser); // default role
-            } else {
-                if (await _roleManager.RoleExistsAsync(role)) {
-                    await _userManager.AddToRoleAsync(user, role);
-                } else {
-                    ModelState.AddModelError(string.Empty, "Invalid role specified.");
-                    ViewBag.Error = "Error during registration.";
-                    return View("Index", ModelState);
-                }
+            var user = await _userManager.FindByNameAsync(model.Username);
+            if (user == null)
+            {
+                return Unauthorized(new { message = "User not found." });
             }
 
-            await _signInManager.SignInAsync(user, isPersistent: false);
-            return RedirectToAction("Index", "Home");
+            var roles = await _userManager.GetRolesAsync(user);
+            var token = GenerateJwtToken(user, roles);
+
+            return Ok(new { token, roles });
         }
 
-        foreach (var error in result.Errors) {
-            ModelState.AddModelError(string.Empty, error.Description);
-        }
-        ViewBag.Error = "Error during registration.";
-        return View("Index", ModelState);
-    }
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] RegisterRequest model)
+        {
+            if (model.Password != model.ConfirmPassword)
+            {
+                return BadRequest(new { message = "Passwords do not match." });
+            }
 
-    [HttpGet]
-    public IActionResult ChangePassword() {
-        return View(); // ChangePassword.cshtml
-    }
+            var reservedUsernames = new[] { "Admin", "Administrator", "Superuser", "Root", "Default_Producer" };
+            if (reservedUsernames.Contains(model.Username, StringComparer.OrdinalIgnoreCase))
+            {
+                return BadRequest(new { message = "The username is reserved and cannot be used." });
+            }
 
-    // /Account/ChangePassword
-    [HttpPost]
-    public async Task<IActionResult> ChangePassword(string currentPassword, string newPassword, string confirmPassword) {
-        if (string.IsNullOrEmpty(currentPassword) || string.IsNullOrEmpty(newPassword) || string.IsNullOrEmpty(confirmPassword)) {
-            ModelState.AddModelError(string.Empty, "All password fields are required.");
-            return View();  // Returns the view so user can correct inputs
-        }
+            var user = new IdentityUser { UserName = model.Username };
+            var result = await _userManager.CreateAsync(user, model.Password);
 
-        if (newPassword != confirmPassword) {
-            ModelState.AddModelError(string.Empty, "New password and confirmation password do not match.");
-            return View();
-        }
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Errors);
+            }
 
-        var user = await _userManager.GetUserAsync(User);
-        if (user == null) {
-            return RedirectToAction("Index");
-        }
+            if (string.IsNullOrEmpty(model.Role))
+            {
+                model.Role = UserRoles.RegularUser;
+            }
 
-        var result = await _userManager.ChangePasswordAsync(user, currentPassword, newPassword);
-        if (result.Succeeded) {
-            await _signInManager.RefreshSignInAsync(user);  // Keeps the user signed in after password change
-            return RedirectToAction("Index", "Account");
-        }
+            if (model.Role == UserRoles.Administrator)
+            {
+                await _userManager.DeleteAsync(user); // Rollback user creation
+                return BadRequest(new { message = "You are not allowed to assign the Administrator role." });
+            }
 
-        foreach (var error in result.Errors) {
-            ModelState.AddModelError(string.Empty, error.Description);
-        }
-        return View();
-    }
+            if (!await _roleManager.RoleExistsAsync(model.Role))
+            {
+                return BadRequest(new { message = "Invalid role specified." });
+            }
 
-    // Show a confirmation view for deleting the account
-    [HttpGet]
-    public IActionResult DeleteAccount() {
-        return View(); // DeleteAccount.cshtml
-    }
+            await _userManager.AddToRoleAsync(user, model.Role);
 
-    [HttpPost]
-    public async Task<IActionResult> DeleteAccountConfirmed(string password) {
-        var user = await _userManager.GetUserAsync(User);
-        if (user == null) {
-            return RedirectToAction("Index");
+            return Ok(new { message = "User registered successfully." });
         }
 
-        // Check if the provided password is correct
-        var passwordCheck = await _signInManager.CheckPasswordSignInAsync(user, password, false);
-        if (!passwordCheck.Succeeded) {
-            ModelState.AddModelError(string.Empty, "Incorrect password.");
-            ViewBag.Error = "Password confirmation failed.";
-            return View("DeleteAccount");
-        }
-
-        var result = await _userManager.DeleteAsync(user);
-        if (result.Succeeded) {
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
             await _signInManager.SignOutAsync();
-            return RedirectToAction("Index", "Home");
+            return Ok(new { message = "Logged out successfully." });
         }
 
-        foreach (var error in result.Errors) {
-            ModelState.AddModelError(string.Empty, error.Description);
+        [HttpPost("changepassword")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest model)
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user == null)
+            {
+                return Unauthorized(new { message = "User not found." });
+            }
+
+            if (model.NewPassword != model.ConfirmPassword)
+            {
+                return BadRequest(new { message = "Passwords do not match." });
+            }
+
+            var result = await _userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
+
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Errors);
+            }
+
+            return Ok(new { message = "Password changed successfully." });
         }
-        return View("DeleteAccount");
+
+        [HttpDelete("deleteaccount")]
+        public async Task<IActionResult> DeleteAccount([FromBody] DeleteAccountRequest model)
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user == null)
+            {
+                return Unauthorized(new { message = "User not found." });
+            }
+
+            var passwordCheck = await _signInManager.CheckPasswordSignInAsync(user, model.Password, false);
+
+            if (!passwordCheck.Succeeded)
+            {
+                return BadRequest(new { message = "Incorrect password." });
+            }
+
+            var result = await _userManager.DeleteAsync(user);
+
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Errors);
+            }
+
+            await _signInManager.SignOutAsync();
+            return Ok(new { message = "Account deleted successfully." });
+        }
+
+        private string GenerateJwtToken(IdentityUser user, IList<string> roles)
+        {
+            var authClaims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            };
+
+            authClaims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+
+            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
+
+            var token = new JwtSecurityToken(
+                issuer: _configuration["JWT:ValidIssuer"],
+                audience: _configuration["JWT:ValidAudience"],
+                expires: DateTime.Now.AddHours(1),
+                claims: authClaims,
+                signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+    }
+
+    // Request Models
+    public class LoginRequest
+    {
+        public string Username { get; set; }
+        public string Password { get; set; }
+    }
+
+    public class RegisterRequest
+    {
+        public string Username { get; set; }
+        public string Password { get; set; }
+        public string ConfirmPassword { get; set; }
+        public string Role { get; set; }
+    }
+
+    public class ChangePasswordRequest
+    {
+        public string CurrentPassword { get; set; }
+        public string NewPassword { get; set; }
+        public string ConfirmPassword { get; set; }
+    }
+
+    public class DeleteAccountRequest
+    {
+        public string Password { get; set; }
     }
 }
