@@ -5,7 +5,7 @@ import ProductPage from './Products/ProductPage';
 import MyProducts from './Products/MyProducts';
 import CreateProduct from './Products/CreateProduct';
 import DeleteProduct from './Products/DeleteProduct';
-import DeleteProduct from './Products/ProductDetails';
+import ProductDetails from './Products/ProductDetails';
 import Account from './Home/Account';
 import Privacy from './Home/Privacy';
 import 'bootstrap/dist/css/bootstrap.min.css';
