@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Form, Alert, Button } from 'react-bootstrap';
-import Tabell from '../shared/Tabell';
+import { Container, Form, Alert, Button, Table } from 'react-bootstrap';
 
 const API_BASE_URL = 'http://localhost:7067';
 
@@ -11,6 +10,8 @@ const MyProducts = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
+    const [sortOrder, setSortOrder] = useState('Name');
+    const [sortDirection, setSortDirection] = useState('asc');
 
     const fetchMyProducts = async () => {
         setLoading(true);
@@ -25,8 +26,8 @@ const MyProducts = () => {
             }
             console.log('Using token:', token);
 
-            // Fetch user products with category filter
-            const response = await fetch(`${API_BASE_URL}/api/Products/user-products?category=${selectedCategory}`, {
+            // Fetch user products with category filter and sorting
+            const response = await fetch(`${API_BASE_URL}/api/Products/user-products?category=${selectedCategory}&sortOrder=${sortOrder}&sortDirection=${sortDirection}`, {
                 method: 'GET',
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -61,7 +62,7 @@ const MyProducts = () => {
 
     useEffect(() => {
         fetchMyProducts();
-    }, [selectedCategory]);
+    }, [selectedCategory, sortOrder, sortDirection]);
 
     const handleSearchChange = (e) => {
         setSearchQuery(e.target.value);
@@ -75,8 +76,10 @@ const MyProducts = () => {
         setSelectedCategory('');
     };
 
-    const handleProductUpdated = () => {
-        fetchMyProducts(); // Refresh the list when a product is updated
+    const handleSort = (field) => {
+        const newDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+        setSortOrder(field);
+        setSortDirection(newDirection);
     };
 
     const filteredProducts = products.filter(product =>
@@ -170,12 +173,120 @@ const MyProducts = () => {
                                 No products found for the selected category or search query.
                             </Alert>
                         ) : (
-                            <Tabell
-                                products={filteredProducts}
-                                isAdmin={false}
-                                isProducer={true}
-                                onProductUpdated={handleProductUpdated}
-                            />
+                            <Table striped bordered hover responsive>
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <a
+                                                role="button"
+                                                onClick={() => handleSort('Name')}
+                                                style={{ cursor: 'pointer' }}
+                                            >
+                                                Name
+                                                {sortOrder === 'Name' && (
+                                                    <span>{sortDirection === 'asc' ? ' ▲' : ' ▼'}</span>
+                                                )}
+                                            </a>
+                                        </th>
+                                        <th>
+                                            <a
+                                                role="button"
+                                                onClick={() => handleSort('Category')}
+                                                style={{ cursor: 'pointer' }}
+                                            >
+                                                Category
+                                                {sortOrder === 'Category' && (
+                                                    <span>{sortDirection === 'asc' ? ' ▲' : ' ▼'}</span>
+                                                )}
+                                            </a>
+                                        </th>
+                                        <th>Description</th>
+                                        <th>
+                                            <a
+                                                role="button"
+                                                onClick={() => handleSort('Calories')}
+                                                style={{ cursor: 'pointer' }}
+                                            >
+                                                Calories (kcal)
+                                                {sortOrder === 'Calories' && (
+                                                    <span>{sortDirection === 'asc' ? ' ▲' : ' ▼'}</span>
+                                                )}
+                                            </a>
+                                        </th>
+                                        <th>
+                                            <a
+                                                role="button"
+                                                onClick={() => handleSort('Protein')}
+                                                style={{ cursor: 'pointer' }}
+                                            >
+                                                Protein (g)
+                                                {sortOrder === 'Protein' && (
+                                                    <span>{sortDirection === 'asc' ? ' ▲' : ' ▼'}</span>
+                                                )}
+                                            </a>
+                                        </th>
+                                        <th>
+                                            <a
+                                                role="button"
+                                                onClick={() => handleSort('Fat')}
+                                                style={{ cursor: 'pointer' }}
+                                            >
+                                                Fat (g)
+                                                {sortOrder === 'Fat' && (
+                                                    <span>{sortDirection === 'asc' ? ' ▲' : ' ▼'}</span>
+                                                )}
+                                            </a>
+                                        </th>
+                                        <th>
+                                            <a
+                                                role="button"
+                                                onClick={() => handleSort('Carbohydrates')}
+                                                style={{ cursor: 'pointer' }}
+                                            >
+                                                Carbohydrates (g)
+                                                {sortOrder === 'Carbohydrates' && (
+                                                    <span>{sortDirection === 'asc' ? ' ▲' : ' ▼'}</span>
+                                                )}
+                                            </a>
+                                        </th>
+                                        {true /* Replace with condition based on user role */ && (
+                                            <th>Actions</th>
+                                        )}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {filteredProducts.map(product => (
+                                        <tr key={product.id} style={{ cursor: 'pointer' }} onClick={() => window.location.href = `/products/details/${product.id}`}>
+                                            <td>{product.name}</td>
+                                            <td>{product.categoryList?.join(', ') || 'No Categories'}</td>
+                                            <td>{product.description}</td>
+                                            <td>{product.calories}</td>
+                                            <td>{product.protein}</td>
+                                            <td>{product.fat}</td>
+                                            <td>{product.carbohydrates}</td>
+                                            {true /* Replace with condition based on user role */ && (
+                                                <td>
+                                                    <Button
+                                                        variant="primary"
+                                                        size="sm"
+                                                        className="me-2"
+                                                        onClick={() => window.location.href = `/products/edit/${product.id}`}
+                                                    >
+                                                        Edit
+                                                    </Button>
+                                                    <Button
+                                                        variant="danger"
+                                                        size="sm"
+                                                        onClick={() => window.location.href = `/products/delete/${product.id}`}
+                                                    >
+                                                        Delete
+                                                    </Button>
+                                                </td>
+                                            )}
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </Table>
                         )}
                     </>
                 )}
