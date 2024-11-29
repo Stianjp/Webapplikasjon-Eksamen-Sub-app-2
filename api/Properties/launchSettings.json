@@ -10,16 +10,16 @@
   },
   "profiles": {
     "api-http": {
-      "commandName": "Project",
-      "dotnetRunMessages": true,
-      "launchBrowser": false,
-      "launchUrl": "swagger",
-      "applicationUrl": "http://localhost:5221",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      }
-    },
-    "api-https": {
+    "commandName": "Project",
+    "dotnetRunMessages": true,
+    "launchBrowser": false,
+    "launchUrl": "swagger",
+    "applicationUrl": "http://localhost:7067",
+    "environmentVariables": {
+      "ASPNETCORE_ENVIRONMENT": "Development" 
+    }
+  },
+  "api-https": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": false,

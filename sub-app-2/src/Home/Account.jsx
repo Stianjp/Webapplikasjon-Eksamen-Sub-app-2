@@ -2,13 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { Container, Form, Button, Alert } from 'react-bootstrap';
 import './Account.css';
 
+const API_BASE_URL = 'http://localhost:7067/api/Account';
+
 const Account = ({ onLogin }) => {
-  const [isRegister, setIsRegister] = useState(false); // Toggle between Login and Register if we want this?
+  const [isRegister, setIsRegister] = useState(false);
   const [formData, setFormData] = useState({
     username: '',
     password: '',
     confirmPassword: '',
-    accountType: 'Regular User',
+    accountType: 'RegularUser', // Adjust based on your backend roles
   });
   const [errors, setErrors] = useState([]);
   const [successMessage, setSuccessMessage] = useState('');
@@ -51,7 +53,7 @@ const Account = ({ onLogin }) => {
     try {
       if (isRegister) {
         // Registration API Call
-        const registerResponse = await fetch('/api/register', {
+        const registerResponse = await fetch(`${API_BASE_URL}/register`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -59,7 +61,8 @@ const Account = ({ onLogin }) => {
           body: JSON.stringify({
             username: formData.username,
             password: formData.password,
-            accountType: formData.accountType,
+            confirmPassword: formData.confirmPassword,
+            role: formData.accountType,
           }),
         });
 
@@ -69,7 +72,7 @@ const Account = ({ onLogin }) => {
         }
 
         // Automatically log the user in after registration
-        const loginResponse = await fetch('/api/login', {
+        const loginResponse = await fetch(`${API_BASE_URL}/login`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -87,11 +90,11 @@ const Account = ({ onLogin }) => {
 
         const loginData = await loginResponse.json();
         localStorage.setItem('authToken', loginData.token); // Save the token
-        onLogin(loginData); // Call parent login handler if provided
+        if (onLogin) onLogin(loginData); // Call parent login handler if provided
         setSuccessMessage('Registration and login successful!');
       } else {
         // Login API Call
-        const loginResponse = await fetch('/api/login', {
+        const loginResponse = await fetch(`${API_BASE_URL}/login`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -109,7 +112,7 @@ const Account = ({ onLogin }) => {
 
         const loginData = await loginResponse.json();
         localStorage.setItem('authToken', loginData.token); // Save the token
-        onLogin(loginData); // Call parent login handler if provided
+        if (onLogin) onLogin(loginData); // Call parent login handler if provided
         setSuccessMessage('Login successful!');
       }
 
@@ -118,17 +121,15 @@ const Account = ({ onLogin }) => {
     } catch (error) {
       setErrors([error.message]);
 
-      // Clear input fields on failure
+      // Clear password fields on failure
       setFormData({
-        username: '',
+        ...formData,
         password: '',
         confirmPassword: '',
-        accountType: formData.accountType, // Keep account type if it's register mode
       });
     }
   };
 
-  // Clear errors and messages when the page refreshes or component mounts
   useEffect(() => {
     setErrors([]);
     setSuccessMessage('');
@@ -192,8 +193,8 @@ const Account = ({ onLogin }) => {
                   value={formData.accountType}
                   onChange={handleInputChange}
                 >
-                  <option value="Regular User">Regular User</option>
-                  <option value="Food Producer">Food Producer</option>
+                  <option value="RegularUser">Regular User</option>
+                  <option value="FoodProducer">Food Producer</option>
                 </Form.Select>
               </Form.Group>
             </>
@@ -209,14 +210,14 @@ const Account = ({ onLogin }) => {
           <span
             onClick={() => {
               setIsRegister(!isRegister);
-              setErrors([]); // Clear errors when toggling forms
-              setSuccessMessage(''); // Clear success message
+              setErrors([]);
+              setSuccessMessage('');
               setFormData({
                 username: '',
                 password: '',
                 confirmPassword: '',
-                accountType: 'Regular User',
-              }); // Reset form fields
+                accountType: 'RegularUser',
+              });
             }}
             className="link-text"
           >
