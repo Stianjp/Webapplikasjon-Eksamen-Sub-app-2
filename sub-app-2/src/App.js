@@ -10,7 +10,7 @@ import ProductDetails from './Products/ProductDetails';
 import Account from './Home/Account';
 import Privacy from './Home/Privacy';
 import AdminUsers from './admin/AdminUsers';
-import { jwtDecode } from 'jwt-decode'; 
+import { jwtDecode } from 'jwt-decode';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './styles/App.css';
 
@@ -18,12 +18,11 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [roles, setRoles] = useState([]);
 
-  // Check authentication state on load
   useEffect(() => {
     const token = localStorage.getItem('authToken');
     if (token) {
       try {
-        const decodedToken = jwtDecode(token); // Decode the token to get roles
+        const decodedToken = jwtDecode(token);
         setIsAuthenticated(true);
         setRoles(decodedToken['role'] || decodedToken['roles'] || []);
       } catch (error) {
@@ -40,7 +39,7 @@ function App() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('authToken'); // Clear the token
+    localStorage.removeItem('authToken');
     setIsAuthenticated(false);
     setRoles([]);
   };
@@ -48,27 +47,18 @@ function App() {
   return (
     <Router>
       <div className="App d-flex">
-        {/* Pass authentication state and handlers to Sidebar */}
-        <Sidebar isAuthenticated={isAuthenticated} roles={roles} onLogout={handleLogout} />
+        <Sidebar onLogout={handleLogout} />
         <main className="flex-grow-1 p-3">
           <Routes>
-            {/* Public Routes */}
             <Route path="/" element={<Home />} />
             <Route path="/privacy" element={<Privacy />} />
-
-            {/* Routes */}
             <Route path="/products" element={<ProductPage />} />
             <Route path="/product-details/:id" element={<ProductDetails />} />
-            {/* Pass handleLogin to Account */}
             <Route path="/account" element={<Account onLogin={handleLogin} />} />
-
-            {/* Producer Routes */}
             <Route path="/products/my" element={<MyProducts />} />
             <Route path="/products/add" element={<CreateProduct />} />
             <Route path="/edit-product/:id" element={<CreateProduct />} />
             <Route path="/delete-product/:id" element={<DeleteProduct />} />
-
-            {/* Admin Routes */}
             <Route path="/admin/users" element={<AdminUsers />} />
           </Routes>
         </main>

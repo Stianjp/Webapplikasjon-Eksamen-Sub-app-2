@@ -1,12 +1,11 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 
-const UserContext = createContext();
+// Create the context
+const UserContext = createContext(undefined);
 
+// Create the provider component
 export const UserProvider = ({ children }) => {
-  const [user, setUser] = useState({
-    isLoggedIn: true, 
-    role: 'Admin',    
-  });
+  const [user, setUser] = useState(null); // User state
 
   return (
     <UserContext.Provider value={{ user, setUser }}>
@@ -15,4 +14,13 @@ export const UserProvider = ({ children }) => {
   );
 };
 
-export const useUser = () => useContext(UserContext);
+// Custom hook to use the UserContext
+export const useUser = () => {
+  const context = useContext(UserContext);
+  if (!context) {
+    console.error("useUser must be used within a UserProvider");
+    throw new Error('useUser must be used within a UserProvider');
+  }
+  return context;
+};
+
