@@ -9,7 +9,7 @@ import AddProductIcon from '../icons/circle-plus-solid.svg';
 import AccountIcon from '../icons/gear-solid.svg';
 import PrivacyIcon from '../icons/eye-solid.svg';
 import LogoutIcon from '../icons/right-to-bracket-solid.svg';
-
+//Main Sidebar component
 interface SidebarProps {
   isAuthenticated: boolean;
   roles: string[];
