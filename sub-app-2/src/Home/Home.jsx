@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, Image } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 
@@ -12,16 +12,12 @@ const Home = () => {
   if (authToken) {
     try {
         const decodedToken = jwtDecode(authToken);
-        // Extract username
         userName = decodedToken['name'] || '';
-        // Extract roles
         roles = decodedToken['role'] || decodedToken['roles'];
-        // Ensure roles is an array
         if (!Array.isArray(roles)) {
             roles = [roles];
         }
 
-      // Determine role-specific message
       if (roles.includes('Administrator')) {
         roleMessage = 'As an administrator, you have full access to manage products and users.';
       } else if (roles.includes('FoodProducer')) {
@@ -33,7 +29,6 @@ const Home = () => {
       }
     } catch (error) {
       console.error('Error decoding token:', error);
-      // If there's an error decoding the token, treat the user as unauthenticated
       userName = '';
       roles = [];
     }
@@ -42,37 +37,73 @@ const Home = () => {
   return (
     <Container>
       {authToken && userName ? (
-        <div className="welcome-container">
-          <div className="jumbotron">
-            <div className="text-center mb-3 rounded">
-              <img src={`${process.env.PUBLIC_URL}/icons/bowl-food-solid.svg`} alt="App Logo" className="img-fluid" />
-            </div>
-            <h2>Welcome, {userName}!</h2>
-            <h6 className="lead">{roleMessage}</h6>
-            <hr className="my-4" />
-            <p className="second-color">Get started by exploring our products.</p>
-            <Link className="btn btn-primary d-flex align-items-center" to="/products" role="button">
-              <img src={`${process.env.PUBLIC_URL}/icons/arrow-right-solid.svg`} alt="Go to products" className="me-2" />
-              <span>View Products</span>
-            </Link>
-          </div>
-        </div>
+        <Card className="welcome-container">
+          <Card.Body>
+            <Row className="justify-content-center">
+              <Col xs={12} className="text-center mb-3">
+                <Image 
+                  src={`${process.env.PUBLIC_URL}/icons/bowl-food-solid.svg`} 
+                  alt="App Logo" 
+                  fluid 
+                />
+              </Col>
+              <Col xs={12}>
+                <Card.Title as="h2">Welcome, {userName}!</Card.Title>
+                <Card.Subtitle as="h6" className="lead mb-3">{roleMessage}</Card.Subtitle>
+                <hr className="my-4" />
+                <Card.Text className="second-color">Get started by exploring our products.</Card.Text>
+                <Button 
+                  as={Link} 
+                  to="/products" 
+                  className="d-flex align-items-center"
+                >
+                  <Image 
+                    src={`${process.env.PUBLIC_URL}/icons/arrow-right-solid.svg`} 
+                    alt="Go to products" 
+                    className="me-2" 
+                  />
+                  <span>View Products</span>
+                </Button>
+              </Col>
+            </Row>
+          </Card.Body>
+        </Card>
       ) : (
-        <div className="welcome-container">
-          <div className="jumbotron">
-            <div className="text-center mb-3 rounded">
-              <img src={`${process.env.PUBLIC_URL}/icons/bowl-food-solid.svg`} alt="App Logo" className="img-fluid" />
-            </div>
-            <h2>Welcome to FoodStack!</h2>
-            <h6 className="lead">Discover a variety of food products and their nutritional information.</h6>
-            <hr className="my-4" />
-            <p className="second-color">You need to log in to access the full features of our application.</p>
-            <Link className="btn btn-primary d-flex align-items-center" to="/account" role="button">
-              <img src={`${process.env.PUBLIC_URL}/icons/arrow-right-solid.svg`} alt="Go to register form" className="me-2" />
-              <span>Log in or register</span>
-            </Link>
-          </div>
-        </div>
+        <Card className="welcome-container">
+          <Card.Body>
+            <Row className="justify-content-center">
+              <Col xs={12} className="text-center mb-3">
+                <Image 
+                  src={`${process.env.PUBLIC_URL}/icons/bowl-food-solid.svg`} 
+                  alt="App Logo" 
+                  fluid 
+                />
+              </Col>
+              <Col xs={12}>
+                <Card.Title as="h2">Welcome to FoodStack!</Card.Title>
+                <Card.Subtitle as="h6" className="lead mb-3">
+                  Discover a variety of food products and their nutritional information.
+                </Card.Subtitle>
+                <hr className="my-4" />
+                <Card.Text className="second-color">
+                  You need to log in to access the full features of our application.
+                </Card.Text>
+                <Button 
+                  as={Link} 
+                  to="/account" 
+                  className="d-flex align-items-center"
+                >
+                  <Image 
+                    src={`${process.env.PUBLIC_URL}/icons/arrow-right-solid.svg`} 
+                    alt="Go to register form" 
+                    className="me-2" 
+                  />
+                  <span>Log in or register</span>
+                </Button>
+              </Col>
+            </Row>
+          </Card.Body>
+        </Card>
       )}
     </Container>
   );

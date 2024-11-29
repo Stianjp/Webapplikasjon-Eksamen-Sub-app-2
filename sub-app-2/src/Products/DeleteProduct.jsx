@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Card, Button, Table } from 'react-bootstrap';
 import { useParams, useNavigate } from 'react-router-dom';
 
-const API_BASE_URL = 'http://localhost:7067';
+const API_BASE_URL = 'http://localhost:7067/api';
 
 const DeleteProduct = () => {
     const { id } = useParams();

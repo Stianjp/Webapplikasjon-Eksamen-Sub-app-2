@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Form, Button, Card, Alert } from 'react-bootstrap';
 import { useNavigate, useParams } from 'react-router-dom';
 
-const API_BASE_URL = 'http://localhost:7067';
+const API_BASE_URL = 'http://localhost:7067/api';
 
 const CreateProduct = () => {
       // Get product ID from URL if editing existing product

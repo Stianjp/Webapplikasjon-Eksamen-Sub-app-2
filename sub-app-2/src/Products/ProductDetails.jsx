@@ -3,7 +3,7 @@ import { Container, Card, Row, Col, Badge, Button } from 'react-bootstrap';
 import { useParams, useNavigate } from 'react-router-dom';
 
 // API endpoint for fetching product data
-const API_BASE_URL = 'http://localhost:7067';
+const API_BASE_URL = 'http://localhost:7067/api';
 
 const ProductDetails = () => {
     // Get product ID from URL parameters
