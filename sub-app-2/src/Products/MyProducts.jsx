@@ -60,6 +60,37 @@ const MyProducts = () => {
         }
     };
 
+    const deleteProduct = async (productId) => {
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            setError('You are not logged in. Please log in to delete products.');
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/Products/${productId}`, {
+                method: 'DELETE',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                console.error('Error deleting product:', response.statusText);
+                setError('Failed to delete the product. Please try again later.');
+                return;
+            }
+
+            // Filter out the deleted product from the products array
+            setProducts(prevProducts => prevProducts.filter(product => product.id !== productId));
+        } catch (error) {
+            console.error('Unexpected error deleting product:', error);
+            setError('An unexpected error occurred while deleting the product. Please try again later.');
+        }
+    };
+
     useEffect(() => {
         fetchMyProducts();
     }, [selectedCategory, sortOrder, sortDirection]);
@@ -258,7 +289,7 @@ const MyProducts = () => {
                                     {filteredProducts.map(product => (
                                         <tr key={product.id} style={{ cursor: 'pointer' }} onClick={() => window.location.href = `/products/details/${product.id}`}>
                                             <td>{product.name}</td>
-                                            <td>{product.categoryList?.join(', ') || 'No Categories'}</td>
+                                            <td>{product.category}</td>
                                             <td>{product.description}</td>
                                             <td>{product.calories}</td>
                                             <td>{product.protein}</td>
@@ -267,17 +298,11 @@ const MyProducts = () => {
                                             {true /* Replace with condition based on user role */ && (
                                                 <td>
                                                     <Button
-                                                        variant="primary"
-                                                        size="sm"
-                                                        className="me-2"
-                                                        onClick={() => window.location.href = `/products/edit/${product.id}`}
-                                                    >
-                                                        Edit
-                                                    </Button>
-                                                    <Button
                                                         variant="danger"
-                                                        size="sm"
-                                                        onClick={() => window.location.href = `/products/delete/${product.id}`}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation(); // Prevent row click
+                                                            deleteProduct(product.id);
+                                                        }}
                                                     >
                                                         Delete
                                                     </Button>
