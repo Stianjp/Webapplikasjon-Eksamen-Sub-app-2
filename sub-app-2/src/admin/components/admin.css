@@ -23,11 +23,10 @@
   }
   
   .form-control, .form-select {
-    max-width: 300px;
+    max-width: auto;
     margin-bottom: 15px;
     border-radius: 5px;
   }
-
 
   select:focus, .form-select:focus, .form-control:focus{
     border-color: #4caf50; /* Grønn kant ved fokus */
