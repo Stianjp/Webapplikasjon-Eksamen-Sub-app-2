@@ -63,16 +63,6 @@ const ProductForm = ({
             />
           </Form.Group>
 
-          <Form.Group className="mb-3">
-            <Form.Label>Categories (comma-separated)</Form.Label>
-            <Form.Control
-              type="text"
-              value={formData.categoryList.join(', ')}
-              onChange={handleCategoryChange}
-              placeholder="e.g., Dairy, Organic, Vegan"
-            />
-          </Form.Group>
-
           {['calories', 'protein', 'fat', 'carbohydrates'].map(field => (
             <Form.Group key={field} className="mb-3">
               <Form.Label>{field.charAt(0).toUpperCase() + field.slice(1)} (g)</Form.Label>
