@@ -1,29 +1,42 @@
 /* General Navbar and Sidebar Styles */
 .navbar {
-  height: auto;
+  height: 100%;
+  background-color: #ffffff; /* Light background for the sidebar */
+  box-shadow: 4px 0 12px rgba(0, 0, 0, 0.1); /* Light shadow for depth */
+  border-right: 1px solid #e0e0e0; /* Subtle border for separation */
+  transition: transform 0.3s ease-in-out; /* Smooth slide-in effect */
 }
+
+/* Navbar links */
 .navbar-nav .nav-link {
   text-align: left;
   font-size: 1rem;
-  padding: 12px 15px; /* Slightly increased padding */
-  border-bottom: 1px solid #e0e0e0; /* Separator line between links */
+  padding: 12px 15px;
+  border-bottom: 1px solid #e0e0e0;
   display: flex;
   align-items: center;
-  gap: 12px; /* Space between icon and text */
-  transition: background-color 0.3s, transform 0.3s ease; /* Smooth transition for hover */
+  gap: 12px;
+  transition: background-color 0.3s, transform 0.3s ease, padding-left 0.3s ease;
+  background-color: #f9f9f9; /* Light background color */
+  border-left: 3px solid transparent; /* Border for hover effect */
 }
 
+/* Hover effects for links */
 .navbar-nav .nav-link:hover {
-  background-color: #f8f9fa; /* Light gray background on hover */
+  background-color: #e2e6ea; /* Slightly darker background */
   color: #4caf50; /* Green text on hover */
-  text-decoration: none; /* Remove underline */
-  transform: translateX(5px); /* Slight shift on hover */
+  text-decoration: none;
+  transform: translateX(5px); /* Subtle shift on hover */
+  padding-left: 20px; /* Add space on the left when hovering */
+  border-left: 3px solid #4caf50; /* Highlight with border on hover */
 }
 
+/* Active link styles */
 .navbar-nav .nav-link.active {
   background-color: #4caf50;
-  color: white; /* Active state color */
+  color: white;
   font-weight: bold;
+  border-left: 3px solid white; /* White border to highlight active link */
 }
 
 /* Icons inside links */
@@ -33,25 +46,13 @@
   height: 22px;
 }
 
-/* Logout button styles */
-.logout {
-  margin-top: auto;
-}
-
-.logout button, .logout a {
-  display: flex;
-  align-items: center;
-  padding: 10px 20px;
-  width: 100%;
-  justify-content: space-between;
-}
-
 /* Logo styling */
 .logo {
   width: 120px;
   height: auto;
   margin: 0 auto;
   display: block;
+  transition: transform 0.3s ease-in-out;
 }
 
 /* Sidebar styles for large screens */
@@ -70,7 +71,9 @@
 
   .nav-pills .nav-link {
     width: 100%;
-    padding: 14px 20px; /* More padding */
+    padding: 14px 20px;
+    background-color: #f9f9f9; /* Light gray background */
+    border-bottom: none;
   }
 
   .nav-pills .nav-link:hover {
@@ -100,4 +103,30 @@
     border-bottom: none;
     padding: 12px;
   }
+}
+
+/* Add depth and hover effects for sidebar */
+.navbar {
+  background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%); /* Subtle gradient */
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15); /* Stronger shadow for depth */
+  transition: all 0.3s ease-in-out;
+}
+
+/* Sidebar hover effect */
+.navbar:hover {
+  transform: translateX(3px); /* Slight movement on hover */
+  box-shadow: 6px 0 20px rgba(0, 0, 0, 0.2); /* Increased shadow on hover */
+}
+
+/* Logout button styles */
+.logout {
+  margin-top: auto;
+}
+
+.logout button, .logout a {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  width: 100%;
+  justify-content: space-between;
 }
