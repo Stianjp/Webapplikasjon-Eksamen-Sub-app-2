@@ -41,24 +41,12 @@ const Home = () => {
           {authToken && userName ? (
             // Authenticated User Content
             <div className="welcome-container p-4 border rounded shadow-lg hover-shadow">
-              <img
-                src="/icons/bowl-food-solid.svg"
-                alt="App Logo"
-                className="img-fluid mb-3"
-                style={{ width: '100px', height: '100px' }}
-              />
               <h2>Welcome, {userName}!</h2>
               <p className="lead text-muted">{roleMessage}</p>
               <hr />
               <p>Get started by exploring our products.</p>
               <Link to="/products">
                 <Button variant="primary" size="lg" className="d-flex align-items-center justify-content-center">
-                  <img
-                    src="/icons/arrow-right-solid.svg"
-                    alt="Go to products"
-                    className="me-2"
-                    style={{ width: '20px', height: '20px' }}
-                  />
                   View Products
                 </Button>
               </Link>
@@ -66,12 +54,6 @@ const Home = () => {
           ) : (
             // Unauthenticated User Content
             <div className="welcome-container p-4 border rounded shadow-lg hover-shadow">
-              <img
-                src="/icons/bowl-food-solid.svg"
-                alt="App Logo"
-                className="img-fluid mb-3"
-                style={{ width: '100px', height: '100px' }}
-              />
               <h2>Welcome to FoodStack!</h2>
               <p className="lead text-muted">Discover a variety of food products and their nutritional information.</p>
               <hr />
@@ -79,12 +61,6 @@ const Home = () => {
               <div className="d-flex justify-content-center mt-3">
                 <Link to="/account">
                   <Button variant="primary" size="lg" className="d-flex align-items-center justify-content-center">
-                    <img
-                      src="/icons/arrow-right-solid.svg"
-                      alt="Go to register form"
-                      className="me-2"
-                      style={{ width: '20px', height: '20px' }}
-                    />
                     Log in or register
                   </Button>
                 </Link>
