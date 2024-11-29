@@ -128,6 +128,7 @@ const CreateProduct = () => {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 },
+                credentials: 'include',
                 body: JSON.stringify({
                     ...formData,
                     // Convert string values to numbers for numeric fields
