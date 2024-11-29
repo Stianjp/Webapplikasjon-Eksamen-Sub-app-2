@@ -13,34 +13,42 @@ import LogoutIcon from '../icons/right-to-bracket-solid.svg';
 interface SidebarProps {
   isAuthenticated: boolean;
   roles: string[];
+  onLogout: () => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
   isAuthenticated = false,
   roles = [],
+  onLogout,
 }) => {
   const location = useLocation();
 
-  // Safely check roles
+  // Check roles
   const isAdmin = roles.includes('Administrator');
   const isFoodProducer = roles.includes('FoodProducer');
   const isRegularUser = roles.includes('RegularUser');
 
+  // Function to determine active class
   const activeClass = (path: string) =>
     location.pathname === path ? 'active' : '';
 
   return (
     <div className="sidebar-content d-flex flex-column flex-shrink-0 p-3">
+      {/* Logo */}
       <img className="logo" src={LogoGreen} alt="Logo of Food Bank" />
       <span className="navbar-brand">FoodBank</span>
       <hr />
+
+      {/* Navigation Links */}
       <ul className="nav nav-pills flex-column mb-auto">
+        {/* Home */}
         <li className="nav-item">
           <Link className={`nav-link ${activeClass('/')}`} to="/">
             <img src={HomeIcon} alt="Home page" className="icon" /> Home
           </Link>
         </li>
 
+        {/* Products */}
         <li className="nav-item">
           {isAuthenticated ? (
             <>
@@ -48,11 +56,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 className={`nav-link ${activeClass('/products')}`}
                 to="/products"
               >
-                <img
-                  src={ProductsIcon}
-                  alt="All products"
-                  className="icon"
-                />{' '}
+                <img src={ProductsIcon} alt="All products" className="icon" />{' '}
                 Products
               </Link>
               {(isAdmin || isFoodProducer || isRegularUser) && (
@@ -74,9 +78,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                     <>
                       <li className="nav-item">
                         <Link
-                          className={`nav-link ${activeClass(
-                            '/products/my'
-                          )}`}
+                          className={`nav-link ${activeClass('/products/my')}`}
                           to="/products/my"
                         >
                           <img
@@ -89,9 +91,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                       </li>
                       <li className="nav-item">
                         <Link
-                          className={`nav-link ${activeClass(
-                            '/products/add'
-                          )}`}
+                          className={`nav-link ${activeClass('/products/add')}`}
                           to="/products/add"
                         >
                           <img
@@ -109,30 +109,24 @@ const Sidebar: React.FC<SidebarProps> = ({
             </>
           ) : (
             <a className="nav-link disabled" aria-disabled="true">
-              <img
-                src={ProductsIcon}
-                alt="Products"
-                className="icon"
-              />{' '}
+              <img src={ProductsIcon} alt="Products" className="icon" />{' '}
               Products
             </a>
           )}
         </li>
 
+        {/* Account */}
         <li className="nav-item">
           <Link
             className={`nav-link ${activeClass('/account')}`}
             to="/account"
           >
-            <img
-              src={AccountIcon}
-              alt="Account settings"
-              className="icon"
-            />{' '}
+            <img src={AccountIcon} alt="Account settings" className="icon" />{' '}
             Account
           </Link>
         </li>
 
+        {/* Privacy */}
         <li className="nav-item">
           <Link
             className={`nav-link ${activeClass('/privacy')}`}
@@ -144,15 +138,20 @@ const Sidebar: React.FC<SidebarProps> = ({
         </li>
       </ul>
       <hr />
+
+      {/* Authentication Actions */}
       <div className="logout">
         {isAuthenticated ? (
-          <button className="btn btn-danger d-flex align-items-center">
+          <button
+            className="btn btn-danger d-flex align-items-center"
+            onClick={onLogout}
+          >
             <img src={LogoutIcon} alt="Logout" className="icon" /> Logout
           </button>
         ) : (
           <Link
             className="btn btn-primary d-flex align-items-center"
-            to="/login"
+            to="/account"
           >
             <img src={LogoutIcon} alt="Login" className="icon" /> Login
           </Link>
