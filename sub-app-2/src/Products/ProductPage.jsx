@@ -15,7 +15,7 @@ const ProductPage = () => {
     const [isProducer, setIsProducer] = useState(false);
     
     const navigate = useNavigate();
-   
+
     const fetchProducts = async () => {
         setLoading(true);
         setError(null);
@@ -47,8 +47,6 @@ const ProductPage = () => {
         }
     };
 
-    // Fetch user data and set roles
-    // Maybe this should be done in another way, cant find api/Users/current? 
     const fetchUserData = async () => {
         try {
             const token = localStorage.getItem('token');
@@ -78,50 +76,66 @@ const ProductPage = () => {
         initializePage();
     }, []);
 
-    // Handle product deletion success
     const handleProductUpdated = () => {
         fetchProducts();
     };
 
-    // Filter products based on search query
     const filteredProducts = products.filter(product =>
         product.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.description?.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    // Get user-specific products if user is a producer
     const userProducts = isProducer 
         ? filteredProducts.filter(product => product.producerId === user?.id)
         : filteredProducts;
 
-    // Display all products if admin, otherwise show user-specific products for producers
     const displayedProducts = isAdmin ? filteredProducts : userProducts;
 
     return (
         <Container>
-            <div className="AllProducts">
-                <div className="d-flex justify-content-between align-items-center mb-4">
-                    <h1>Products</h1>
-                    {(isAdmin || isProducer) && (
-                        <button 
-                            className="btn btn-primary"
-                            onClick={() => navigate('/products/add')}
-                        >
-                            Add New Product
-                        </button>
-                    )}
-                </div>
-                
-                <Form.Group className="mb-4">
+            <div className="justify-content-between">
+                <h1>Products</h1>
+                {(isAdmin || isProducer) && (
+                    <a 
+                        className="btn btn-primary mt-3"
+                        onClick={() => navigate('/products/add')}
+                    >
+                        <img src={`${process.env.PUBLIC_URL}/icons/plus-solid.svg`} alt="add new product" className="icon" />
+                        Add new product
+                    </a>
+                )}
+            </div>
+
+            <p className="info mt-3">
+                Welcome to the product catalog. This page gives you a comprehensive view of all registered food products in our database. Each product displays essential information including nutritional content (calories, protein, fat, and carbohydrates), categorization, and allergen details. 
+                Use the search function to find specific products, or click on any item for detailed information.
+            </p>
+
+            <div className="search-container mt-3">
+                <div className="search d-flex justify-content-between align-items-center mt-3">
                     <Form.Control
                         type="text"
-                        placeholder="Search products by name or description"
+                        placeholder="Search for a product..."
                         value={searchQuery}
                         onChange={e => setSearchQuery(e.target.value)}
-                        className="mb-3"
+                        className="form-control"
                     />
-                </Form.Group>
+                    <button 
+                        className="btn btn-primary btn-md ms-3"
+                        onClick={() => fetchProducts()}
+                    >
+                        Search
+                    </button>
+                </div>
+            </div>
 
+            <hr />
+
+            <div className="tag-info mt-3">
+                <p>The nutritional values below are based on 100 grams of the product</p>
+            </div>
+
+            <div className="mt-3">
                 {error && (
                     <Alert variant="danger" className="mb-4">
                         {error}
