@@ -50,3 +50,9 @@ However, you are able to create/register your own account(s) aswell!
 The corresponding Sub-App-1 repository can be found here:
 
 https://github.com/Stianjp/Webapplikasjon-Eksamen-Sub-app-1
+
+
+## To do
+1. API folder 
+    - Needs to make a DTO layer DATA TRANSFAR OBJECT se modul MAgnus?
+
