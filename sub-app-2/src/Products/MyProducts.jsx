@@ -1,35 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Form } from 'react-bootstrap';
 import Tabell from '../shared/Tabell';
-import { mockProducts, API_URL } from './mockDataProducts';
+
+const API_BASE_URL = 'http://localhost:7067';
 
 const MyProducts = () => {
-    // Initialize with filtered mock data for current user
-    const currentUserId = "123";
-    const initialProducts = mockProducts.filter(p => p.producerId === currentUserId);
-    
-    const [products, setProducts] = useState(initialProducts);
-    const [loading, setLoading] = useState(false);
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
-
-    // Filter products based on search query
-    const filteredProducts = products.filter(product =>
-        product.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.description?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
     
     const fetchMyProducts = async () => {
-        // Comment out API fetch for now and use mock data
-        /* 
         setLoading(true);
         setError(null);
 
         try {
-            const response = await fetch(`${API_URL}/api/itemapi/myitems/${currentUserId}`);
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${API_BASE_URL}/api/Products/my`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                }
+            });
+
             if (!response.ok) {
-                throw new Error('Network response was not ok');
+                throw new Error('Failed to fetch products');
             }
+
             const data = await response.json();
             setProducts(data);
         } catch (error) {
@@ -38,13 +35,21 @@ const MyProducts = () => {
         } finally {
             setLoading(false);
         }
-        */
     };
 
     useEffect(() => {
-        // Uncomment when ready to use real API
-        // fetchMyProducts();
+        fetchMyProducts();
     }, []);
+
+    // Filter products based on search query
+    const filteredProducts = products.filter(product =>
+        product.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.description?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    const handleProductUpdated = () => {
+        fetchMyProducts(); // Refresh the list when a product is updated
+    };
 
     return (
         <Container>
@@ -66,10 +71,9 @@ const MyProducts = () => {
                 ) : (
                     <Tabell 
                         products={filteredProducts}
-                        apiUrl={API_URL}
                         isAdmin={false}
                         isProducer={true}
-                        currentUserId={currentUserId}
+                        onProductUpdated={handleProductUpdated}
                     />
                 )}
             </div>

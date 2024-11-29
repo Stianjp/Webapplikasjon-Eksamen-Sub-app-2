@@ -1,29 +1,72 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Card, Button , Table } from 'react-bootstrap';
+import { Container, Card, Button, Table } from 'react-bootstrap';
 import { useParams, useNavigate } from 'react-router-dom';
-import { mockProducts } from './mockDataProducts';
+
+const API_BASE_URL = 'http://localhost:7067';
 
 const DeleteProduct = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [product, setProduct] = useState(null);
+    const [error, setError] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Find product from mock data
-        const foundProduct = mockProducts.find(p => p.id === parseInt(id));
-        setProduct(foundProduct);
+        const fetchProduct = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_BASE_URL}/api/Products/${id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch product');
+                }
+
+                const data = await response.json();
+                setProduct(data);
+            } catch (error) {
+                console.error('Error fetching product:', error);
+                setError('Failed to load product details');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProduct();
     }, [id]);
 
     const handleDelete = async () => {
-        // Add your delete logic here
-        // For now, just navigate back
-        navigate(-1);
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${API_BASE_URL}/api/Products/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to delete product');
+            }
+
+            navigate('/products');
+        } catch (error) {
+            console.error('Error deleting product:', error);
+            setError('Failed to delete product');
+        }
     };
 
     const handleCancel = () => {
         navigate(-1);
     };
 
+    if (loading) return <Container>Loading...</Container>;
+    if (error) return <Container className="text-danger">{error}</Container>;
     if (!product) return <Container>Product not found</Container>;
 
     return (

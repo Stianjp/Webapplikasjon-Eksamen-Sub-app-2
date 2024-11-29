@@ -12,28 +12,33 @@ import AdminUsers from './admin/AdminUsers';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './styles/App.css';
 
-{/* Need if sentens to routing so admin gets to admin components, and foodproducer gets to there components */}
-
 function App() {
   return (
     <Router>
-    <div className='App d-flex'>
-      <Sidebar />
-      <main className="flex-grow-1 p-3">
+      <div className='App d-flex'>
+        <Sidebar />
+        <main className="flex-grow-1 p-3">
           <Routes>
+            {/* Public Routes */}
             <Route path="/" element={<Home />} />
+            <Route path="/privacy" element={<Privacy />} />
+
+            {/* Routes */}
             <Route path="/products" element={<ProductPage />} />
+            <Route path="/product-details/:id" element={<ProductDetails />} />
+            <Route path="/account" element={<Account />} />
+
+            {/* Producer Routes */}
             <Route path="/products/my" element={<MyProducts />} />
             <Route path="/products/add" element={<CreateProduct />} />
-            <Route path="/product-details/:id" element={<ProductDetails />} /> {/* id means its based on userRole, will show you buttons to edit or delet product like in sub-app-1*/}
-            <Route path="/edit-product/:id" element={<CreateProduct />} /> {/* We gona reuse CreateProduct for editing no need for new component, still need to make the logic for it */}
-            <Route path="/delete-product/:id" element={<DeleteProduct />} /> {/*Needs to create a new ProductDelet component*/}
-            <Route path="/account" element={<Account />} />
-            <Route path='/admin/users' element={<AdminUsers />} />
-            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/edit-product/:id" element={<CreateProduct />} />
+            <Route path="/delete-product/:id" element={<DeleteProduct />} />
+
+            {/* Admin Routes */}
+            <Route path="/admin/users" element={<AdminUsers />} />
           </Routes>
-      </main>
-    </div>
+        </main>
+      </div>
     </Router>
   );
 }
