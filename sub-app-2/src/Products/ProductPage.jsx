@@ -48,6 +48,7 @@ const ProductPage = () => {
     };
 
     // Fetch user data and set roles
+    // Maybe this should be done in another way, cant find api/Users/current? 
     const fetchUserData = async () => {
         try {
             const token = localStorage.getItem('token');
