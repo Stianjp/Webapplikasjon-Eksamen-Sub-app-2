@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Form, Alert, Button, Table } from 'react-bootstrap';
+import { Container, Form, Alert, Button, Table, Modal } from 'react-bootstrap';
 
 const API_BASE_URL = 'http://localhost:7067';
 
@@ -12,6 +12,18 @@ const MyProducts = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [sortOrder, setSortOrder] = useState('Name');
     const [sortDirection, setSortDirection] = useState('asc');
+    const [showEditModal, setShowEditModal] = useState(false); // For showing the Edit Modal
+    const [showDeleteModal, setShowDeleteModal] = useState(false); // For showing the Delete Confirmation Modal
+    const [selectedProduct, setSelectedProduct] = useState(null); // For storing selected product for editing or deleting
+    const [editedProduct, setEditedProduct] = useState({
+        name: '',
+        description: '',
+        category: '',
+        calories: '',
+        protein: '',
+        fat: '',
+        carbohydrates: '',
+    });
 
     const fetchMyProducts = async () => {
         setLoading(true);
@@ -26,7 +38,6 @@ const MyProducts = () => {
             }
             console.log('Using token:', token);
 
-            // Fetch user products with category filter and sorting
             const response = await fetch(`${API_BASE_URL}/api/Products/user-products?category=${selectedCategory}&sortOrder=${sortOrder}&sortDirection=${sortDirection}`, {
                 method: 'GET',
                 headers: {
@@ -60,7 +71,26 @@ const MyProducts = () => {
         }
     };
 
-    const deleteProduct = async (productId) => {
+    const handleEditProduct = (product) => {
+        setSelectedProduct(product);
+        setEditedProduct({
+            name: product.name,
+            description: product.description,
+            category: product.category,
+            calories: product.calories,
+            protein: product.protein,
+            fat: product.fat,
+            carbohydrates: product.carbohydrates,
+        });
+        setShowEditModal(true);
+    };
+
+    const handleDeleteProduct = (product) => {
+        setSelectedProduct(product);
+        setShowDeleteModal(true); // Show the delete confirmation modal
+    };
+
+    const handleDeleteConfirmation = async () => {
         const token = localStorage.getItem('authToken');
         if (!token) {
             setError('You are not logged in. Please log in to delete products.');
@@ -68,13 +98,13 @@ const MyProducts = () => {
         }
 
         try {
-            const response = await fetch(`${API_BASE_URL}/api/Products/${productId}`, {
+            const response = await fetch(`${API_BASE_URL}/api/Products/${selectedProduct.id}`, {
                 method: 'DELETE',
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
-                credentials: 'include'
+                credentials: 'include',
             });
 
             if (!response.ok) {
@@ -83,11 +113,72 @@ const MyProducts = () => {
                 return;
             }
 
-            // Filter out the deleted product from the products array
-            setProducts(prevProducts => prevProducts.filter(product => product.id !== productId));
+            // Remove the product from the UI
+            setProducts(prevProducts =>
+                prevProducts.filter(product => product.id !== selectedProduct.id)
+            );
+
+            handleCloseDeleteModal();
         } catch (error) {
             console.error('Unexpected error deleting product:', error);
             setError('An unexpected error occurred while deleting the product. Please try again later.');
+        }
+    };
+
+    const handleCloseEditModal = () => {
+        setShowEditModal(false);
+        setSelectedProduct(null);
+        setEditedProduct({
+            name: '',
+            description: '',
+            category: '',
+            calories: '',
+            protein: '',
+            fat: '',
+            carbohydrates: '',
+        });
+    };
+
+    const handleCloseDeleteModal = () => {
+        setShowDeleteModal(false);
+        setSelectedProduct(null);
+    };
+
+    const handleSaveEdit = async () => {
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            setError('You are not logged in. Please log in to edit products.');
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/Products/${selectedProduct.id}`, {
+                method: 'PUT',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify(editedProduct),
+            });
+
+            if (!response.ok) {
+                console.error('Error updating product:', response.statusText);
+                setError('Failed to update the product. Please try again later.');
+                return;
+            }
+
+            // Update the products list in the UI
+            setProducts(prevProducts =>
+                prevProducts.map(product =>
+                    product.id === selectedProduct.id ? { ...product, ...editedProduct } : product
+                )
+            );
+
+            handleCloseEditModal();
+        } catch (error) {
+            console.error('Unexpected error updating product:', error);
+            setError('An unexpected error occurred while updating the product. Please try again later.');
         }
     };
 
@@ -194,128 +285,150 @@ const MyProducts = () => {
                     </Alert>
                 )}
                 {loading ? (
-                    <div className="text-center">
-                        <p>Loading...</p>
-                    </div>
+                    <div className="text-center">Loading...</div>
                 ) : (
-                    <>
-                        {filteredProducts.length === 0 ? (
-                            <Alert variant="info">
-                                No products found for the selected category or search query.
-                            </Alert>
-                        ) : (
-                            <Table striped bordered hover responsive>
-                                <thead>
-                                    <tr>
-                                        <th>
-                                            <a
-                                                role="button"
-                                                onClick={() => handleSort('Name')}
-                                                style={{ cursor: 'pointer' }}
-                                            >
-                                                Name
-                                                {sortOrder === 'Name' && (
-                                                    <span>{sortDirection === 'asc' ? ' ▲' : ' ▼'}</span>
-                                                )}
-                                            </a>
-                                        </th>
-                                        <th>
-                                            <a
-                                                role="button"
-                                                onClick={() => handleSort('Category')}
-                                                style={{ cursor: 'pointer' }}
-                                            >
-                                                Category
-                                                {sortOrder === 'Category' && (
-                                                    <span>{sortDirection === 'asc' ? ' ▲' : ' ▼'}</span>
-                                                )}
-                                            </a>
-                                        </th>
-                                        <th>Description</th>
-                                        <th>
-                                            <a
-                                                role="button"
-                                                onClick={() => handleSort('Calories')}
-                                                style={{ cursor: 'pointer' }}
-                                            >
-                                                Calories (kcal)
-                                                {sortOrder === 'Calories' && (
-                                                    <span>{sortDirection === 'asc' ? ' ▲' : ' ▼'}</span>
-                                                )}
-                                            </a>
-                                        </th>
-                                        <th>
-                                            <a
-                                                role="button"
-                                                onClick={() => handleSort('Protein')}
-                                                style={{ cursor: 'pointer' }}
-                                            >
-                                                Protein (g)
-                                                {sortOrder === 'Protein' && (
-                                                    <span>{sortDirection === 'asc' ? ' ▲' : ' ▼'}</span>
-                                                )}
-                                            </a>
-                                        </th>
-                                        <th>
-                                            <a
-                                                role="button"
-                                                onClick={() => handleSort('Fat')}
-                                                style={{ cursor: 'pointer' }}
-                                            >
-                                                Fat (g)
-                                                {sortOrder === 'Fat' && (
-                                                    <span>{sortDirection === 'asc' ? ' ▲' : ' ▼'}</span>
-                                                )}
-                                            </a>
-                                        </th>
-                                        <th>
-                                            <a
-                                                role="button"
-                                                onClick={() => handleSort('Carbohydrates')}
-                                                style={{ cursor: 'pointer' }}
-                                            >
-                                                Carbohydrates (g)
-                                                {sortOrder === 'Carbohydrates' && (
-                                                    <span>{sortDirection === 'asc' ? ' ▲' : ' ▼'}</span>
-                                                )}
-                                            </a>
-                                        </th>
-                                        {true /* Replace with condition based on user role */ && (
-                                            <th>Actions</th>
-                                        )}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {filteredProducts.map(product => (
-                                        <tr key={product.id} style={{ cursor: 'pointer' }} onClick={() => window.location.href = `/products/details/${product.id}`}>
-                                            <td>{product.name}</td>
-                                            <td>{product.category}</td>
-                                            <td>{product.description}</td>
-                                            <td>{product.calories}</td>
-                                            <td>{product.protein}</td>
-                                            <td>{product.fat}</td>
-                                            <td>{product.carbohydrates}</td>
-                                            {true /* Replace with condition based on user role */ && (
-                                                <td>
-                                                    <Button
-                                                        variant="danger"
-                                                        onClick={(e) => {
-                                                            e.stopPropagation(); // Prevent row click
-                                                            deleteProduct(product.id);
-                                                        }}
-                                                    >
-                                                        Delete
-                                                    </Button>
-                                                </td>
-                                            )}
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </Table>
-                        )}
-                    </>
+                    <Table striped bordered hover responsive>
+                        <thead>
+                            <tr>
+                                <th onClick={() => handleSort('Name')}>Name</th>
+                                <th onClick={() => handleSort('Description')}>Description</th>
+                                <th>Category</th>
+                                <th onClick={() => handleSort('Calories')}>Calories</th>
+                                <th onClick={() => handleSort('Protein')}>Protein</th>
+                                <th onClick={() => handleSort('Fat')}>Fat</th>
+                                <th onClick={() => handleSort('Carbohydrates')}>Carbs</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {filteredProducts.map((product) => (
+                                <tr key={product.id}>
+                                    <td>{product.name}</td>
+                                    <td>{product.description}</td>
+                                    <td>{product.category}</td>
+                                    <td>{product.calories}</td>
+                                    <td>{product.protein}</td>
+                                    <td>{product.fat}</td>
+                                    <td>{product.carbohydrates}</td>
+                                    <td>
+                                        <Button
+                                            variant="warning"
+                                            onClick={() => handleEditProduct(product)}
+                                        >
+                                            Edit
+                                        </Button>
+                                        <Button
+                                            variant="danger"
+                                            onClick={() => handleDeleteProduct(product)}
+                                            className="ms-2"
+                                        >
+                                            Delete
+                                        </Button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </Table>
                 )}
             </div>
+
+            {/* Edit Product Modal */}
+            <Modal show={showEditModal} onHide={handleCloseEditModal} centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>Edit Product</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Name</Form.Label>
+                            <Form.Control
+                                type="text"
+                                value={editedProduct.name}
+                                onChange={(e) => setEditedProduct({ ...editedProduct, name: e.target.value })}
+                            />
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Description</Form.Label>
+                            <Form.Control
+                                type="text"
+                                value={editedProduct.description}
+                                onChange={(e) => setEditedProduct({ ...editedProduct, description: e.target.value })}
+                            />
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Category</Form.Label>
+                            <Form.Control
+                                as="select"
+                                value={editedProduct.category}
+                                onChange={(e) => setEditedProduct({ ...editedProduct, category: e.target.value })}
+                            >
+                                <option value="">Select Category</option>
+                                {categories.map(category => (
+                                    <option key={category} value={category}>{category}</option>
+                                ))}
+                            </Form.Control>
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Calories (kcal)</Form.Label>
+                            <Form.Control
+                                type="number"
+                                value={editedProduct.calories}
+                                onChange={(e) => setEditedProduct({ ...editedProduct, calories: e.target.value })}
+                            />
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Protein (g)</Form.Label>
+                            <Form.Control
+                                type="number"
+                                value={editedProduct.protein}
+                                onChange={(e) => setEditedProduct({ ...editedProduct, protein: e.target.value })}
+                            />
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Fat (g)</Form.Label>
+                            <Form.Control
+                                type="number"
+                                value={editedProduct.fat}
+                                onChange={(e) => setEditedProduct({ ...editedProduct, fat: e.target.value })}
+                            />
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Carbohydrates (g)</Form.Label>
+                            <Form.Control
+                                type="number"
+                                value={editedProduct.carbohydrates}
+                                onChange={(e) => setEditedProduct({ ...editedProduct, carbohydrates: e.target.value })}
+                            />
+                        </Form.Group>
+                    </Form>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleCloseEditModal}>
+                        Cancel
+                    </Button>
+                    <Button variant="primary" onClick={handleSaveEdit}>
+                        Save Changes
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+            {/* Delete Product Confirmation Modal */}
+            <Modal show={showDeleteModal} onHide={handleCloseDeleteModal} centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>Confirm Deletion</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    Are you sure you want to delete the product: <strong>{selectedProduct?.name}</strong>?
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleCloseDeleteModal}>
+                        Cancel
+                    </Button>
+                    <Button variant="danger" onClick={handleDeleteConfirmation}>
+                        Delete
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </Container>
     );
 };
