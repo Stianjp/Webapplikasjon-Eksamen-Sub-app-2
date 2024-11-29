@@ -218,22 +218,30 @@ public class ProductsController : ControllerBase
     /// <response code="400">Invalid user ID or input.</response>
     [HttpGet("user-products")]
     [Authorize]
-    /*[ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]*/
     public async Task<IActionResult> GetUserProducts([FromQuery] string? category = null)
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(currentUserId))
         {
-            return Unauthorized(new { message = "Invalid token or user not found." });
+            return BadRequest(new { message = "User ID is invalid." });
         }
 
+        // Get user products
         var products = await _productRepository.GetProductsByProducerIdAsync(currentUserId);
+
+        // Filter by category
         if (!string.IsNullOrEmpty(category))
         {
             products = products.Where(p => p.CategoryList.Contains(category)).ToList();
         }
 
-        return Ok(products);
+        // Retrieve all categories
+        var allCategories = await _productRepository.GetAllCategoriesAsync();
+
+        return Ok(new
+        {
+            products,
+            categories = allCategories.OrderBy(c => c).ToList()
+        });
     }
 }

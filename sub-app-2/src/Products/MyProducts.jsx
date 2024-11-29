@@ -11,13 +11,12 @@ const MyProducts = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
-    
+
     const fetchMyProducts = async () => {
         setLoading(true);
         setError(null);
-    
+
         try {
-            // Retrieve the token from localStorage
             const token = localStorage.getItem('authToken');
             if (!token) {
                 console.error('No authentication token found.');
@@ -25,62 +24,40 @@ const MyProducts = () => {
                 return;
             }
             console.log('Using token:', token);
-    
-            // Fetch user products
-            const response = await fetch(`${API_BASE_URL}/api/Products/user-products`, {
+
+            // Fetch user products with category filter
+            const response = await fetch(`${API_BASE_URL}/api/Products/user-products?category=${selectedCategory}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
             });
-    
-            // Handle unauthorized access
+
             if (response.status === 401) {
                 console.error('Unauthorized.');
                 setError('You are not authorized. Please log in again.');
-                //localStorage.removeItem('authToken'); // Clear invalid token
-                //window.location.href = '/account'; // Redirect to login
                 return;
             }
-    
-            // Handle other non-successful statuses
+
             if (!response.ok) {
                 console.error(`Error fetching products: ${response.status} ${response.statusText}`);
                 setError('Failed to fetch your products. Please try again later.');
                 return;
             }
-    
-            // Parse and set the product data
+
             const data = await response.json();
-            console.log('Fetched products:', data);
-            setProducts(data);
+            console.log('Fetched products and categories:', data);
+            setProducts(data.products || []);
+            setCategories(data.categories || []);
         } catch (error) {
-            // Handle unexpected errors
             console.error('Unexpected error fetching products:', error);
             setError('An unexpected error occurred. Please try again later.');
         } finally {
             setLoading(false);
         }
     };
-    
-    
-    
-    const fetchCategories = async () => {
-        try {
-            const response = await fetch(`${API_BASE_URL}/api/Products/categories`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch categories');
-            }
-
-            const data = await response.json();
-            setCategories(data);
-        } catch (error) {
-            console.error('Error fetching categories:', error);
-        }
-    };
 
     useEffect(() => {
-        fetchCategories();
         fetchMyProducts();
     }, [selectedCategory]);
 
@@ -90,6 +67,10 @@ const MyProducts = () => {
 
     const handleCategoryChange = (e) => {
         setSelectedCategory(e.target.value);
+    };
+
+    const clearCategoryFilter = () => {
+        setSelectedCategory('');
     };
 
     const handleProductUpdated = () => {
@@ -106,7 +87,7 @@ const MyProducts = () => {
             <div className="section-container">
                 <h1>My Products</h1>
                 <div className="d-flex justify-content-between align-items-center">
-                    <Button 
+                    <Button
                         className="btn btn-primary mt-3"
                         onClick={() => window.location.href = '/products/add'}
                     >
@@ -117,7 +98,7 @@ const MyProducts = () => {
                         {products.length} Products
                     </span>
                 </div>
-                
+
                 {/* Category Filter */}
                 <div className="mt-3">
                     <Form className="d-flex align-items-center">
@@ -138,7 +119,7 @@ const MyProducts = () => {
                                 </option>
                             ))}
                         </Form.Select>
-                        <Button 
+                        <Button
                             variant="primary"
                             onClick={fetchMyProducts}
                             className="me-2"
@@ -146,9 +127,9 @@ const MyProducts = () => {
                             Filter
                         </Button>
                         {selectedCategory && (
-                            <Button 
+                            <Button
                                 variant="secondary"
-                                onClick={() => setSelectedCategory('')}
+                                onClick={clearCategoryFilter}
                             >
                                 Clear Filter
                             </Button>
@@ -187,7 +168,7 @@ const MyProducts = () => {
                                 No products found for the selected category or search query.
                             </Alert>
                         ) : (
-                            <Tabell 
+                            <Tabell
                                 products={filteredProducts}
                                 isAdmin={false}
                                 isProducer={true}
