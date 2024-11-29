@@ -191,24 +191,28 @@
     }, []);
 
     return (
-      <Container>
-        <div className="account-container">
-          {errors.length > 0 && (
-            <Alert variant="danger">
-              {errors.map((error, index) => (
-                <p key={index}>{error}</p>
-              ))}
-            </Alert>
-          )}
-          {successMessage && <Alert variant="success">{successMessage}</Alert>}
-    
-          {isAuthenticated ? (
-            <Row>
-              <Col>
-                
-              </Col>
-            </Row>
-          ) : (
+  <Container>
+    <div className="account-container">
+      {errors.length > 0 && (
+        <Alert variant="danger">
+          {errors.map((error, index) => (
+            <p key={index}>{error}</p>
+          ))}
+        </Alert>
+      )}
+      {successMessage && <Alert variant="success">{successMessage}</Alert>}
+
+      {isAuthenticated ? (
+        <Row>
+          <Col>
+            {/* Content for authenticated users */}
+            <h2>Welcome back!</h2>
+            <Button variant="primary" onClick={() => navigate('/')}>
+              Go to Dashboard
+            </Button>
+          </Col>
+        </Row>
+      ) : (
             <Row>
               {/* Login Form */}
               <Col md={6} className="mb-4">

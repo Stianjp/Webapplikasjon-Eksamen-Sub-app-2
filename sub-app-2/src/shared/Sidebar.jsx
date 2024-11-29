@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useLocation, useMatch } from 'react-router-dom';
+import { Link, useLocation, useMatch, useNavigate } from 'react-router-dom';  // Import useNavigate
 import './Sidebar.css';
 import LogoGreen from '../icons/LogoGreen.svg';
 import HomeIcon from '../icons/house-solid.svg';
@@ -12,6 +12,7 @@ import LogoutIcon from '../icons/right-to-bracket-solid.svg';
 
 const Sidebar = ({ isAuthenticated = false, roles = [], onLogout }) => {
   const location = useLocation();
+  const navigate = useNavigate();  // Initialize useNavigate hook
 
   // Check roles
   const isAdmin = roles.includes('Administrator');
@@ -30,6 +31,12 @@ const Sidebar = ({ isAuthenticated = false, roles = [], onLogout }) => {
   const addProductMatch = useMatch('/products/add');
   const accountMatch = useMatch('/account');
   const privacyMatch = useMatch('/privacy');
+
+  // Handle logout functionality
+  const handleLogout = () => {
+    onLogout();  // Assuming onLogout clears user data or performs logout
+    navigate('/');  // Redirect to the home page after logout
+  };
 
   return (
     <div className="sidebar-content d-flex flex-column flex-shrink-0 p-3">
@@ -104,7 +111,7 @@ const Sidebar = ({ isAuthenticated = false, roles = [], onLogout }) => {
       {/* Authentication Actions */}
       <div className="logout mt-auto">
         {isAuthenticated ? (
-          <button className="btn btn-danger d-flex align-items-center" onClick={onLogout}>
+          <button className="btn btn-danger d-flex align-items-center" onClick={handleLogout}>
             <img src={LogoutIcon} alt="Logout" className="icon" /> Logout
           </button>
         ) : (
