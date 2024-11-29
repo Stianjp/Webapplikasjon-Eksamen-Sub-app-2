@@ -17,13 +17,16 @@ const MyProducts = () => {
         setError(null);
     
         try {
-            const token = localStorage.getItem('authToken'); // Use the correct key
+            // Retrieve the token from localStorage
+            const token = localStorage.getItem('authToken');
             if (!token) {
                 console.error('No authentication token found.');
-                window.location.href = '/account'; // Redirect to login
+                setError('You are not logged in. Please log in to view your products.');
                 return;
             }
+            console.log('Using token:', token);
     
+            // Fetch user products
             const response = await fetch(`${API_BASE_URL}/api/Products/user-products`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -31,19 +34,35 @@ const MyProducts = () => {
                 },
             });
     
-            if (!response.ok) {
-                throw new Error('Failed to fetch products');
+            // Handle unauthorized access
+            if (response.status === 401) {
+                console.error('Unauthorized.');
+                setError('You are not authorized. Please log in again.');
+                //localStorage.removeItem('authToken'); // Clear invalid token
+                //window.location.href = '/account'; // Redirect to login
+                return;
             }
     
+            // Handle other non-successful statuses
+            if (!response.ok) {
+                console.error(`Error fetching products: ${response.status} ${response.statusText}`);
+                setError('Failed to fetch your products. Please try again later.');
+                return;
+            }
+    
+            // Parse and set the product data
             const data = await response.json();
+            console.log('Fetched products:', data);
             setProducts(data);
         } catch (error) {
-            console.error('Error fetching products:', error);
-            setError('Failed to fetch your products. Please try again later.');
+            // Handle unexpected errors
+            console.error('Unexpected error fetching products:', error);
+            setError('An unexpected error occurred. Please try again later.');
         } finally {
             setLoading(false);
         }
     };
+    
     
     
     const fetchCategories = async () => {

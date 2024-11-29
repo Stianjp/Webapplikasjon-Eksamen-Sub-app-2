@@ -59,7 +59,7 @@ public class ProductsController : ControllerBase
     /// <returns>The product details if found; otherwise, a 404 response.</returns>
     /// <response code="200">Returns the product details.</response>
     /// <response code="404">Product not found.</response>
-    [HttpGet("{id}")]
+    [HttpGet("{id:int}")]
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -83,7 +83,7 @@ public class ProductsController : ControllerBase
     /// <response code="400">Invalid input data.</response>
     /// <response code="500">An error occurred while creating the product.</response>
     [HttpPost]
-    [Authorize(Roles = UserRoles.FoodProducer + "," + UserRoles.Administrator)]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -120,7 +120,7 @@ public class ProductsController : ControllerBase
     /// <response code="403">User is not authorized to update the product.</response>
     /// <response code="500">An error occurred while updating the product.</response>
     [HttpPut("{id}")]
-    [Authorize(Roles = UserRoles.FoodProducer + "," + UserRoles.Administrator)]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -167,7 +167,7 @@ public class ProductsController : ControllerBase
     /// <response code="403">User is not authorized to delete the product.</response>
     /// <response code="400">Unable to delete the product.</response>
     [HttpDelete("{id}")]
-    [Authorize(Roles = UserRoles.FoodProducer + "," + UserRoles.Administrator)]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -217,15 +217,14 @@ public class ProductsController : ControllerBase
     /// <response code="200">Returns the list of user-created products.</response>
     /// <response code="400">Invalid user ID or input.</response>
     [HttpGet("user-products")]
-    [Authorize(Roles = UserRoles.FoodProducer + "," + UserRoles.Administrator)]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [Authorize]
+    /*[ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]*/
     public async Task<IActionResult> GetUserProducts([FromQuery] string? category = null)
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(currentUserId))
         {
-            Console.WriteLine("No valid user ID found in token.");
             return Unauthorized(new { message = "Invalid token or user not found." });
         }
 

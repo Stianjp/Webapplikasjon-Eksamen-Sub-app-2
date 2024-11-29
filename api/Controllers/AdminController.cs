@@ -9,7 +9,7 @@ using api.Models;
 /// Provides administrative functionalities for managing users and roles.
 /// Requires the user to have the Administrator role.
 /// </summary>
-[Authorize(Roles = UserRoles.Administrator)]
+[Authorize]
 [Route("api/[controller]")]
 [ApiController]
 public class AdminController : ControllerBase
