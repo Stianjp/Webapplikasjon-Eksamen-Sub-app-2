@@ -27,10 +27,12 @@ const MyProducts = () => {
 
             // Fetch user products with category filter
             const response = await fetch(`${API_BASE_URL}/api/Products/user-products?category=${selectedCategory}`, {
+                method: 'GET',
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include',
             });
 
             if (response.status === 401) {

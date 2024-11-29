@@ -130,7 +130,8 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins(builder.Configuration["CORS:AllowedOrigins"].Split(','))
             .AllowAnyHeader()
-            .AllowAnyMethod();
+            .AllowAnyMethod()
+            .AllowCredentials();
     });
 });
 

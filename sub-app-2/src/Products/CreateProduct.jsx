@@ -48,10 +48,12 @@ const CreateProduct = () => {
         try {
             const token = localStorage.getItem('token');
             const response = await fetch(`${API_BASE_URL}/api/Products/${id}`, {
+                method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
-                }
+                },
+                credentials: 'include'
             });
 
             if (!response.ok) throw new Error('Failed to fetch product');
