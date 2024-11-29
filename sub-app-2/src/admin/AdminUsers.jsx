@@ -1,19 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Form } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom'; // Remove none admin-useres
 import Tabell from './components/UserTable'; 
 import UserEdit from './components/UserEdit'; 
+import { useUser } from '../contexts/UserContext'; // Get the user context 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './components/admin.css';
 
 const AdminUsers = () => {
+  const navigate = useNavigate(); // Navigation hook
+  const { user } = useUser(); // get userinfo from Context
+
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [sortKey, setSortKey] = useState(null);
   const [sortDirection, setSortDirection] = useState('asc');
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedUser, setSelectedUser] = useState(null); // Brukeren som redigeres
+  const [selectedUser, setSelectedUser] = useState(null);
 
-  // Mock data for brukere
+  // Beskytt siden basert på rolle
+  useEffect(() => {
+    if (user.role !== 'Admin') {
+      alert('You are not authorized to view this page.');
+      navigate('./Home/Home'); // Will navigate to the home-page
+    }
+  }, [user, navigate]);
+
   useEffect(() => {
     const mockUsers = [
       { id: 1, name: 'Petter Northug', username: 'petternorthug', role: 'User' },
@@ -24,7 +36,6 @@ const AdminUsers = () => {
     setFilteredUsers(mockUsers);
   }, []);
 
-  // Sort
   const handleSort = (key) => {
     const direction = sortKey === key && sortDirection === 'asc' ? 'desc' : 'asc';
     setSortKey(key);
@@ -39,7 +50,6 @@ const AdminUsers = () => {
     setFilteredUsers(sorted);
   };
 
-  // Søke-funksjon
   const handleSearch = (term) => {
     setSearchTerm(term);
     const lowerCaseTerm = term.toLowerCase();
@@ -52,13 +62,11 @@ const AdminUsers = () => {
     setFilteredUsers(filtered);
   };
 
-  // Open edit
   const handleEdit = (id) => {
     const userToEdit = users.find((user) => user.id === id);
     setSelectedUser(userToEdit);
   };
 
-  // Save change
   const handleSave = (updatedUser) => {
     setUsers((prevUsers) =>
       prevUsers.map((user) => (user.id === updatedUser.id ? updatedUser : user))
@@ -71,7 +79,6 @@ const AdminUsers = () => {
     setSelectedUser(null); // Close edit-menu
   };
 
-  // Delete a user
   const handleDelete = (id) => {
     if (window.confirm('Are you sure you want to delete this user?')) {
       setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
@@ -94,7 +101,6 @@ const AdminUsers = () => {
         />
       </Form.Group>
 
-      
       <Tabell
         data={filteredUsers}
         onEdit={handleEdit}
@@ -104,7 +110,6 @@ const AdminUsers = () => {
         onSort={handleSort}
       />
 
-      
       {selectedUser && (
         <UserEdit
           user={selectedUser}
