@@ -138,21 +138,21 @@ const Account = ({ onLogin }) => {
       const loginResponse = await fetch(`${API_BASE_URL}/login`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+            'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          username: registerFormData.username,
-          password: registerFormData.password,
+            username: registerFormData.username,
+            password: registerFormData.password,
         }),
-      });
-
-      if (!loginResponse.ok) {
+    });
+    
+    if (!loginResponse.ok) {
         const errorData = await loginResponse.json();
         throw new Error(errorData.message || 'Auto-login failed.');
-      }
-
-      const loginData = await loginResponse.json();
-      localStorage.setItem('authToken', loginData.token); // Save the token
+    }
+    
+    const loginData = await loginResponse.json();
+    localStorage.setItem('authToken', loginData.token); // Save the token
       if (onLogin) onLogin(loginData); // Call parent login handler if provided
       setSuccessMessage('Registration and login successful!');
       setErrors([]);
