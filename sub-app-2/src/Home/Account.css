@@ -1,20 +1,87 @@
+/* Account Container */
 .account-container {
   margin: 50px auto;
+  padding: 20px; /* Add padding for spacing */
+  max-width: 900px; /* Wider container */
+  background-color: #fff; /* White background for card */
+  border-radius: 10px; /* Soft rounded corners */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); /* Larger shadow for more depth */
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for hover effect */
 }
 
+.account-container:hover {
+  transform: translateY(-5px); /* Slight lift on hover */
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.15); /* Enhance shadow effect on hover */
+}
+
+/* Card Styling */
 .card {
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */
+  border-radius: 8px; /* Rounded corners */
+  background-color: #fff;
+  padding: 20px;
+  transition: box-shadow 0.3s ease;
 }
 
+/* Heading (h2) */
 h2 {
   text-align: center;
+  font-size: 1.5rem;
+  font-weight: 600;
   margin-bottom: 20px;
+  color: #333; /* Dark text for contrast */
 }
 
+/* Button */
 .button {
   width: 100%;
+  padding: 12px 20px;
+  font-size: 1rem;
+  font-weight: bold;
+  background-color: #4CAF50; /* Green background for the button */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth transition */
 }
 
+.button:hover {
+  background-color: #45a049; /* Slightly darker green on hover */
+  transform: translateY(-2px); /* Slight lift effect on hover */
+}
+
+/* Alert Styling */
 .alert {
-  margin-top: 10px;
+  margin-top: 20px;
+  padding: 15px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: none;
+  color: #fff;
+  background-color: #f44336; /* Red background for errors */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  animation: fadeIn 0.5s ease-in-out; /* Fade-in effect for alert */
+}
+
+.alert.success {
+  background-color: #4caf50; /* Green for success */
+}
+
+.alert.info {
+  background-color: #2196F3; /* Blue for info */
+}
+
+.alert.warning {
+  background-color: #ff9800; /* Orange for warnings */
+}
+
+/* Fade-in animation for alert */
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
