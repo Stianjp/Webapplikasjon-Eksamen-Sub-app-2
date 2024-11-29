@@ -222,15 +222,14 @@ public class ProductsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetUserProducts([FromQuery] string? category = null)
     {
-        string currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
-
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(currentUserId))
         {
-            return BadRequest(new { message = "User ID is invalid." });
+            Console.WriteLine("No valid user ID found in token.");
+            return Unauthorized(new { message = "Invalid token or user not found." });
         }
 
         var products = await _productRepository.GetProductsByProducerIdAsync(currentUserId);
-
         if (!string.IsNullOrEmpty(category))
         {
             products = products.Where(p => p.CategoryList.Contains(category)).ToList();

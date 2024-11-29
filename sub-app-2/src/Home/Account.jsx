@@ -9,12 +9,14 @@ const Account = ({ onLogin }) => {
     username: '',
     password: '',
   });
+
   const [registerFormData, setRegisterFormData] = useState({
     username: '',
     password: '',
     confirmPassword: '',
-    accountType: 'RegularUser',
+    role: 'RegularUser', // Changed from accountType to role
   });
+
   const [errors, setErrors] = useState([]);
   const [successMessage, setSuccessMessage] = useState('');
 
@@ -124,7 +126,7 @@ const Account = ({ onLogin }) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(registerFormData),
+        body: JSON.stringify(registerFormData), // Include role in the request body
       });
 
       if (!registerResponse.ok) {
@@ -266,8 +268,8 @@ const Account = ({ onLogin }) => {
                   <Form.Group className="mb-3">
                     <Form.Label>Account Type</Form.Label>
                     <Form.Select
-                      name="accountType"
-                      value={registerFormData.accountType}
+                      name="role" // Changed from accountType to role
+                      value={registerFormData.role}
                       onChange={handleRegisterInputChange}
                     >
                       <option value="RegularUser">Regular User</option>
