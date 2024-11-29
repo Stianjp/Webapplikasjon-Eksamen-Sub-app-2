@@ -49,7 +49,7 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "FoodStack (Sub-App-2) | API",
+        Title = "FoodBank (Sub-App-2) | API",
         Version = "v1"
     });
 
