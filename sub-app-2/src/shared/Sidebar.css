@@ -35,6 +35,13 @@
   padding: 10px 20px;
 }
 
+.logo {
+  width: 100px; /* Adjust width as needed */
+  height: auto; /* Maintain aspect ratio */
+  margin: 0 auto; /* Center the logo if needed */
+  display: block; /* Ensure it behaves as a block element */
+}
+
 /* Sidebar styles for large screens */
 @media (min-width: 992px) {
   .d-lg-flex {

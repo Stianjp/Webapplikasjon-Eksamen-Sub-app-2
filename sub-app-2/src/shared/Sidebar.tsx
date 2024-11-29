@@ -1,138 +1,164 @@
-import React, { useState } from 'react';
-import { Nav, Navbar, Collapse, NavDropdown } from 'react-bootstrap';
-import { Link, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import './Sidebar.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import SolidList from '../icons/list-solid.svg';
-import SolidCircle from '../icons/circle-plus-solid.svg';
-import EyeSolid from '../icons/eye-solid.svg';
-import BowlSolid from '../icons/bowl-food-solid.svg';
-import Home from '../icons/house-solid.svg';
 import LogoGreen from '../icons/LogoGreen.svg';
-import AccountGear from '../icons/gear-solid.svg';
-import MyAccount from '../icons/gauge-solid.svg';
-import Logout from '../icons/right-to-bracket-solid.svg';
-import { FaUsersCog } from 'react-icons/fa';
+import HomeIcon from '../icons/house-solid.svg';
+import ProductsIcon from '../icons/box-open-solid.svg';
+import MyProductsIcon from '../icons/list-solid.svg';
+import AddProductIcon from '../icons/circle-plus-solid.svg';
+import AccountIcon from '../icons/gear-solid.svg';
+import PrivacyIcon from '../icons/eye-solid.svg';
+import LogoutIcon from '../icons/right-to-bracket-solid.svg';
 
-const Sidebar: React.FC = () => {
-  const [open, setOpen] = useState(false); // State for toggling the navbar on small screens
-  const navigate = useNavigate();
+interface SidebarProps {
+  isAuthenticated: boolean;
+  roles: string[];
+}
 
-  const handleLogout = () => {
-    // Remove the authToken from localStorage
-    localStorage.removeItem('authToken');
+const Sidebar: React.FC<SidebarProps> = ({
+  isAuthenticated = false,
+  roles = [],
+}) => {
+  const location = useLocation();
 
-    // Redirect the user to the login page
-    navigate('/account');
-  };
+  // Safely check roles
+  const isAdmin = roles.includes('Administrator');
+  const isFoodProducer = roles.includes('FoodProducer');
+  const isRegularUser = roles.includes('RegularUser');
+
+  const activeClass = (path: string) =>
+    location.pathname === path ? 'active' : '';
 
   return (
-    <>
-      {/* Navbar for small screens */}
-      <Navbar bg="light" expand="lg" className="d-lg-none shadow">
-        <div className="d-flex justify-content-between align-items-center w-100 p-3">
-          <Navbar.Brand as={Link} to="/" className="d-flex align-items-center">
-            <img src={LogoGreen} alt="Logo" className="me-2" style={{ width: '30px' }} />
-            <span>FoodBank</span>
-          </Navbar.Brand>
-          <Navbar.Toggle
-            aria-controls="responsive-navbar-nav"
-            onClick={() => setOpen(!open)}
-            className="border-0"
-          />
-        </div>
-        <Collapse in={open}>
-          <div id="responsive-navbar-nav">
-            <Nav className="flex-column">
-              <Nav.Link as={Link} to="/" className="border-bottom">
-                <img src={Home} alt="Home" className="icon" /> Home
-              </Nav.Link>
-              <Nav.Link as={Link} to="/products" className="border-bottom ">
-                <img src={SolidList} alt="Products" className="icon" /> All products
-              </Nav.Link>
-              <Nav.Link as={Link} to="/add" className="border-bottom p-2">
-                <img src={SolidCircle} alt="Create products" className="icon" /> Add a product
-              </Nav.Link>
-              <Nav.Link as={Link} to={'/my'} className="border-bottom p-2">
-                <img src={BowlSolid} alt="My products" className="icon" /> My products
-              </Nav.Link>
-              <Nav.Link as={Link} to="/account" className="border-bottom">
-                <img src={AccountGear} alt="Account" className="icon" /> Account
-              </Nav.Link>
-              <Nav.Link as={Link} to="/privacy" className="border-bottom p-2">
-                <img src={EyeSolid} alt="Privacy" className="icon" /> Privacy
-              </Nav.Link>
-              <Nav.Link as={Link} to="/admin/users" className="border-bottom p-2">
-                <FaUsersCog className="icon" />
-                Admin
-              </Nav.Link>
-              <Nav.Link as={Link} to="#" className="text-danger p-3" onClick={handleLogout}>
-                <img src={Logout} alt="Logout" className="icon" /> Logout
-              </Nav.Link>
-            </Nav>
-          </div>
-        </Collapse>
-      </Navbar>
+    <div className="sidebar-content d-flex flex-column flex-shrink-0 p-3">
+      <img className="logo" src={LogoGreen} alt="Logo of Food Bank" />
+      <span className="navbar-brand">FoodBank</span>
+      <hr />
+      <ul className="nav nav-pills flex-column mb-auto">
+        <li className="nav-item">
+          <Link className={`nav-link ${activeClass('/')}`} to="/">
+            <img src={HomeIcon} alt="Home page" className="icon" /> Home
+          </Link>
+        </li>
 
-      {/* Sidebar for large screens */}
-      <Navbar bg="light" expand="lg" className="vh-100 flex-column d-none d-lg-flex shadow">
-        <Navbar.Brand as={Link} to="/" className="p-3 text-center border-bottom">
-          <img src={LogoGreen} alt="Logo" className="mb-3" style={{ width: '50px' }} />
-          <h1 className="h5 mb-0">FoodBank</h1>
-        </Navbar.Brand>
-        <Nav className="flex-column nav-pills mt-3">
-          <Nav.Link as={Link} to="/" className="text-dark d-flex align-items-center p-3">
-            <img src={Home} alt="Home" className="icon" /> Home
-          </Nav.Link>
-          <NavDropdown
-            title={
-              <span>
-                <img src={BowlSolid} alt="List of all products" className="icon" /> Products
-              </span>
-            }
-            className="text-dark d-flex align-items-center p-3"
+        <li className="nav-item">
+          {isAuthenticated ? (
+            <>
+              <Link
+                className={`nav-link ${activeClass('/products')}`}
+                to="/products"
+              >
+                <img
+                  src={ProductsIcon}
+                  alt="All products"
+                  className="icon"
+                />{' '}
+                Products
+              </Link>
+              {(isAdmin || isFoodProducer || isRegularUser) && (
+                <ul className="nav flex-column ms-2">
+                  <li className="nav-item">
+                    <Link
+                      className={`nav-link ${activeClass('/products')}`}
+                      to="/products"
+                    >
+                      <img
+                        src={ProductsIcon}
+                        alt="View all products"
+                        className="icon"
+                      />{' '}
+                      View All
+                    </Link>
+                  </li>
+                  {!isRegularUser && (
+                    <>
+                      <li className="nav-item">
+                        <Link
+                          className={`nav-link ${activeClass(
+                            '/products/my'
+                          )}`}
+                          to="/products/my"
+                        >
+                          <img
+                            src={MyProductsIcon}
+                            alt="My products"
+                            className="icon"
+                          />{' '}
+                          My Products
+                        </Link>
+                      </li>
+                      <li className="nav-item">
+                        <Link
+                          className={`nav-link ${activeClass(
+                            '/products/add'
+                          )}`}
+                          to="/products/add"
+                        >
+                          <img
+                            src={AddProductIcon}
+                            alt="Add a product"
+                            className="icon"
+                          />{' '}
+                          Add
+                        </Link>
+                      </li>
+                    </>
+                  )}
+                </ul>
+              )}
+            </>
+          ) : (
+            <a className="nav-link disabled" aria-disabled="true">
+              <img
+                src={ProductsIcon}
+                alt="Products"
+                className="icon"
+              />{' '}
+              Products
+            </a>
+          )}
+        </li>
+
+        <li className="nav-item">
+          <Link
+            className={`nav-link ${activeClass('/account')}`}
+            to="/account"
           >
-            <NavDropdown.Item as={Link} to="/products">
-              <img src={SolidList} alt="See all products" className="icon" /> All products
-            </NavDropdown.Item>
-            <NavDropdown.Divider />
-            <NavDropdown.Item as={Link} to="/products/add">
-              <img src={SolidCircle} alt="Add a new product" className="icon" /> Add product
-            </NavDropdown.Item>
-            <NavDropdown.Item as={Link} to="/products/my">
-              <img src={BowlSolid} alt="List of all my products" className="icon" /> My products
-            </NavDropdown.Item>
-          </NavDropdown>
-          <NavDropdown
-            title={
-              <span>
-                <img src={AccountGear} alt="Account" className="icon" /> Account
-              </span>
-            }
-            className="text-dark d-flex align-items-center p-3"
+            <img
+              src={AccountIcon}
+              alt="Account settings"
+              className="icon"
+            />{' '}
+            Account
+          </Link>
+        </li>
+
+        <li className="nav-item">
+          <Link
+            className={`nav-link ${activeClass('/privacy')}`}
+            to="/privacy"
           >
-            <NavDropdown.Item as={Link} to="/account">
-              <img src={MyAccount} alt="My Account" className="icon" /> My Account
-            </NavDropdown.Item>
-            <NavDropdown.Divider />
-            <NavDropdown.Item as={Link} to="/privacy">
-              <img src={EyeSolid} alt="Privacy" className="icon" /> Privacy
-            </NavDropdown.Item>
-            <NavDropdown.Item as={Link} to="/admin/users">
-              <FaUsersCog className="icon" /> Admin
-            </NavDropdown.Item>
-          </NavDropdown>
-          <div className="logout-button mt-auto p-3 border-top">
-            <button
-              className="btn btn-danger d-flex align-items-center w-100"
-              onClick={handleLogout}
-            >
-              <img src={Logout} alt="Logout" className="icon" /> Logout
-            </button>
-          </div>
-        </Nav>
-      </Navbar>
-    </>
+            <img src={PrivacyIcon} alt="Privacy policy" className="icon" />{' '}
+            Privacy
+          </Link>
+        </li>
+      </ul>
+      <hr />
+      <div className="logout">
+        {isAuthenticated ? (
+          <button className="btn btn-danger d-flex align-items-center">
+            <img src={LogoutIcon} alt="Logout" className="icon" /> Logout
+          </button>
+        ) : (
+          <Link
+            className="btn btn-primary d-flex align-items-center"
+            to="/login"
+          >
+            <img src={LogoutIcon} alt="Login" className="icon" /> Login
+          </Link>
+        )}
+      </div>
+    </div>
   );
 };
 
