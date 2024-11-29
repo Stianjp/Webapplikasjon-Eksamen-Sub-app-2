@@ -206,7 +206,7 @@
         <Row>
           <Col>
             {/* Content for authenticated users */}
-            <h2>Welcome back!</h2>
+            <h2>Welcome!</h2>
             <Button variant="primary" onClick={() => navigate('/')}>
               Go to Dashboard
             </Button>

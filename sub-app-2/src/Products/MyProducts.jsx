@@ -218,7 +218,6 @@ const MyProducts = () => {
                         className="btn btn-primary mt-3"
                         onClick={() => window.location.href = '/products/add'}
                     >
-                        <img src={`${process.env.PUBLIC_URL}/icons/plus-solid.svg`} alt="add new product" className="icon" />
                         Add new product
                     </Button>
                     <span className="badge bg-warning me-2">
