@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container } from 'react-bootstrap';
+import { Container, Button, Row, Col } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 
@@ -11,17 +11,13 @@ const Home = () => {
 
   if (authToken) {
     try {
-        const decodedToken = jwtDecode(authToken);
-        // Extract username
-        userName = decodedToken['name'] || '';
-        // Extract roles
-        roles = decodedToken['role'] || decodedToken['roles'];
-        // Ensure roles is an array
-        if (!Array.isArray(roles)) {
-            roles = [roles];
-        }
+      const decodedToken = jwtDecode(authToken);
+      userName = decodedToken['name'] || '';
+      roles = decodedToken['role'] || decodedToken['roles'];
+      if (!Array.isArray(roles)) {
+        roles = [roles];
+      }
 
-      // Determine role-specific message
       if (roles.includes('Administrator')) {
         roleMessage = 'As an administrator, you have full access to manage products and users.';
       } else if (roles.includes('FoodProducer')) {
@@ -33,47 +29,70 @@ const Home = () => {
       }
     } catch (error) {
       console.error('Error decoding token:', error);
-      // If there's an error decoding the token, treat the user as unauthenticated
       userName = '';
       roles = [];
     }
   }
 
   return (
-    <Container>
-      {authToken && userName ? (
-        // Authenticated User Content
-        <div className="welcome-container">
-          <div className="jumbotron">
-            <div className="text-center mb-3 rounded">
-              <img src="/icons/bowl-food-solid.svg" alt="App Logo" className="img-fluid" />
+    <Container className="mt-5">
+      <Row className="justify-content-center">
+        <Col md={8} lg={6} className="text-center">
+          {authToken && userName ? (
+            // Authenticated User Content
+            <div className="welcome-container p-4 border rounded shadow-lg hover-shadow">
+              <img
+                src="/icons/bowl-food-solid.svg"
+                alt="App Logo"
+                className="img-fluid mb-3"
+                style={{ width: '100px', height: '100px' }}
+              />
+              <h2>Welcome, {userName}!</h2>
+              <p className="lead text-muted">{roleMessage}</p>
+              <hr />
+              <p>Get started by exploring our products.</p>
+              <Link to="/products">
+                <Button variant="primary" size="lg" className="d-flex align-items-center justify-content-center">
+                  <img
+                    src="/icons/arrow-right-solid.svg"
+                    alt="Go to products"
+                    className="me-2"
+                    style={{ width: '20px', height: '20px' }}
+                  />
+                  View Products
+                </Button>
+              </Link>
             </div>
-            <h2>Welcome, {userName}!</h2>
-            <h6 className="lead">{roleMessage}</h6>
-            <hr className="my-4" />
-            <p className="second-color">Get started by exploring our products.</p>
-            <Link className="btn btn-primary icon" to="/products" role="button">
-              <img src="/icons/arrow-right-solid.svg" alt="Go to products" /> View Products
-            </Link>
-          </div>
-        </div>
-      ) : (
-        // Unauthenticated User Content
-        <div className="welcome-container">
-          <div className="jumbotron">
-            <div className="text-center mb-3 rounded">
-              <img src="/icons/bowl-food-solid.svg" alt="App Logo" className="img-fluid" />
+          ) : (
+            // Unauthenticated User Content
+            <div className="welcome-container p-4 border rounded shadow-lg hover-shadow">
+              <img
+                src="/icons/bowl-food-solid.svg"
+                alt="App Logo"
+                className="img-fluid mb-3"
+                style={{ width: '100px', height: '100px' }}
+              />
+              <h2>Welcome to FoodStack!</h2>
+              <p className="lead text-muted">Discover a variety of food products and their nutritional information.</p>
+              <hr />
+              <p className="text-muted">You need to log in to access the full features of our application.</p>
+              <div className="d-flex justify-content-center mt-3">
+                <Link to="/account">
+                  <Button variant="primary" size="lg" className="d-flex align-items-center justify-content-center">
+                    <img
+                      src="/icons/arrow-right-solid.svg"
+                      alt="Go to register form"
+                      className="me-2"
+                      style={{ width: '20px', height: '20px' }}
+                    />
+                    Log in or register
+                  </Button>
+                </Link>
+              </div>
             </div>
-            <h2>Welcome to FoodStack!</h2>
-            <h6 className="lead">Discover a variety of food products and their nutritional information.</h6>
-            <hr className="my-4" />
-            <p className="second-color">You need to log in to access the full features of our application.</p>
-            <Link className="btn btn-primary icon" to="/account" role="button">
-              <img src="/icons/arrow-right-solid.svg" alt="Go to register form" /> Log in or register
-            </Link>
-          </div>
-        </div>
-      )}
+          )}
+        </Col>
+      </Row>
     </Container>
   );
 };
