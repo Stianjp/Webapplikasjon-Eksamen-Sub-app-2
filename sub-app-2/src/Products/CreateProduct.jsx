@@ -5,12 +5,18 @@ import { useNavigate, useParams } from 'react-router-dom';
 const API_BASE_URL = 'http://localhost:7067';
 
 const CreateProduct = () => {
+      // Get product ID from URL if editing existing product
+      // Maybe something we also need to change? 
     const { id } = useParams();
     const navigate = useNavigate();
+
+
+    // Component state management
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(false);
 
+    // Initialize form data with empty values
     const [formData, setFormData] = useState({
         name: '',
         description: '',
@@ -21,11 +27,22 @@ const CreateProduct = () => {
         carbohydrates: ''
     });
 
+     /**
+     * Effect hook to fetch product data when editing
+     * Only runs when there's an ID in the URL
+     * Maybe something that we need to change 
+     */
+
     useEffect(() => {
         if (id) {
             fetchProduct();
         }
     }, [id]);
+
+    /**
+     * Fetches product data from the API for editing
+     * Sets the form data with the retrieved product information
+     */
 
     const fetchProduct = async () => {
         try {
@@ -40,6 +57,7 @@ const CreateProduct = () => {
             if (!response.ok) throw new Error('Failed to fetch product');
 
             const data = await response.json();
+             // Populate form with existing product data
             setFormData({
                 name: data.name || '',
                 description: data.description || '',
@@ -55,6 +73,11 @@ const CreateProduct = () => {
         }
     };
 
+    /**
+     * Handles changes to form inputs
+     * Updates the form state with new values as the user types
+     */
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({
@@ -62,6 +85,11 @@ const CreateProduct = () => {
             [name]: value
         }));
     };
+
+    /**
+     * Special handler for category input
+     * Converts comma-separated string into array of categories
+     */
 
     const handleCategoryChange = (e) => {
         const categories = e.target.value.split(',').map(cat => cat.trim());
@@ -71,6 +99,12 @@ const CreateProduct = () => {
         }));
     };
 
+    /**
+     * Handles form submission
+     * Sends data to API to either create or update a product
+     * Redirects to products page on success
+     */
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -79,12 +113,13 @@ const CreateProduct = () => {
 
         try {
             const token = localStorage.getItem('token');
+            // Determine if we're creating or updating based on ID presence
             const url = id 
                 ? `${API_BASE_URL}/api/Products/${id}`
                 : `${API_BASE_URL}/api/Products`;
 
             const method = id ? 'PUT' : 'POST';
-
+              // Send request to API
             const response = await fetch(url, {
                 method: method,
                 headers: {
@@ -93,6 +128,7 @@ const CreateProduct = () => {
                 },
                 body: JSON.stringify({
                     ...formData,
+                    // Convert string values to numbers for numeric fields
                     calories: parseFloat(formData.calories),
                     protein: parseFloat(formData.protein),
                     fat: parseFloat(formData.fat),
@@ -102,6 +138,7 @@ const CreateProduct = () => {
 
             if (!response.ok) throw new Error('Failed to save product');
 
+            // Show success message and redirect
             setSuccess(true);
             setTimeout(() => {
                 navigate('/products');
