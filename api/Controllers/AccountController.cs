@@ -170,21 +170,45 @@ public class AccountController : ControllerBase
     }
 
     /// <summary>
-    /// Generates a JWT token for a user with their roles.
+    /// Generates a JSON Web Token (JWT) for the specified user, including their roles.
     /// </summary>
     /// <param name="user">The user for whom the token is being generated.</param>
-    /// <param name="roles">The roles associated with the user.</param>
-    /// <returns>A JWT token as a string.</returns>
+    /// <param name="roles">A list of roles assigned to the user.</param>
+    /// <returns>
+    /// A string representation of the JWT token, which includes the user's claims and roles.
+    /// </returns>
+    /// <remarks>
+    /// This method creates a signed JWT token containing the user's username, identifier, and assigned roles.
+    /// The token is valid for 1 hour and is signed using the HMAC-SHA256 algorithm with a secret key.
+    /// 
+    /// Example claims included in the token:
+    /// - Name: Represents the username.
+    /// - NameIdentifier: Represents the unique identifier of the user.
+    /// - Jti (JWT ID): A unique identifier for the token.
+    /// - Role: Includes the roles assigned to the user.
+    /// 
+    /// Ensure the secret key and issuer/audience settings are securely configured in the application settings.
+    /// </remarks>
+    /// <exception cref="ArgumentNullException">
+    /// Thrown if the <paramref name="user"/> parameter is null.
+    /// </exception>
+    /// <example>
+    /// Example usage:
+    /// <code>
+    /// var token = GenerateJwtToken(user, new List<string> { "Administrator", "User" });
+    /// Console.WriteLine(token); // Outputs the signed JWT token as a string
+    /// </code>
+    /// </example>
     private string GenerateJwtToken(IdentityUser user, IList<string> roles)
     {
         var authClaims = new List<Claim>
         {
-            new Claim(ClaimTypes.Name, user.UserName),
+            new Claim("name", user.UserName),
             new Claim(ClaimTypes.NameIdentifier, user.Id),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 
-        authClaims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+        authClaims.AddRange(roles.Select(role => new Claim("role", role)));
 
         var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
 

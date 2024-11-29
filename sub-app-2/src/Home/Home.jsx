@@ -1,19 +1,81 @@
-import React from "react";
-import { Container } from "react-bootstrap";
-import Account from "./Account";
-
-
-{ /* Need login and create account info her, se Index home i Sub-app-1 for inspo */}
+import React from 'react';
+import { Container } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
 
 const Home = () => {
-    return (
-        <Container >
-        <div className="text-center">
-            <h1>Welcome to FoodBank</h1>
-            < Account />
+  const authToken = localStorage.getItem('authToken');
+  let userName = '';
+  let roles = [];
+  let roleMessage = '';
+
+  if (authToken) {
+    try {
+        const decodedToken = jwtDecode(authToken);
+        // Extract username
+        userName = decodedToken['name'] || '';
+        // Extract roles
+        roles = decodedToken['role'] || decodedToken['roles'];
+        // Ensure roles is an array
+        if (!Array.isArray(roles)) {
+            roles = [roles];
+        }
+
+      // Determine role-specific message
+      if (roles.includes('Administrator')) {
+        roleMessage = 'As an administrator, you have full access to manage products and users.';
+      } else if (roles.includes('FoodProducer')) {
+        roleMessage = 'As a food producer, you can add and manage your products.';
+      } else if (roles.includes('RegularUser')) {
+        roleMessage = 'As a user, you can view all products and their nutritional information.';
+      } else {
+        roleMessage = 'Welcome to our application!';
+      }
+    } catch (error) {
+      console.error('Error decoding token:', error);
+      // If there's an error decoding the token, treat the user as unauthenticated
+      userName = '';
+      roles = [];
+    }
+  }
+
+  return (
+    <Container>
+      {authToken && userName ? (
+        <div className="welcome-container">
+          <div className="jumbotron">
+            <div className="text-center mb-3 rounded">
+              <img src={`${process.env.PUBLIC_URL}/icons/bowl-food-solid.svg`} alt="App Logo" className="img-fluid" />
+            </div>
+            <h2>Welcome, {userName}!</h2>
+            <h6 className="lead">{roleMessage}</h6>
+            <hr className="my-4" />
+            <p className="second-color">Get started by exploring our products.</p>
+            <Link className="btn btn-primary d-flex align-items-center" to="/products" role="button">
+              <img src={`${process.env.PUBLIC_URL}/icons/arrow-right-solid.svg`} alt="Go to products" className="me-2" />
+              <span>View Products</span>
+            </Link>
+          </div>
         </div>
-        </Container>
-    );
+      ) : (
+        <div className="welcome-container">
+          <div className="jumbotron">
+            <div className="text-center mb-3 rounded">
+              <img src={`${process.env.PUBLIC_URL}/icons/bowl-food-solid.svg`} alt="App Logo" className="img-fluid" />
+            </div>
+            <h2>Welcome to FoodStack!</h2>
+            <h6 className="lead">Discover a variety of food products and their nutritional information.</h6>
+            <hr className="my-4" />
+            <p className="second-color">You need to log in to access the full features of our application.</p>
+            <Link className="btn btn-primary d-flex align-items-center" to="/account" role="button">
+              <img src={`${process.env.PUBLIC_URL}/icons/arrow-right-solid.svg`} alt="Go to register form" className="me-2" />
+              <span>Log in or register</span>
+            </Link>
+          </div>
+        </div>
+      )}
+    </Container>
+  );
 };
 
 export default Home;
