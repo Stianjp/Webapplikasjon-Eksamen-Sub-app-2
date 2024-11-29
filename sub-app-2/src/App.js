@@ -47,18 +47,27 @@ function App() {
   return (
     <Router>
       <div className="App d-flex">
-        <Sidebar onLogout={handleLogout} />
+        {/* Pass authentication state and handlers to Sidebar */}
+        <Sidebar isAuthenticated={isAuthenticated} roles={roles} onLogout={handleLogout} />
         <main className="flex-grow-1 p-3">
           <Routes>
+            {/* Public Routes */}
             <Route path="/" element={<Home />} />
             <Route path="/privacy" element={<Privacy />} />
+
+            {/* Routes */}
             <Route path="/products" element={<ProductPage />} />
             <Route path="/product-details/:id" element={<ProductDetails />} />
+            {/* Pass handleLogin to Account */}
             <Route path="/account" element={<Account onLogin={handleLogin} />} />
+
+            {/* Producer Routes */}
             <Route path="/products/my" element={<MyProducts />} />
             <Route path="/products/add" element={<CreateProduct />} />
             <Route path="/edit-product/:id" element={<CreateProduct />} />
             <Route path="/delete-product/:id" element={<DeleteProduct />} />
+
+            {/* Admin Routes */}
             <Route path="/admin/users" element={<AdminUsers />} />
           </Routes>
         </main>

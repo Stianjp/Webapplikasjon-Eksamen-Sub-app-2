@@ -1,7 +1,6 @@
 /* General Navbar and Sidebar Styles */
 .navbar {
   height: auto; /* Adjust height for both navbar and sidebar */
-  background-color: (--bg-sidebar); /* Background color for sidebar */
 }
 .navbar-nav .nav-link {
   text-align: left;
