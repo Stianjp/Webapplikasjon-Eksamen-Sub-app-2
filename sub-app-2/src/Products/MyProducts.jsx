@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Form, Alert, Button } from 'react-bootstrap';
-import Tabell from '../shared/Tabell';
+import { Container, Form, Alert, Button, Table } from 'react-bootstrap';
 
 const API_BASE_URL = 'http://localhost:7067';
 
@@ -11,13 +10,14 @@ const MyProducts = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
-    
+    const [sortOrder, setSortOrder] = useState('Name');
+    const [sortDirection, setSortDirection] = useState('asc');
+
     const fetchMyProducts = async () => {
         setLoading(true);
         setError(null);
-    
+
         try {
-            // Retrieve the token from localStorage
             const token = localStorage.getItem('authToken');
             if (!token) {
                 console.error('No authentication token found.');
@@ -25,64 +25,44 @@ const MyProducts = () => {
                 return;
             }
             console.log('Using token:', token);
-    
-            // Fetch user products
-            const response = await fetch(`${API_BASE_URL}/api/Products/user-products`, {
+
+            // Fetch user products with category filter and sorting
+            const response = await fetch(`${API_BASE_URL}/api/Products/user-products?category=${selectedCategory}&sortOrder=${sortOrder}&sortDirection=${sortDirection}`, {
+                method: 'GET',
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include',
             });
-    
-            // Handle unauthorized access
+
             if (response.status === 401) {
                 console.error('Unauthorized.');
                 setError('You are not authorized. Please log in again.');
-                //localStorage.removeItem('authToken'); // Clear invalid token
-                //window.location.href = '/account'; // Redirect to login
                 return;
             }
-    
-            // Handle other non-successful statuses
+
             if (!response.ok) {
                 console.error(`Error fetching products: ${response.status} ${response.statusText}`);
                 setError('Failed to fetch your products. Please try again later.');
                 return;
             }
-    
-            // Parse and set the product data
+
             const data = await response.json();
-            console.log('Fetched products:', data);
-            setProducts(data);
+            console.log('Fetched products and categories:', data);
+            setProducts(data.products || []);
+            setCategories(data.categories || []);
         } catch (error) {
-            // Handle unexpected errors
             console.error('Unexpected error fetching products:', error);
             setError('An unexpected error occurred. Please try again later.');
         } finally {
             setLoading(false);
         }
     };
-    
-    
-    
-    const fetchCategories = async () => {
-        try {
-            const response = await fetch(`${API_BASE_URL}/api/Products/categories`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch categories');
-            }
-
-            const data = await response.json();
-            setCategories(data);
-        } catch (error) {
-            console.error('Error fetching categories:', error);
-        }
-    };
 
     useEffect(() => {
-        fetchCategories();
         fetchMyProducts();
-    }, [selectedCategory]);
+    }, [selectedCategory, sortOrder, sortDirection]);
 
     const handleSearchChange = (e) => {
         setSearchQuery(e.target.value);
@@ -92,8 +72,14 @@ const MyProducts = () => {
         setSelectedCategory(e.target.value);
     };
 
-    const handleProductUpdated = () => {
-        fetchMyProducts(); // Refresh the list when a product is updated
+    const clearCategoryFilter = () => {
+        setSelectedCategory('');
+    };
+
+    const handleSort = (field) => {
+        const newDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+        setSortOrder(field);
+        setSortDirection(newDirection);
     };
 
     const filteredProducts = products.filter(product =>
@@ -106,7 +92,7 @@ const MyProducts = () => {
             <div className="section-container">
                 <h1>My Products</h1>
                 <div className="d-flex justify-content-between align-items-center">
-                    <Button 
+                    <Button
                         className="btn btn-primary mt-3"
                         onClick={() => window.location.href = '/products/add'}
                     >
@@ -117,7 +103,7 @@ const MyProducts = () => {
                         {products.length} Products
                     </span>
                 </div>
-                
+
                 {/* Category Filter */}
                 <div className="mt-3">
                     <Form className="d-flex align-items-center">
@@ -138,7 +124,7 @@ const MyProducts = () => {
                                 </option>
                             ))}
                         </Form.Select>
-                        <Button 
+                        <Button
                             variant="primary"
                             onClick={fetchMyProducts}
                             className="me-2"
@@ -146,9 +132,9 @@ const MyProducts = () => {
                             Filter
                         </Button>
                         {selectedCategory && (
-                            <Button 
+                            <Button
                                 variant="secondary"
-                                onClick={() => setSelectedCategory('')}
+                                onClick={clearCategoryFilter}
                             >
                                 Clear Filter
                             </Button>
@@ -187,12 +173,120 @@ const MyProducts = () => {
                                 No products found for the selected category or search query.
                             </Alert>
                         ) : (
-                            <Tabell 
-                                products={filteredProducts}
-                                isAdmin={false}
-                                isProducer={true}
-                                onProductUpdated={handleProductUpdated}
-                            />
+                            <Table striped bordered hover responsive>
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <a
+                                                role="button"
+                                                onClick={() => handleSort('Name')}
+                                                style={{ cursor: 'pointer' }}
+                                            >
+                                                Name
+                                                {sortOrder === 'Name' && (
+                                                    <span>{sortDirection === 'asc' ? ' ▲' : ' ▼'}</span>
+                                                )}
+                                            </a>
+                                        </th>
+                                        <th>
+                                            <a
+                                                role="button"
+                                                onClick={() => handleSort('Category')}
+                                                style={{ cursor: 'pointer' }}
+                                            >
+                                                Category
+                                                {sortOrder === 'Category' && (
+                                                    <span>{sortDirection === 'asc' ? ' ▲' : ' ▼'}</span>
+                                                )}
+                                            </a>
+                                        </th>
+                                        <th>Description</th>
+                                        <th>
+                                            <a
+                                                role="button"
+                                                onClick={() => handleSort('Calories')}
+                                                style={{ cursor: 'pointer' }}
+                                            >
+                                                Calories (kcal)
+                                                {sortOrder === 'Calories' && (
+                                                    <span>{sortDirection === 'asc' ? ' ▲' : ' ▼'}</span>
+                                                )}
+                                            </a>
+                                        </th>
+                                        <th>
+                                            <a
+                                                role="button"
+                                                onClick={() => handleSort('Protein')}
+                                                style={{ cursor: 'pointer' }}
+                                            >
+                                                Protein (g)
+                                                {sortOrder === 'Protein' && (
+                                                    <span>{sortDirection === 'asc' ? ' ▲' : ' ▼'}</span>
+                                                )}
+                                            </a>
+                                        </th>
+                                        <th>
+                                            <a
+                                                role="button"
+                                                onClick={() => handleSort('Fat')}
+                                                style={{ cursor: 'pointer' }}
+                                            >
+                                                Fat (g)
+                                                {sortOrder === 'Fat' && (
+                                                    <span>{sortDirection === 'asc' ? ' ▲' : ' ▼'}</span>
+                                                )}
+                                            </a>
+                                        </th>
+                                        <th>
+                                            <a
+                                                role="button"
+                                                onClick={() => handleSort('Carbohydrates')}
+                                                style={{ cursor: 'pointer' }}
+                                            >
+                                                Carbohydrates (g)
+                                                {sortOrder === 'Carbohydrates' && (
+                                                    <span>{sortDirection === 'asc' ? ' ▲' : ' ▼'}</span>
+                                                )}
+                                            </a>
+                                        </th>
+                                        {true /* Replace with condition based on user role */ && (
+                                            <th>Actions</th>
+                                        )}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {filteredProducts.map(product => (
+                                        <tr key={product.id} style={{ cursor: 'pointer' }} onClick={() => window.location.href = `/products/details/${product.id}`}>
+                                            <td>{product.name}</td>
+                                            <td>{product.categoryList?.join(', ') || 'No Categories'}</td>
+                                            <td>{product.description}</td>
+                                            <td>{product.calories}</td>
+                                            <td>{product.protein}</td>
+                                            <td>{product.fat}</td>
+                                            <td>{product.carbohydrates}</td>
+                                            {true /* Replace with condition based on user role */ && (
+                                                <td>
+                                                    <Button
+                                                        variant="primary"
+                                                        size="sm"
+                                                        className="me-2"
+                                                        onClick={() => window.location.href = `/products/edit/${product.id}`}
+                                                    >
+                                                        Edit
+                                                    </Button>
+                                                    <Button
+                                                        variant="danger"
+                                                        size="sm"
+                                                        onClick={() => window.location.href = `/products/delete/${product.id}`}
+                                                    >
+                                                        Delete
+                                                    </Button>
+                                                </td>
+                                            )}
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </Table>
                         )}
                     </>
                 )}

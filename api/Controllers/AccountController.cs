@@ -7,6 +7,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authorization;
 
 /// <summary>
 /// Handles account-related actions, such as login, registration, password changes, and account deletion.
@@ -81,7 +82,7 @@ public class AccountController : ControllerBase
 
         var user = new IdentityUser { UserName = model.Username };
         var result = await _userManager.CreateAsync(user, model.Password);
-        if (!result.Succeeded) return BadRequest(result.Errors);
+        if (!result.Succeeded) return BadRequest(new { errors = result.Errors });
 
         model.Role ??= UserRoles.RegularUser;
 
@@ -104,6 +105,7 @@ public class AccountController : ControllerBase
     /// </summary>
     /// <returns>A success message indicating the user has logged out.</returns>
     /// <response code="200">Logout successful.</response>
+    [Authorize]
     [HttpPost("logout")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> Logout()
@@ -122,6 +124,7 @@ public class AccountController : ControllerBase
     /// <response code="200">Password changed successfully.</response>
     /// <response code="400">Invalid input (e.g., mismatched passwords).</response>
     /// <response code="401">User is unauthorized or not logged in.</response>
+    [Authorize]
     [HttpPost("changepassword")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -135,7 +138,7 @@ public class AccountController : ControllerBase
             return BadRequest(new { message = "Passwords do not match." });
 
         var result = await _userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
-        if (!result.Succeeded) return BadRequest(result.Errors);
+        if (!result.Succeeded) return BadRequest(new { errors = result.Errors });
 
         return Ok(new { message = "Password changed successfully." });
     }
@@ -150,6 +153,7 @@ public class AccountController : ControllerBase
     /// <response code="200">Account deleted successfully.</response>
     /// <response code="400">Invalid input or operation failed.</response>
     /// <response code="401">User is unauthorized or not logged in.</response>
+    [Authorize]
     [HttpDelete("deleteaccount")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -163,7 +167,7 @@ public class AccountController : ControllerBase
         if (!passwordCheck.Succeeded) return BadRequest(new { message = "Incorrect password." });
 
         var result = await _userManager.DeleteAsync(user);
-        if (!result.Succeeded) return BadRequest(result.Errors);
+        if (!result.Succeeded) return BadRequest(new { errors = result.Errors });
 
         await _signInManager.SignOutAsync();
         return Ok(new { message = "Account deleted successfully." });
@@ -215,7 +219,7 @@ public class AccountController : ControllerBase
         var token = new JwtSecurityToken(
             issuer: _configuration["JWT:ValidIssuer"],
             audience: _configuration["JWT:ValidAudience"],
-            expires: DateTime.Now.AddHours(1),
+            expires: DateTime.UtcNow.AddHours(1), // Use UtcNow for consistency
             claims: authClaims,
             signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
         );

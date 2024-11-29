@@ -85,6 +85,7 @@ const Account = ({ onLogin }) => {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify(loginFormData),
       });
 
@@ -126,6 +127,7 @@ const Account = ({ onLogin }) => {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify(registerFormData), // Include role in the request body
       });
 
@@ -140,6 +142,7 @@ const Account = ({ onLogin }) => {
         headers: {
             'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({
             username: registerFormData.username,
             password: registerFormData.password,

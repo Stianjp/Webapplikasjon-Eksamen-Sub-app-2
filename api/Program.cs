@@ -84,6 +84,7 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 
 /// <summary>
 /// Configures JWT authentication with token validation parameters.
+/// Ensures secure authentication by validating the issuer, audience, lifetime, and signing key of JWT tokens.
 /// </summary>
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -100,6 +101,16 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+/// <summary>
+/// Configures the behavior of the application cookie for authentication.
+/// Ensures that unauthorized and forbidden requests return appropriate HTTP status codes
+/// instead of redirecting to login or access denied pages.
+/// </summary>
+/// <remarks>
+/// This configuration is essential for API-only applications like this where redirecting to login
+/// or access denied pages is not suitable, and the client (e.g., React frontend) expects
+/// proper HTTP status codes (401 for unauthorized and 403 for forbidden).
+/// </remarks>
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Events.OnRedirectToLogin = context =>
@@ -113,7 +124,6 @@ builder.Services.ConfigureApplicationCookie(options =>
         return Task.CompletedTask;
     };
 });
-
 
 /// <summary>
 /// Registers the repository interfaces with their implementations.
@@ -130,7 +140,8 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins(builder.Configuration["CORS:AllowedOrigins"].Split(','))
             .AllowAnyHeader()
-            .AllowAnyMethod();
+            .AllowAnyMethod()
+            .AllowCredentials();
     });
 });
 

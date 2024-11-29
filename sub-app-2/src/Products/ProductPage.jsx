@@ -23,10 +23,12 @@ const ProductPage = () => {
         try {
             const token = localStorage.getItem('token');
             const response = await fetch(`${API_BASE_URL}/api/Products`, {
+                method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',
-                }
+                },
+                credentials: 'include'
             });
 
             if (!response.ok) {
@@ -51,10 +53,12 @@ const ProductPage = () => {
         try {
             const token = localStorage.getItem('token');
             const response = await fetch(`${API_BASE_URL}/api/Users/current`, {
+                method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',
-                }
+                },
+                credentials: 'include'
             });
 
             if (!response.ok) throw new Error('Failed to fetch user data');
