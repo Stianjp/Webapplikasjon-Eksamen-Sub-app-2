@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useLocation, useMatch } from 'react-router-dom';  // Import necessary hooks
+import { Link, useLocation, useMatch } from 'react-router-dom';
 import './Sidebar.css';
 import LogoGreen from '../icons/LogoGreen.svg';
 import HomeIcon from '../icons/house-solid.svg';
@@ -34,8 +34,8 @@ const Sidebar = ({ isAuthenticated = false, roles = [], onLogout }) => {
   return (
     <div className="sidebar-content d-flex flex-column flex-shrink-0 p-3">
       {/* Logo */}
-      <img className="logo" src={LogoGreen} alt="Logo of Food Bank" />
-      <span className="navbar-brand">FoodBank</span>
+      <img className="logo mb-4" src={LogoGreen} alt="Logo of Food Bank" />
+      <span className="navbar-brand mb-4">FoodBank</span>
       <hr />
 
       {/* Navigation Links */}
@@ -55,7 +55,7 @@ const Sidebar = ({ isAuthenticated = false, roles = [], onLogout }) => {
                 <img src={ProductsIcon} alt="All products" className="icon" /> Products
               </Link>
               {(isAdmin || isFoodProducer || isRegularUser) && (
-                <ul className="nav flex-column ms-2">
+                <ul className="nav flex-column ms-3">
                   <li className="nav-item">
                     <Link className={`nav-link ${getActiveClass(productsMatch)}`} to="/products">
                       <img src={ProductsIcon} alt="View all products" className="icon" /> View All
@@ -70,7 +70,7 @@ const Sidebar = ({ isAuthenticated = false, roles = [], onLogout }) => {
                       </li>
                       <li className="nav-item">
                         <Link className={`nav-link ${getActiveClass(addProductMatch)}`} to="/products/add">
-                          <img src={AddProductIcon} alt="Add a product" className="icon" /> Add
+                          <img src={AddProductIcon} alt="Add a product" className="icon" /> Add Product
                         </Link>
                       </li>
                     </>
@@ -102,7 +102,7 @@ const Sidebar = ({ isAuthenticated = false, roles = [], onLogout }) => {
       <hr />
 
       {/* Authentication Actions */}
-      <div className="logout">
+      <div className="logout mt-auto">
         {isAuthenticated ? (
           <button className="btn btn-danger d-flex align-items-center" onClick={onLogout}>
             <img src={LogoutIcon} alt="Logout" className="icon" /> Logout

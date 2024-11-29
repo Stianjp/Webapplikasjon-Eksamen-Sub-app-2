@@ -45,11 +45,17 @@ const Home = () => {
               <p className="lead text-muted">{roleMessage}</p>
               <hr />
               <p>Get started by exploring our products.</p>
-              <Link to="/products">
-                <Button variant="primary" size="lg" className="d-flex align-items-center justify-content-center">
-                  View Products
-                </Button>
-              </Link>
+              <div className="d-flex justify-content-center mt-3">
+                <Link to="/products">
+                  <Button
+                    variant="primary"
+                    size="lg"
+                    className="d-flex align-items-center justify-content-center"
+                  >
+                    View Products
+                  </Button>
+                </Link>
+              </div>
             </div>
           ) : (
             // Unauthenticated User Content
@@ -60,7 +66,11 @@ const Home = () => {
               <p className="text-muted">You need to log in to access the full features of our application.</p>
               <div className="d-flex justify-content-center mt-3">
                 <Link to="/account">
-                  <Button variant="primary" size="lg" className="d-flex align-items-center justify-content-center">
+                  <Button
+                    variant="primary"
+                    size="lg"
+                    className="d-flex align-items-center justify-content-center"
+                  >
                     Log in or register
                   </Button>
                 </Link>
@@ -70,7 +80,6 @@ const Home = () => {
         </Col>
       </Row>
     </Container>
-  );
-};
-
+  )}
+  
 export default Home;
