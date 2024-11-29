@@ -1,8 +1,7 @@
-import React, { useState } from "react";
 import { Table, Button, Modal } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 
-const API_BASE_URL = 'http://localhost:7067';
+const API_BASE_URL = 'http://localhost:7067/api';
 
 const Tabell = ({ 
     products, 
@@ -53,11 +52,9 @@ const Tabell = ({
 
     const confirmDelete = async () => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await fetch(`${API_BASE_URL}/api/Products/${productToDelete}`, {
+            const response = await fetch(`${API_BASE_URL}/Products/${productToDelete}`, {
                 method: 'DELETE',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 },
             });
@@ -69,7 +66,7 @@ const Tabell = ({
             setShowDeleteModal(false);
             setProductToDelete(null);
             setDeleteError(null);
-            onProductUpdated(); // Refresh the product list
+            onProductUpdated();
         } catch (error) {
             console.error('Error deleting product:', error);
             setDeleteError('Failed to delete product. Please try again.');
