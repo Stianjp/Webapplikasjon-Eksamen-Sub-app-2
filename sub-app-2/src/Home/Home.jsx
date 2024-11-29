@@ -1,6 +1,9 @@
 import React from "react";
 import { Container } from "react-bootstrap";
 
+
+{ /* Need login and create account info her, se Index home i Sub-app-1 for inspo */}
+
 const Home = () => {
     return (
         <Container >

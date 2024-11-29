@@ -12,6 +12,7 @@ import AdminUsers from './admin/AdminUsers';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './styles/App.css';
 
+{/* Need if sentens to routing so admin gets to admin components, and foodproducer gets to there components */}
 
 function App() {
   return (
