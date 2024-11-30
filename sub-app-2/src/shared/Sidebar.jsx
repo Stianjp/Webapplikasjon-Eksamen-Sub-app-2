@@ -9,6 +9,7 @@ import AddProductIcon from '../icons/circle-plus-solid.svg';
 import AccountIcon from '../icons/gear-solid.svg';
 import PrivacyIcon from '../icons/eye-solid.svg';
 import LogoutIcon from '../icons/right-to-bracket-solid.svg';
+import { NavbarBrand } from 'react-bootstrap';
 
 const Sidebar = ({ isAuthenticated = false, roles = [], onLogout }) => {
   const location = useLocation();
@@ -42,7 +43,7 @@ const Sidebar = ({ isAuthenticated = false, roles = [], onLogout }) => {
     <div className="sidebar-content d-flex flex-column flex-shrink-0 p-3">
       {/* Logo */}
       <img className="logo mb-4" src={LogoGreen} alt="Logo of Food Bank" />
-      <span className="navbar-brand mb-4">FoodBank</span>
+      <NavbarBrand className="navbar-brand mb-4">FoodBank</NavbarBrand>
       <hr />
 
       {/* Navigation Links */}

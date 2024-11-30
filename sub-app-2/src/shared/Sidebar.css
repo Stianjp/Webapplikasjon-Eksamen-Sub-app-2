@@ -77,7 +77,7 @@
   }
 
   .nav-pills .nav-link:hover {
-    background-color: #4caf50;
+    background-color: #4caf50 !important; /* Green background on hover */
     color: white;
   }
 }
