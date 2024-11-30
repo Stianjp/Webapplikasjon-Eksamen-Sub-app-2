@@ -25,30 +25,14 @@
 
 /* Heading (h2) */
 h2 {
-  text-align: center;
   font-size: 1.5rem;
   font-weight: 600;
   margin-bottom: 20px;
   color: #333; /* Dark text for contrast */
 }
 
-/* Button */
-.button {
-  width: 100%;
-  padding: 12px 20px;
-  font-size: 1rem;
-  font-weight: bold;
-  background-color: #4CAF50; /* Green background for the button */
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth transition */
-}
-
-.button:hover {
-  background-color: #45a049; /* Slightly darker green on hover */
-  transform: translateY(-2px); /* Slight lift effect on hover */
+.loggedin-container { 
+  text-align: center; /* Centers h2 and the button */
 }
 
 /* Alert Styling */

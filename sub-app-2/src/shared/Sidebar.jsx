@@ -156,7 +156,7 @@ const Sidebar = ({ isAuthenticated = false, roles = [], onLogout }) => {
             {/* Privacy */}
             <li className="nav-item">
               <Link
-                className={"nav-link ${getActiveClass('/privacy')}"}
+                className={`nav-link ${getActiveClass('/privacy')}`}
                 to="/privacy"
                 onClick={closeNavbar}
               >

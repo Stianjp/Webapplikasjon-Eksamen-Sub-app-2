@@ -49,11 +49,6 @@
   text-decoration: none;
 }
 
-.nav-link.active {
-  background-color: #4caf50;
-  color: white;
-}
-
 /* Icon Styles */
 .icon {
   width: 20px;

@@ -204,10 +204,13 @@
 
       {isAuthenticated ? (
         <Row>
-          <Col>
+          <Col className="loggedin-container">
             {/* Content for authenticated users */}
             <h2>Welcome!</h2>
-            <Button variant="primary" onClick={() => navigate('/')}>
+            <Button 
+            className="mt-3 dashboard-button"
+            variant="primary" 
+            onClick={() => navigate('/')}>
               Go to Dashboard
             </Button>
           </Col>
