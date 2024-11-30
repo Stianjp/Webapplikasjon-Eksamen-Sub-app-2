@@ -1,0 +1,87 @@
+/* Section Container */
+.section-container {
+    background-color: rgba(255, 255, 255, 0.875); /* White transparent background */
+    border-radius: 10px; /* Rounded corners */
+    padding: 20px; /* Spacing inside the container */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    margin-top: 20px; /* Spacing from the top */
+  }
+  
+  /* Header (h1) */
+  .section-container h1 {
+    font-size: 2rem; /* Larger font size */
+    font-weight: 700; /* Bold heading */
+    color: #333; /* Dark color for contrast */
+    margin-bottom: 10px; /* Space below the heading */
+  }
+  
+  /* Welcome Text */
+  .section-container .info {
+    font-size: 1.1rem; /* Slightly larger text for readability */
+    color: #555; /* Neutral text color */
+    line-height: 1.6; /* Increase line spacing for better readability */
+    margin-bottom: 20px; /* Spacing below the text */
+  }
+  
+  /* Category Filter */
+  .section-container form {
+    background-color: rgba(255, 255, 255, 0.8); /* White transparent background for form */
+    padding: 10px;
+    border-radius: 8px; /* Rounded corners for filter section */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  }
+  
+  /* Filter Labels */
+  .section-container form label {
+    font-weight: 600; /* Bold labels */
+    color: #333; /* Darker color for better visibility */
+  }
+  
+  /* Filter Dropdown and Buttons */
+  .section-container form select,
+  .section-container form .btn {
+    border-radius: 5px; /* Rounded corners for inputs */
+    font-size: 1rem; /* Standard font size */
+  }
+  
+  .section-container form .btn {
+    transition: background-color 0.3s ease; /* Smooth button hover transition */
+  }
+  
+  .section-container form .btn-primary {
+    background-color: #007bff; /* Blue color for the primary button */
+    color: #fff;
+    border: none;
+  }
+  
+  .section-container form .btn-primary:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+  }
+  
+  .section-container form .btn-secondary {
+    background-color: #6c757d; /* Gray for secondary button */
+    color: #fff;
+    border: none;
+  }
+  
+  .section-container form .btn-secondary:hover {
+    background-color: #5a6268; /* Darker gray on hover */
+  }
+  
+  /* Search Bar */
+  .section-container .search-container input {
+    border-radius: 5px; /* Rounded input */
+    border: 1px solid #ddd; /* Subtle border */
+    padding: 10px; /* Spacing inside the input */
+    width: 100%; /* Full width */
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05); /* Subtle shadow */
+  }
+  
+  /* Tag Info */
+  .section-container .tag-info {
+    font-size: 1rem; /* Standard font size */
+    color: #555; /* Neutral color */
+    text-align: center; /* Center align */
+    margin-top: 15px; /* Space above */
+  }
+  

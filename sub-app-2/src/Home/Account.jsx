@@ -1,7 +1,7 @@
   import React, { useState, useEffect } from 'react';
   import { Container, Form, Button, Alert, Row, Col, Card } from 'react-bootstrap';
   import { useNavigate } from 'react-router-dom'; 
-  import './Account.css';
+  import '../styles/Account.css';
 
   const API_BASE_URL = 'http://localhost:7067/api/Account';
 

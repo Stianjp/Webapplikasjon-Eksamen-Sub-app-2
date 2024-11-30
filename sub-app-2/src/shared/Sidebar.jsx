@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import '@fortawesome/fontawesome-free/css/all.min.css'; // Font Awesome for ikoner
-import './Sidebar.css';
+import '../styles/Sidebar.css';
 import LogoGreen from '../icons/LogoGreen.svg';
 import HomeIcon from '../icons/house-solid.svg';
 import ProductsIcon from '../icons/box-open-solid.svg';

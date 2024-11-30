@@ -1,0 +1,62 @@
+/* Welcome Container */
+.welcome-container {
+    margin: 50px auto; /* Center the container vertically and horizontally */
+    padding: 20px; /* Add padding for spacing */
+    max-width: 900px; /* Wider container */
+    background-color: #fff; /* White background for the card */
+    border-radius: 10px; /* Soft rounded corners */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); /* Larger shadow for more depth */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for hover effect */
+  }
+  
+  .welcome-container:hover {
+    transform: translateY(-5px); /* Slight lift on hover */
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.15); /* Enhance shadow effect on hover */
+  }
+  
+  /* Heading (h2) */
+  .welcome-container h2 {
+    font-size: 1.5rem; /* Larger font for the heading */
+    font-weight: 600; /* Bold text */
+    margin-bottom: 20px; /* Space below the heading */
+    color: #333; /* Dark color for contrast */
+  }
+  
+  /* Paragraph Text */
+  .welcome-container p {
+    font-size: 1.1rem; /* Slightly larger text for readability */
+    color: #555; /* Neutral color for paragraph text */
+    margin-bottom: 20px; /* Spacing between paragraphs */
+  }
+  
+  /* Divider Line */
+  .welcome-container hr {
+    border-top: 1px solid #ddd; /* Light gray divider */
+    margin: 20px 0; /* Spacing above and below the line */
+  }
+  
+  /* Button Styling */
+  .welcome-container .btn {
+    font-size: 1rem; /* Standard font size for buttons */
+    font-weight: 600; /* Bold text */
+    padding: 10px 20px; /* Padding for a larger click area */
+    border-radius: 5px; /* Rounded button edges */
+    color: #fff; /* White text */
+    background-color: #007bff; /* Primary blue color */
+    border: none; /* No border */
+    transition: background-color 0.3s ease; /* Smooth color transition */
+  }
+  
+  .welcome-container .btn:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+  }
+  
+  /* Additional Utility Classes */
+  .hover-shadow {
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Matching smooth transitions */
+  }
+  
+  .hover-shadow:hover {
+    transform: translateY(-5px); /* Slight lift */
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.15); /* Subtle shadow enhancement */
+  }  

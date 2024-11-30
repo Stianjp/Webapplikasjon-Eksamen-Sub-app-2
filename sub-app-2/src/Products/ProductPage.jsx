@@ -3,6 +3,7 @@ import { Container, Form, Alert, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import Tabell from '../shared/Tabell';
+import '../styles/ProductPage.css';
 
 const API_BASE_URL = 'http://localhost:7067';
 

@@ -2,6 +2,7 @@ import React from 'react';
 import { Container, Button, Row, Col } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
+import '../styles/Home.css';
 
 const Home = () => {
   const authToken = localStorage.getItem('authToken');

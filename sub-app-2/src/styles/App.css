@@ -19,7 +19,6 @@
   flex: 1;
   margin-left: 250px;
   min-height: 100vh;
-  background-color: #f8f9fa;
 }
 
 .content-container {
@@ -28,14 +27,16 @@
   margin: 0 auto;
 }
 
-
-
 /* Base styles */
 html, body {
   margin: 0;
   padding: 0;
   height: 100%;
-  background-color: #f8f9fa;
+  background-image: url('../../public/background-image.jpg'); /* Correct path to your background image */
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  background-attachment: scroll; /* Avoid fixed attachment for smooth scrolling */
 }
 
 /* Responsive styles */
