@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Form } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom'; // Remove none admin-useres
-import Tabell from './components/UserTable'; 
-import UserEdit from './components/UserEdit'; 
-import { useUser } from '../contexts/UserContext'; // Get the user context 
+import Tabell from './UserTable'; 
+import UserEdit from './UserEdit'; 
 import 'bootstrap/dist/css/bootstrap.min.css';
-import './components/admin.css';
+import './admin.css';
 
 const AdminUsers = () => {
   const navigate = useNavigate(); // Navigation hook
