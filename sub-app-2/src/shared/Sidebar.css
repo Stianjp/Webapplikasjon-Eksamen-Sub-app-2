@@ -1,17 +1,17 @@
+/* Base Sidebar Layout */
 .navbar {
   height: 100%;
   width: 250px;
   background-color: #ffffff;
   box-shadow: 4px 0 12px rgba(0, 0, 0, 0.1);
   border-right: 1px solid #e0e0e0;
-  transition: all 0.3s ease-in-out;
 }
 
 .sidebar-content {
   height: 100vh;
+  width: inherit;
   display: flex;
   flex-direction: column;
-  background-color: #e0e0e0;
 }
 
 /* Logo Styles */
@@ -28,24 +28,18 @@
   align-items: center;
   padding: 12px 15px;
   color: #333;
-  background-color: transparent;
-  border-left: 3px solid transparent;
-  transition: all 0.3s ease;
+  transition: background-color 0.2s ease;
 }
 
 .nav-link:hover {
   background-color: #e2e6ea;
   color: #4caf50;
   text-decoration: none;
-  transform: translateX(5px);
-  padding-left: 20px;
-  border-left: 3px solid #4caf50;
 }
 
 .nav-link.active {
   background-color: #4caf50;
   color: white;
-  border-left: 3px solid white;
 }
 
 /* Icon Styles */
@@ -101,10 +95,6 @@
   .sidebar-content {
     height: auto;
     min-height: unset;
-  }
-
-  .nav-link:hover {
-    transform: none;
   }
 }
 
