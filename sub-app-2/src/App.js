@@ -8,6 +8,8 @@ import CreateProduct from './Products/CreateProduct';
 import DeleteProduct from './Products/DeleteProduct';
 import ProductDetails from './Products/ProductDetails';
 import Account from './Home/Account';
+import ChangePassword from './Home/ChangePassword';
+import DeleteAccount from './Home/DeleteAccount';
 import Privacy from './Home/Privacy';
 import AdminUsers from './admin/AdminUsers';
 import { jwtDecode } from 'jwt-decode';
@@ -65,6 +67,8 @@ function App() {
               <Route path="/products" element={<ProductPage />} />
               <Route path="/product-details/:id" element={<ProductDetails />} />
               <Route path="/account" element={<Account onLogin={handleLogin} />} />
+              <Route path="/change-password" element={<ChangePassword />} />
+              <Route path="/delete-account" element={<DeleteAccount />} />
 
               {/* Producer Routes */}
               <Route path="/products/my" element={<MyProducts />} />

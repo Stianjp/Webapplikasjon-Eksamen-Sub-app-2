@@ -1,6 +1,7 @@
   import React, { useState, useEffect } from 'react';
   import { Container, Form, Button, Alert, Row, Col, Card } from 'react-bootstrap';
-  import { useNavigate } from 'react-router-dom'; 
+  import { useNavigate } from 'react-router-dom';
+  import { jwtDecode } from 'jwt-decode'; 
   import '../styles/Account.css';
 
   const API_BASE_URL = 'http://localhost:7067/api/Account';
@@ -27,7 +28,18 @@
       // Check if the user is authenticated by checking the auth token in localStorage
       const token = localStorage.getItem('authToken');
       if (token) {
-        setIsAuthenticated(true);
+        try {
+          const decodedToken = jwtDecode(token);
+          const userName = decodedToken['name'] || ''; // Extract username
+          setLoginFormData((prevData) => ({
+            ...prevData,
+            username: userName, // Populate the username field
+          }));
+          setIsAuthenticated(true);
+        } catch (error) {
+          console.error('Error decoding token:', error);
+          setIsAuthenticated(false);
+        }
       } else {
         setIsAuthenticated(false);
       }
@@ -203,18 +215,60 @@
       {successMessage && <Alert variant="success">{successMessage}</Alert>}
 
       {isAuthenticated ? (
-        <Row>
-          <Col className="loggedin-container">
-            {/* Content for authenticated users */}
-            <h2>Welcome!</h2>
-            <Button 
-            className="mt-3 dashboard-button"
-            variant="primary" 
-            onClick={() => navigate('/')}>
-              Go to Dashboard
-            </Button>
-          </Col>
-        </Row>
+            <Row>
+              <Col className="loggedin-container">
+                {/* Content for authenticated users */}
+                <h2 className="mb-3">Welcome!</h2>
+                <p>You are currently logged in.</p>
+
+                {/* Go to Dashboard Button */}
+                <Button
+                  className="mb-3"
+                  variant="primary"
+                  onClick={() => navigate('/')}
+                >
+                  Go to Dashboard
+                </Button>
+
+                <Card className="p-3 mb-3">
+                  <Form>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Username</Form.Label>
+                      <Form.Control
+                        type="text"
+                        value={loginFormData.username}
+                        disabled
+                      />
+                    </Form.Group>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Password</Form.Label>
+                      <Form.Control
+                        type="password"
+                        value="********"
+                        disabled
+                      />
+                    </Form.Group>
+                  </Form>
+                </Card>
+
+                {/* Buttons Positioned on Opposite Sides */}
+                <div className="d-flex justify-content-between mb-3">
+                  <Button
+                    variant="warning"
+                    onClick={() => navigate('/change-password')}
+                  >
+                    Change Password
+                  </Button>
+                  <Button
+                    variant="danger"
+                    onClick={() => navigate('/delete-account')}
+                  >
+                    Delete Account
+                  </Button>
+                </div>
+                  {/* Highlighted Changes End */}
+              </Col>
+            </Row>
       ) : (
             <Row>
               {/* Login Form */}
