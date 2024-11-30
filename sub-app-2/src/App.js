@@ -10,6 +10,7 @@ import ProductDetails from './Products/ProductDetails';
 import Account from './Home/Account';
 import Privacy from './Home/Privacy';
 import AdminUsers from './admin/AdminUsers';
+import ProtectedRoute from './components/ProtectedRoute';
 import { jwtDecode } from 'jwt-decode';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './styles/App.css';
@@ -60,20 +61,73 @@ function App() {
               {/* Public Routes */}
               <Route path="/" element={<Home />} />
               <Route path="/privacy" element={<Privacy />} />
-
-              {/* Routes */}
               <Route path="/products" element={<ProductPage />} />
               <Route path="/product-details/:id" element={<ProductDetails />} />
               <Route path="/account" element={<Account onLogin={handleLogin} />} />
 
               {/* Producer Routes */}
-              <Route path="/products/my" element={<MyProducts />} />
-              <Route path="/products/add" element={<CreateProduct />} />
-              <Route path="/edit-product/:id" element={<CreateProduct />} />
-              <Route path="/delete-product/:id" element={<DeleteProduct />} />
+              <Route 
+                path="/products/my" 
+                element={
+                  <ProtectedRoute 
+                    isAuthenticated={isAuthenticated} 
+                    roles={roles}
+                    requiredRole="Producer"
+                  >
+                    <MyProducts />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/products/add" 
+                element={
+                  <ProtectedRoute 
+                    isAuthenticated={isAuthenticated} 
+                    roles={roles}
+                    requiredRole="Producer"
+                  >
+                    <CreateProduct />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/edit-product/:id" 
+                element={
+                  <ProtectedRoute 
+                    isAuthenticated={isAuthenticated} 
+                    roles={roles}
+                    requiredRole="Producer"
+                  >
+                    <CreateProduct />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/delete-product/:id" 
+                element={
+                  <ProtectedRoute 
+                    isAuthenticated={isAuthenticated} 
+                    roles={roles}
+                    requiredRole="Producer"
+                  >
+                    <DeleteProduct />
+                  </ProtectedRoute>
+                } 
+              />
 
               {/* Admin Routes */}
-              <Route path="/admin/users" element={<AdminUsers />} />
+              <Route 
+                path="/admin/users" 
+                element={
+                  <ProtectedRoute 
+                    isAuthenticated={isAuthenticated} 
+                    roles={roles}
+                    requiredRole="Administrator"
+                  >
+                    <AdminUsers />
+                  </ProtectedRoute>
+                } 
+              />
             </Routes>
           </div>
         </main>

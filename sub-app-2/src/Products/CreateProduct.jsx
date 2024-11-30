@@ -1,22 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Container, Form, Button, Card, Alert } from 'react-bootstrap';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const API_BASE_URL = 'http://localhost:7067';
 
 const CreateProduct = () => {
-      // Get product ID from URL if editing existing product
-      // Maybe something we also need to change? 
-    const { id } = useParams();
     const navigate = useNavigate();
-
-
-    // Component state management
+    
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(false);
 
-    // Initialize form data with empty values
+    // Available categories - should match your backend
+    const availableCategories = [
+        "Meat", "Fish", "Vegetable", "Fruit", "Pasta", "Legume", "Drink"
+    ];
+
     const [formData, setFormData] = useState({
         name: '',
         description: '',
@@ -27,59 +26,6 @@ const CreateProduct = () => {
         carbohydrates: ''
     });
 
-     /**
-     * Effect hook to fetch product data when editing
-     * Only runs when there's an ID in the URL
-     * Maybe something that we need to change 
-     */
-
-    useEffect(() => {
-        if (id) {
-            fetchProduct();
-        }
-    }, [id]);
-
-    /**
-     * Fetches product data from the API for editing
-     * Sets the form data with the retrieved product information
-     */
-
-    const fetchProduct = async () => {
-        try {
-            const token = localStorage.getItem('token');
-            const response = await fetch(`${API_BASE_URL}/api/Products/${id}`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                credentials: 'include'
-            });
-
-            if (!response.ok) throw new Error('Failed to fetch product');
-
-            const data = await response.json();
-             // Populate form with existing product data
-            setFormData({
-                name: data.name || '',
-                description: data.description || '',
-                categoryList: data.categoryList || [],
-                calories: data.calories || '',
-                protein: data.protein || '',
-                fat: data.fat || '',
-                carbohydrates: data.carbohydrates || ''
-            });
-        } catch (error) {
-            console.error('Error fetching product:', error);
-            setError('Failed to load product details');
-        }
-    };
-
-    /**
-     * Handles changes to form inputs
-     * Updates the form state with new values as the user types
-     */
-
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({
@@ -88,24 +34,14 @@ const CreateProduct = () => {
         }));
     };
 
-    /**
-     * Special handler for category input
-     * Converts comma-separated string into array of categories
-     */
-
     const handleCategoryChange = (e) => {
-        const categories = e.target.value.split(',').map(cat => cat.trim());
+        // Get all selected options from the multiple select
+        const selectedOptions = Array.from(e.target.selectedOptions).map(option => option.value);
         setFormData(prev => ({
             ...prev,
-            categoryList: categories
+            categoryList: selectedOptions
         }));
     };
-
-    /**
-     * Handles form submission
-     * Sends data to API to either create or update a product
-     * Redirects to products page on success
-     */
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -114,16 +50,14 @@ const CreateProduct = () => {
         setSuccess(false);
 
         try {
-            const token = localStorage.getItem('token');
-            // Determine if we're creating or updating based on ID presence
-            const url = id 
-                ? `${API_BASE_URL}/api/Products/${id}`
-                : `${API_BASE_URL}/api/Products`;
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                setError('You must be logged in to create a product.');
+                return;
+            }
 
-            const method = id ? 'PUT' : 'POST';
-              // Send request to API
-            const response = await fetch(url, {
-                method: method,
+            const response = await fetch(`${API_BASE_URL}/api/Products/CreateProduct`, {
+                method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
@@ -131,7 +65,6 @@ const CreateProduct = () => {
                 credentials: 'include',
                 body: JSON.stringify({
                     ...formData,
-                    // Convert string values to numbers for numeric fields
                     calories: parseFloat(formData.calories),
                     protein: parseFloat(formData.protein),
                     fat: parseFloat(formData.fat),
@@ -139,16 +72,18 @@ const CreateProduct = () => {
                 })
             });
 
-            if (!response.ok) throw new Error('Failed to save product');
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to create product');
+            }
 
-            // Show success message and redirect
             setSuccess(true);
             setTimeout(() => {
-                navigate('/products');
+                navigate('/my-products');
             }, 1500);
         } catch (error) {
-            console.error('Error saving product:', error);
-            setError('Failed to save product. Please try again.');
+            console.error('Error creating product:', error);
+            setError(error.message || 'Failed to create product. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -158,87 +93,114 @@ const CreateProduct = () => {
         <Container className="py-4">
             <Card>
                 <Card.Body>
-                    <Card.Title>{id ? 'Edit Product' : 'Create New Product'}</Card.Title>
+                    <Card.Title>Create New Product</Card.Title>
                     
                     {error && <Alert variant="danger">{error}</Alert>}
-                    {success && <Alert variant="success">
-                        Product successfully {id ? 'updated' : 'created'}! Redirecting...
-                    </Alert>}
+                    {success && (
+                        <Alert variant="success">
+                            Product successfully created! Redirecting to products page...
+                        </Alert>
+                    )}
 
                     <Form onSubmit={handleSubmit}>
                         <Form.Group className="mb-3">
-                            <Form.Label>Name</Form.Label>
+                            <Form.Label>Name*</Form.Label>
                             <Form.Control
                                 type="text"
                                 name="name"
                                 value={formData.name}
                                 onChange={handleChange}
                                 required
+                                placeholder="Enter product name"
                             />
                         </Form.Group>
 
                         <Form.Group className="mb-3">
-                            <Form.Label>Description</Form.Label>
+                            <Form.Label>Description*</Form.Label>
                             <Form.Control
                                 as="textarea"
                                 name="description"
                                 value={formData.description}
                                 onChange={handleChange}
                                 required
+                                placeholder="Enter product description"
+                                rows={3}
                             />
                         </Form.Group>
 
                         <Form.Group className="mb-3">
-                            <Form.Label>Categories (comma-separated)</Form.Label>
-                            <Form.Control
-                                type="text"
-                                value={formData.categoryList.join(', ')}
+                            <Form.Label>Categories*</Form.Label>
+                            <Form.Select
+                                multiple
+                                name="categoryList"
+                                value={formData.categoryList}
                                 onChange={handleCategoryChange}
-                                placeholder="e.g., Dairy, Organic, Vegan"
-                            />
+                                required
+                            >
+                                {availableCategories.map((category) => (
+                                    <option key={category} value={category}>
+                                        {category}
+                                    </option>
+                                ))}
+                            </Form.Select>
+                            <Form.Text className="text-muted">
+                                Hold Ctrl (Windows) or Command (Mac) to select multiple categories
+                            </Form.Text>
                         </Form.Group>
 
                         <Form.Group className="mb-3">
-                            <Form.Label>Calories</Form.Label>
+                            <Form.Label>Calories (per 100g)*</Form.Label>
                             <Form.Control
                                 type="number"
                                 name="calories"
                                 value={formData.calories}
                                 onChange={handleChange}
                                 required
+                                min="0"
+                                step="0.1"
+                                placeholder="Enter calories"
                             />
                         </Form.Group>
 
                         <Form.Group className="mb-3">
-                            <Form.Label>Protein (g)</Form.Label>
+                            <Form.Label>Protein (g per 100g)*</Form.Label>
                             <Form.Control
                                 type="number"
                                 name="protein"
                                 value={formData.protein}
                                 onChange={handleChange}
                                 required
+                                min="0"
+                                step="0.1"
+                                placeholder="Enter protein content"
                             />
                         </Form.Group>
 
                         <Form.Group className="mb-3">
-                            <Form.Label>Fat (g)</Form.Label>
+                            <Form.Label>Fat (g per 100g)*</Form.Label>
                             <Form.Control
                                 type="number"
                                 name="fat"
                                 value={formData.fat}
                                 onChange={handleChange}
                                 required
+                                min="0"
+                                step="0.1"
+                                placeholder="Enter fat content"
                             />
                         </Form.Group>
 
                         <Form.Group className="mb-3">
-                            <Form.Label>Carbohydrates (g)</Form.Label>
+                            <Form.Label>Carbohydrates (g per 100g)*</Form.Label>
                             <Form.Control
                                 type="number"
                                 name="carbohydrates"
                                 value={formData.carbohydrates}
                                 onChange={handleChange}
                                 required
+                                min="0"
+                                step="0.1"
+                                placeholder="Enter carbohydrates content"
                             />
                         </Form.Group>
 
@@ -248,12 +210,12 @@ const CreateProduct = () => {
                                 variant="primary"
                                 disabled={loading}
                             >
-                                {loading ? 'Saving...' : (id ? 'Update Product' : 'Create Product')}
+                                {loading ? 'Creating...' : 'Create Product'}
                             </Button>
                             <Button 
                                 type="button" 
                                 variant="secondary"
-                                onClick={() => navigate(-1)}
+                                onClick={() => navigate('/my-products')}
                                 disabled={loading}
                             >
                                 Cancel
