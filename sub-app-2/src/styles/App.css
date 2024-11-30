@@ -36,7 +36,7 @@ html, body {
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
-  background-attachment: scroll; /* Avoid fixed attachment for smooth scrolling */
+  background-attachment: fixed;
 }
 
 /* Responsive styles */
