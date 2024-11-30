@@ -2,15 +2,14 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
 const AdminUsers = () => {
-  const [users, setUsers] = useState([]); // Lagrer listen over brukere
-  const [loading, setLoading] = useState(true); // Håndterer loading state
-  const [error, setError] = useState(null); // Håndterer feil
+  const [users, setUsers] = useState([]); // Save the list of users
+  const [loading, setLoading] = useState(true); // handling loading state
+  const [error, setError] = useState(null); // handling error state
 
-  // Funksjon for å hente brukere fra API-et
+  // Function for fetching users
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem('authToken');
-      console.log('Token:', token); // Bekreft tokenet
       const response = await axios.get('http://localhost:7067/api/Admin/usermanager', {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -41,7 +40,7 @@ const AdminUsers = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      // Oppdater listen over brukere etter sletting
+      // Update list of users after deleting the user
       setUsers(users.filter((user) => user.userId !== userId));
       console.log(`User with ID ${userId} deleted successfully.`);
     } catch (err) {
@@ -49,17 +48,17 @@ const AdminUsers = () => {
     }
   };
 
-  // Hvis det er en feil
+  // If there is an error
   if (error) {
     return <div>Error: {error}</div>;
   }
 
-  // Hvis det laster
+  // If the data is still loading
   if (loading) {
     return <div>Loading users...</div>;
   }
 
-  // Render brukere i en tabell
+  // Render the list of users
   return (
     <div>
       <h1>Admin User Management</h1>
