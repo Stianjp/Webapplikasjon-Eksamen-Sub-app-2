@@ -11,28 +11,28 @@ public interface IProductRepository
     /// Retrieves all products from the database.
     /// </summary>
     /// <returns>A collection of all products.</returns>
-    Task<IEnumerable<Product>> GetAllProductsAsync();
+    Task<IEnumerable<ProductDTO>> GetAllProductsAsync();
 
     /// <summary>
     /// Retrieves a specific product by its unique ID.
     /// </summary>
     /// <param name="id">The unique ID of the product to retrieve.</param>
     /// <returns>The product if found; otherwise, null.</returns>
-    Task<Product?> GetProductByIdAsync(int id);
+    Task<ProductDTO?> GetProductByIdAsync(int id);
 
     /// <summary>
     /// Creates a new product in the database.
     /// </summary>
     /// <param name="product">The product to create.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
-    Task CreateProductAsync(Product product);
+    Task CreateProductAsync(ProductDTO productDto);
 
     /// <summary>
     /// Updates an existing product in the database.
     /// </summary>
     /// <param name="product">The product with updated details.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
-    Task UpdateProductAsync(Product product);
+    Task UpdateProductAsync(int id, ProductDTO productDto);
 
     /// <summary>
     /// Deletes a product by its unique ID.
@@ -48,7 +48,7 @@ public interface IProductRepository
     /// </summary>
     /// <param name="producerId">The ID of the producer.</param>
     /// <returns>A collection of products created by the specified producer.</returns>
-    Task<IEnumerable<Product>> GetProductsByProducerIdAsync(string producerId);
+    Task<IEnumerable<ProductDTO>> GetProductsByProducerIdAsync(string producerId);
 
     /// <summary>
     /// Retrieves all unique product categories.
@@ -61,12 +61,12 @@ public interface IProductRepository
     /// </summary>
     /// <param name="category">The category to filter products by.</param>
     /// <returns>A collection of products within the specified category.</returns>
-    Task<IEnumerable<Product>> GetProductsByCategoryAsync(string category);
+    Task<IEnumerable<ProductDTO>> GetProductsByCategoryAsync(string category);
 
     /// <summary>
     /// Retrieves all products sorted by the specified field.
     /// </summary>
     /// <param name="sortBy">The field to sort by (e.g., "name" or "calories").</param>
     /// <returns>A collection of products sorted by the specified field.</returns>
-    Task<IEnumerable<Product>> GetSortedProductsAsync(string sortBy);
+    Task<IEnumerable<ProductDTO>> GetSortedProductsAsync(string sortBy);
 }
