@@ -1,132 +1,127 @@
-/* General Navbar and Sidebar Styles */
 .navbar {
   height: 100%;
-  background-color: #ffffff; /* Light background for the sidebar */
-  box-shadow: 4px 0 12px rgba(0, 0, 0, 0.1); /* Light shadow for depth */
-  border-right: 1px solid #e0e0e0; /* Subtle border for separation */
-  transition: transform 0.3s ease-in-out; /* Smooth slide-in effect */
+  width: 250px;
+  background-color: #ffffff;
+  box-shadow: 4px 0 12px rgba(0, 0, 0, 0.1);
+  border-right: 1px solid #e0e0e0;
+  transition: all 0.3s ease-in-out;
 }
 
-/* Navbar links */
-.navbar-nav .nav-link {
-  text-align: left;
-  font-size: 1rem;
-  padding: 12px 15px;
-  border-bottom: 1px solid #e0e0e0;
+.sidebar-content {
+  height: 100vh;
   display: flex;
-  align-items: center;
-  gap: 12px;
-  transition: background-color 0.3s, transform 0.3s ease, padding-left 0.3s ease;
-  background-color: #f9f9f9; /* Light background color */
-  border-left: 3px solid transparent; /* Border for hover effect */
+  flex-direction: column;
+  background-color: #e0e0e0;
 }
 
-/* Hover effects for links */
-.navbar-nav .nav-link:hover {
-  background-color: #e2e6ea; /* Slightly darker background */
-  color: #4caf50; /* Green text on hover */
-  text-decoration: none;
-  transform: translateX(5px); /* Subtle shift on hover */
-  padding-left: 20px; /* Add space on the left when hovering */
-  border-left: 3px solid #4caf50; /* Highlight with border on hover */
-}
-
-/* Active link styles */
-.navbar-nav .nav-link.active {
-  background-color: #4caf50;
-  color: white;
-  font-weight: bold;
-  border-left: 3px solid white; /* White border to highlight active link */
-}
-
-/* Icons inside links */
-.icon {
-  margin-right: 10px;
-  width: 22px;
-  height: 22px;
-}
-
-/* Logo styling */
+/* Logo Styles */
 .logo {
   width: 120px;
   height: auto;
   margin: 0 auto;
   display: block;
-  transition: transform 0.3s ease-in-out;
 }
 
-/* Sidebar styles for large screens */
-@media (min-width: 992px) {
-  .d-lg-flex {
-    display: flex !important;
-  }
-  .d-lg-none {
-    display: none !important;
-  }
-
-  .navbar {
-    height: 100%;
-    flex-direction: column;
-  }
-
-  .nav-pills .nav-link {
-    width: 100%;
-    padding: 14px 20px;
-    background-color: #f9f9f9; /* Light gray background */
-    border-bottom: none;
-  }
-
-  .nav-pills .nav-link:hover {
-    background-color: #4caf50 !important; /* Green background on hover */
-    color: white;
-  }
-}
-
-/* Navbar styles for small screens */
-@media (max-width: 991px) {
-  .d-lg-none {
-    display: block !important;
-  }
-
-  .d-lg-flex {
-    display: none !important;
-  }
-
-  .navbar {
-    flex-direction: row;
-    justify-content: space-between;
-    width: 100%;
-    padding: 0 15px;
-  }
-
-  .navbar-nav .nav-link {
-    border-bottom: none;
-    padding: 12px;
-  }
-}
-
-/* Add depth and hover effects for sidebar */
-.navbar {
-  background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%); /* Subtle gradient */
-  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15); /* Stronger shadow for depth */
-  transition: all 0.3s ease-in-out;
-}
-
-/* Sidebar hover effect */
-.navbar:hover {
-  transform: translateX(3px); /* Slight movement on hover */
-  box-shadow: 6px 0 20px rgba(0, 0, 0, 0.2); /* Increased shadow on hover */
-}
-
-/* Logout button styles */
-.logout {
-  margin-top: auto;
-}
-
-.logout button, .logout a {
+/* Navigation Styles */
+.nav-link {
   display: flex;
   align-items: center;
-  padding: 10px 20px;
+  padding: 12px 15px;
+  color: #333;
+  background-color: transparent;
+  border-left: 3px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+  background-color: #e2e6ea;
+  color: #4caf50;
+  text-decoration: none;
+  transform: translateX(5px);
+  padding-left: 20px;
+  border-left: 3px solid #4caf50;
+}
+
+.nav-link.active {
+  background-color: #4caf50;
+  color: white;
+  border-left: 3px solid white;
+}
+
+/* Icon Styles */
+.icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+}
+
+/* Sub-menu Styles */
+.sub-menu {
+  margin-left: 20px;
+  padding-left: 10px;
+  border-left: 1px solid #e0e0e0;
+}
+
+.sub-menu .nav-link {
+  font-size: 0.9rem;
+  padding: 8px 12px;
+}
+
+/* Auth Section */
+.logout {
+  margin-top: auto;
+  padding: 15px 0;
+}
+
+.logout button,
+.logout a {
   width: 100%;
-  justify-content: space-between;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+/* Disabled Link Styles */
+.nav-link.disabled {
+  color: #6c757d;
+  pointer-events: none;
+  background-color: transparent;
+  opacity: 0.6;
+}
+
+/* Responsive Styles */
+@media (max-width: 991px) {
+  .navbar {
+    width: 100%;
+    height: auto;
+  }
+
+  .sidebar-content {
+    height: auto;
+    min-height: unset;
+  }
+
+  .nav-link:hover {
+    transform: none;
+  }
+}
+
+/* Divider Styles */
+hr {
+  margin: 1rem 0;
+  color: inherit;
+  border: 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  opacity: 0.25;
+}
+
+/* Navbar Brand */
+.navbar-brand {
+  padding: 0;
+  margin: 10px 0;
+  font-size: 1.25rem;
+  text-align: center;
+  color: #333;
 }
