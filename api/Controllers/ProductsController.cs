@@ -1,13 +1,12 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
+using api.Models;
+using api.DTO;
+using api.DAL.Interfaces;
+
 namespace api.Controllers
 {
-    using Microsoft.AspNetCore.Authorization;
-    using Microsoft.AspNetCore.Mvc;
-    using System.Security.Claims;
-    using api.Models;
-    using api.DAL.Interfaces;
-    using System.Linq;
-    using System.Threading.Tasks;
-
     [Route("api/[controller]")]
     [ApiController]
     public class ProductsController : ControllerBase
@@ -32,28 +31,14 @@ namespace api.Controllers
             return User?.IsInRole(UserRoles.Administrator) ?? false;
         }
 
-        [HttpGet]
+        [HttpGet("GetAllProducts")]
         [AllowAnonymous]
         [ProducesResponseType(typeof(IEnumerable<ProductDTO>), 200)]
         [ProducesResponseType(400)]
         public async Task<IActionResult> GetAllProducts()
         {
             var products = await _productRepository.GetAllProductsAsync();
-            
-            var productDtos = products.Select(p => new ProductDTO
-            {
-                Name = p.Name,
-                Description = p.Description,
-                Category = p.Category,
-                Calories = p.Calories,
-                Protein = p.Protein,
-                Fat = p.Fat,
-                Carbohydrates = p.Carbohydrates,
-                ProducerId = p.ProducerId,  // Map ProducerId
-                CategoryList = p.CategoryList  // Map CategoryList
-            }).ToList();
-            
-            return Ok(productDtos);
+            return Ok(products);
         }
 
         [HttpGet("{id:int}")]
@@ -69,53 +54,26 @@ namespace api.Controllers
                 return NotFound(new { message = "Product not found." });
             }
 
-            var productDto = new ProductDTO
-            {
-                Name = product.Name,
-                Description = product.Description,
-                Category = product.Category,
-                Calories = product.Calories,
-                Protein = product.Protein,
-                Fat = product.Fat,
-                Carbohydrates = product.Carbohydrates,
-                ProducerId = product.ProducerId,  // Map ProducerId
-                CategoryList = product.CategoryList  // Map CategoryList
-            };
-
-            return Ok(productDto);
+            return Ok(product);
         }
 
-        [HttpPost]
+        [HttpPost("CreateProduct")]
         [Authorize]
         [ProducesResponseType(typeof(ProductDTO), 201)]
         [ProducesResponseType(400)]
-        public async Task<IActionResult> CreateProduct([FromBody] Product product)
+        public async Task<IActionResult> CreateProduct([FromBody] ProductDTO productDto)
         {
             try
             {
-                product.ProducerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                productDto.ProducerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-                if (string.IsNullOrEmpty(product.ProducerId))
+                if (string.IsNullOrEmpty(productDto.ProducerId))
                 {
                     return BadRequest(new { message = "Unable to determine your producer account. Please log in again." });
                 }
 
-                await _productRepository.CreateProductAsync(product);
-                
-                var productDto = new ProductDTO
-                {
-                    Name = product.Name,
-                    Description = product.Description,
-                    Category = product.Category,
-                    Calories = product.Calories,
-                    Protein = product.Protein,
-                    Fat = product.Fat,
-                    Carbohydrates = product.Carbohydrates,
-                    ProducerId = product.ProducerId,  // Map ProducerId
-                    CategoryList = product.CategoryList  // Map CategoryList
-                };
-
-                return CreatedAtAction(nameof(GetProductDetails), new { id = product.Id }, productDto);
+                await _productRepository.CreateProductAsync(productDto);
+                return CreatedAtAction(nameof(GetProductDetails), new { id = productDto.Id }, productDto);
             }
             catch (Exception ex)
             {
@@ -124,48 +82,34 @@ namespace api.Controllers
             }
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("UpdateProduct{id}")]
         [Authorize]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         [ProducesResponseType(403)]
-        public async Task<IActionResult> UpdateProduct(int id, [FromBody] Product updatedProduct)
+        public async Task<IActionResult> UpdateProduct(int id, [FromBody] ProductDTO productDto)
         {
-            if (id != updatedProduct.Id)
+            if (id != productDto.Id)
             {
                 return BadRequest(new { message = "Product ID mismatch." });
             }
 
-            var product = await _productRepository.GetProductByIdAsync(id);
+            var existingProduct = await _productRepository.GetProductByIdAsync(id);
 
-            if (product == null)
+            if (existingProduct == null)
             {
                 return NotFound(new { message = "Product not found." });
             }
 
-            if (!IsAdmin() && product.ProducerId != User.FindFirstValue(ClaimTypes.NameIdentifier))
+            if (!IsAdmin() && existingProduct.ProducerId != User.FindFirstValue(ClaimTypes.NameIdentifier))
             {
                 return Forbid();
             }
 
             try
             {
-                await _productRepository.UpdateProductAsync(updatedProduct);
-                
-                var productDto = new ProductDTO
-                {
-                    Name = updatedProduct.Name,
-                    Description = updatedProduct.Description,
-                    Category = updatedProduct.Category,
-                    Calories = updatedProduct.Calories,
-                    Protein = updatedProduct.Protein,
-                    Fat = updatedProduct.Fat,
-                    Carbohydrates = updatedProduct.Carbohydrates,
-                    ProducerId = updatedProduct.ProducerId,  // Map ProducerId
-                    CategoryList = updatedProduct.CategoryList  // Map CategoryList
-                };
-
+                await _productRepository.UpdateProductAsync(id, productDto);
                 return NoContent();
             }
             catch (Exception ex)
@@ -175,7 +119,7 @@ namespace api.Controllers
             }
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("DeleteProduct{id}")]
         [Authorize]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
@@ -212,6 +156,14 @@ namespace api.Controllers
             return Ok(_availableCategories);
         }
 
+        [HttpGet("allergens")]
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(IEnumerable<string>), 200)]
+        public IActionResult GetAvailableAllergens()
+        {
+            return Ok(_availableAllergens);
+        }
+
         [HttpGet("user-products")]
         [Authorize]
         [ProducesResponseType(typeof(IEnumerable<ProductDTO>), 200)]
@@ -233,22 +185,88 @@ namespace api.Controllers
 
             var allCategories = await _productRepository.GetAllCategoriesAsync();
 
-            var productDtos = products.Select(p => new ProductDTO
+            return Ok(new
             {
-                Name = p.Name,
-                Description = p.Description,
-                Category = p.Category,
-                Calories = p.Calories,
-                Protein = p.Protein,
-                Fat = p.Fat,
-                Carbohydrates = p.Carbohydrates,
-                ProducerId = p.ProducerId,  // Map ProducerId
-                CategoryList = p.CategoryList  // Map CategoryList
-            }).ToList();
+                products = products,
+                categories = allCategories.OrderBy(c => c).ToList()
+            });
+        }
+
+        [HttpPut("admin/products/{id}")]
+        [Authorize(Roles = "Administrator")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> AdminUpdateProduct(int id, [FromBody] ProductDTO productDto)
+        {
+            if (id != productDto.Id)
+            {
+                return BadRequest(new { message = "Product ID mismatch." });
+            }
+
+            var existingProduct = await _productRepository.GetProductByIdAsync(id);
+            if (existingProduct == null)
+            {
+                return NotFound(new { message = "Product not found." });
+            }
+
+            try
+            {
+                await _productRepository.UpdateProductAsync(id, productDto);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating product: {ex}");
+                return StatusCode(500, new { message = "An error occurred while updating the product." });
+            }
+        }
+
+        [HttpDelete("admin/products/{id}")]
+        [Authorize(Roles = "Administrator")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> AdminDeleteProduct(int id)
+        {
+            var product = await _productRepository.GetProductByIdAsync(id);
+            
+            if (product == null)
+            {
+                return NotFound(new { message = "Product not found." });
+            }
+
+            var success = await _productRepository.DeleteProductAsync(id);
+            
+            if (!success)
+            {
+                return StatusCode(500, new { message = "An error occurred while deleting the product." });
+            }
+
+            return NoContent();
+        }
+
+        [HttpGet("admin/all-products")]
+        [Authorize(Roles = "Administrator")] // Ensures only admins can access
+        public async Task<IActionResult> GetAllProductsAdmin([FromQuery] string? sortBy = null, [FromQuery] string? category = null)
+        {
+            var products = await _productRepository.GetAllProductsAsync();
+            
+            // Apply filters if provided
+            if (!string.IsNullOrEmpty(category))
+            {
+                products = products.Where(p => p.CategoryList.Contains(category)).ToList();
+            }
+
+            if (!string.IsNullOrEmpty(sortBy))
+            {
+                products = await _productRepository.GetSortedProductsAsync(sortBy);
+            }
+
+            var allCategories = await _productRepository.GetAllCategoriesAsync();
 
             return Ok(new
             {
-                products = productDtos,
+                products = products,
                 categories = allCategories.OrderBy(c => c).ToList()
             });
         }
