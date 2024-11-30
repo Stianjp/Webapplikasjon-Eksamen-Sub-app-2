@@ -42,15 +42,20 @@ html, body {
 @media (max-width: 991px) {
   .sidebar-wrapper {
     width: 100%;
-    height: auto;
     position: fixed;
     top: 0;
     z-index: 1000;
   }
 
+  .navbar-brand{
+    padding: 0;
+    margin: 10px 0;
+    font-size: 1rem;
+    text-align: center;
+  }
+
   .content-wrapper {
     margin-left: 0;
-    width: 100%;
     margin-top: 250px; /* Adjust based on your navbar height */
   }
 
