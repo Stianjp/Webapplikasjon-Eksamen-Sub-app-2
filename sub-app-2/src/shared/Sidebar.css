@@ -5,13 +5,25 @@
   background-color: #ffffff;
   box-shadow: 4px 0 12px rgba(0, 0, 0, 0.1);
   border-right: 1px solid #e0e0e0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  transform: translateX(-100%); /* Skjuler sidebaren som standard */
+  transition: transform 0.3s ease-in-out;
+  z-index: 1050; /* Sørg for at den ligger over overlay */
 }
 
+.navbar.open {
+  transform: translateX(0); /* Viser sidebaren */
+}
+
+/* Sidebar Content */
 .sidebar-content {
   height: 100vh;
   width: inherit;
   display: flex;
   flex-direction: column;
+  z-index: 1050; /* Sørg for at innholdet ligger over overlay */
 }
 
 /* Logo Styles */
@@ -85,16 +97,83 @@
   opacity: 0.6;
 }
 
+/* Menu Toggle Button */
+.menu-toggle {
+  display: block;
+  position: fixed;
+  top: 15px;
+  right: 15px; /* Plasseres øverst til høyre */
+  z-index: 1100; /* Sørger for at knappen vises over alt */
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.menu-toggle:hover {
+  background-color: #45a049;
+}
+
+/* Overlay for small screens */
+.overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1049; /* Sørger for at overlay er under navbar */
+}
+
+.overlay.active {
+  display: block;
+}
+/* Navbar Brand */
+.navbar-brand {
+  padding: 2px;
+  display: flex;
+  font-size: 2rem;
+  justify-content: center;
+  color: #333;
+}
+
 /* Responsive Styles */
 @media (max-width: 991px) {
   .navbar {
     width: 100%;
-    height: auto;
+    height: 100%;
+    z-index: 1050; /* Sørg for at sidebaren vises korrekt */
   }
 
   .sidebar-content {
     height: auto;
     min-height: unset;
+  }
+
+  .menu-toggle {
+    display: block; /* Viser menyknappen på små skjermer */
+  }
+
+  .overlay {
+    display: block; /* Sørger for at overlay er aktiv på små skjermer */
+  }
+}
+
+@media (min-width: 992px) {
+  .navbar {
+    transform: translateX(0); /* Sidebaren alltid synlig på store skjermer */
+  }
+
+  .menu-toggle {
+    display: none; /* Skjuler menyknappen på store skjermer */
+  }
+
+  .overlay {
+    display: none; /* Ingen overlay på store skjermer */
   }
 }
 
@@ -107,11 +186,3 @@ hr {
   opacity: 0.25;
 }
 
-/* Navbar Brand */
-.navbar-brand {
-  padding: 0;
-  margin: 10px 0;
-  font-size: 1.25rem;
-  text-align: center;
-  color: #333;
-}
