@@ -2,8 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Form, Alert, Button, Table, Badge } from 'react-bootstrap';
 import { jwtDecode } from 'jwt-decode';
-import EditProductModal from './EditProductModal';
-import DeleteProductModal from './DeleteProductModal';
+import EditProductModal from '../../components/shared/EditProductModal';
+import DeleteProductModal from '../../components/shared/DeleteProductModal';
 
 const API_BASE_URL = 'http://localhost:7067';
 
