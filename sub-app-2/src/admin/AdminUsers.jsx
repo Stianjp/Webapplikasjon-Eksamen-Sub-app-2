@@ -9,30 +9,28 @@ const AdminUsers = () => {
   // Funksjon for å hente brukere fra API-et
   const fetchUsers = async () => {
     try {
-      const token = localStorage.getItem('authToken'); // Hent token fra localStorage
+      const token = localStorage.getItem('authToken');
+      console.log('Token:', token); // Bekreft tokenet
       const response = await axios.get('http://localhost:7067/api/Admin/usermanager', {
         headers: {
-          Authorization: `Bearer ${token}`, // Legg til token i forespørselen
+          Authorization: `Bearer ${token}`,
         },
       });
-      setUsers(response.data); // Oppdater brukere
-      setLoading(false); // Slå av loading state
-    } catch (err) {
-      console.error('Error fetching users:', err.response?.data || err.message);
-      setError('Failed to fetch users. Please try again.');
-      setLoading(false); // Slå av loading state
+      console.log(response.data); // The list of the users
+    } catch (error) {
+      console.error('Error fetching users:', error.response?.data || error.message);
     }
   };
 
-  // useEffect for å hente data når komponenten laster
+  
   useEffect(() => {
     fetchUsers();
   }, []);
 
-  // Handlinger (disse kan implementeres senere)
+  
   const editRoles = (userId) => {
     console.log(`Edit roles for user with ID: ${userId}`);
-    // Implementer funksjonalitet for å redigere roller
+    // This is where you would open a modal or navigate to a new page to edit roles
   };
 
   const deleteUser = async (userId) => {
