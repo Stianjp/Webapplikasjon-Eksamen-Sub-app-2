@@ -10,6 +10,7 @@ import AddProductIcon from '../icons/circle-plus-solid.svg';
 import AccountIcon from '../icons/gear-solid.svg';
 import PrivacyIcon from '../icons/eye-solid.svg';
 import LogoutIcon from '../icons/right-to-bracket-solid.svg';
+import { FaUserCog } from "react-icons/fa";
 
 
 const Sidebar = ({ isAuthenticated = false, roles = [], onLogout }) => {
@@ -164,6 +165,17 @@ const Sidebar = ({ isAuthenticated = false, roles = [], onLogout }) => {
                 <span>Privacy</span>
               </Link>
             </li>
+         
+
+          {/* Admin Page */}
+          <li className="nav-item">
+          {(isAdmin) && (
+            <Link className={`nav-link ${getActiveClass('/admin/users')}`} to="/admin/users" onClick={closeNavbar}>
+            <FaUserCog className='icon' />
+              <span>User Admin</span>
+            </Link>
+          )}
+          </li>
           </ul>
 
           {/* Auth Section */}
