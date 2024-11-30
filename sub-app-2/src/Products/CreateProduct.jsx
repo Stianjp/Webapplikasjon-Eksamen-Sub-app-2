@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
-import { Container, Form, Button, Card, Alert } from 'react-bootstrap';
+import { Container, Form, Button, Card, Alert, Row, Col } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 
 const API_BASE_URL = 'http://localhost:7067';
+
+const AVAILABLE_ALLERGENS = [
+    "Milk", "Egg", "Peanut", "Soy", "Wheat", "Tree Nut", "Shellfish", "Fish", "Sesame", "None"
+];
 
 const CreateProduct = () => {
     const navigate = useNavigate();
@@ -23,7 +27,8 @@ const CreateProduct = () => {
         calories: '',
         protein: '',
         fat: '',
-        carbohydrates: ''
+        carbohydrates: '',
+        allergens: ''
     });
 
     const handleChange = (e) => {
@@ -34,8 +39,35 @@ const CreateProduct = () => {
         }));
     };
 
+    const handleAllergenChange = (allergen) => {
+        setFormData(prev => {
+            let currentAllergens = prev.allergens ? prev.allergens.split(',').map(a => a.trim()) : [];
+            
+            if (allergen === 'None') {
+                // If 'None' is selected, clear all other allergens
+                return {
+                    ...prev,
+                    allergens: 'None'
+                };
+            } else {
+                // If any other allergen is selected, remove 'None'
+                currentAllergens = currentAllergens.filter(a => a !== 'None');
+                
+                if (currentAllergens.includes(allergen)) {
+                    currentAllergens = currentAllergens.filter(a => a !== allergen);
+                } else {
+                    currentAllergens.push(allergen);
+                }
+
+                return {
+                    ...prev,
+                    allergens: currentAllergens.join(', ')
+                };
+            }
+        });
+    };
+
     const handleCategoryChange = (e) => {
-        // Get all selected options from the multiple select
         const selectedOptions = Array.from(e.target.selectedOptions).map(option => option.value);
         setFormData(prev => ({
             ...prev,
@@ -79,7 +111,7 @@ const CreateProduct = () => {
 
             setSuccess(true);
             setTimeout(() => {
-                navigate('/my-products');
+                navigate('/products');
             }, 1500);
         } catch (error) {
             console.error('Error creating product:', error);
@@ -88,6 +120,8 @@ const CreateProduct = () => {
             setLoading(false);
         }
     };
+
+    const currentAllergens = formData.allergens ? formData.allergens.split(',').map(a => a.trim()) : [];
 
     return (
         <Container className="py-4">
@@ -204,6 +238,24 @@ const CreateProduct = () => {
                             />
                         </Form.Group>
 
+                        <Form.Group className="mb-3">
+                            <Form.Label>Allergens</Form.Label>
+                            <Row className="mt-2">
+                                {AVAILABLE_ALLERGENS.map((allergen) => (
+                                    <Col key={allergen} xs={12} sm={6} md={4}>
+                                        <Form.Check
+                                            type="checkbox"
+                                            id={`allergen-${allergen}`}
+                                            label={allergen}
+                                            checked={currentAllergens.includes(allergen)}
+                                            onChange={() => handleAllergenChange(allergen)}
+                                            disabled={allergen !== 'None' && currentAllergens.includes('None')}
+                                        />
+                                    </Col>
+                                ))}
+                            </Row>
+                        </Form.Group>
+
                         <div className="d-flex gap-2">
                             <Button 
                                 type="submit" 
@@ -215,7 +267,7 @@ const CreateProduct = () => {
                             <Button 
                                 type="button" 
                                 variant="secondary"
-                                onClick={() => navigate('/my-products')}
+                                onClick={() => navigate('/products/my')}
                                 disabled={loading}
                             >
                                 Cancel

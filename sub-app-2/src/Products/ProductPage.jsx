@@ -34,14 +34,14 @@ const ProductPage = () => {
 
     const fetchUserData = async () => {
         try {
-            const authToken = localStorage.getItem('authToken');
-            if (!authToken) {
+            const token = localStorage.getItem('authToken');
+            if (!token) {
                 console.log('No auth token found');
                 navigate('/login');
                 return;
             }
 
-            const decodedToken = jwtDecode(authToken);
+            const decodedToken = jwtDecode(token);
             let userRoles = decodedToken['role'] || decodedToken['roles'];
             if (!Array.isArray(userRoles)) {
                 userRoles = [userRoles];
@@ -65,12 +65,12 @@ const ProductPage = () => {
         setError(null);
 
         try {
-            const authToken = localStorage.getItem('authToken');
+            const token = localStorage.getItem('authToken');
             const response = await fetch(
-                `${API_BASE_URL}/api/Products?category=${selectedCategory}&sortOrder=${sortOrder}&sortDirection=${sortDirection}`, {
+                `${API_BASE_URL}/api/Products/GetAllProducts/`, {
                 method: 'GET',
                 headers: {
-                    'Authorization': `Bearer ${authToken}`,
+                    'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
                 credentials: 'include'
@@ -96,11 +96,11 @@ const ProductPage = () => {
 
     const fetchCategories = async () => {
         try {
-            const authToken = localStorage.getItem('authToken');
+            const token = localStorage.getItem('authToken');
             const response = await fetch(`${API_BASE_URL}/api/Products/categories`, {
                 method: 'GET',
                 headers: {
-                    'Authorization': `Bearer ${authToken}`,
+                    'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
                 credentials: 'include'

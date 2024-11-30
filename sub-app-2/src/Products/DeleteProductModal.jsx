@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Button, Form } from 'react-bootstrap';
+import { Modal, Button, } from 'react-bootstrap';
 
 const DeleteProductModal = ({ show, onHide, onConfirm, productName }) => {
     return (
