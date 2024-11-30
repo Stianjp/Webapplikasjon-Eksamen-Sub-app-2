@@ -50,7 +50,8 @@ html, body {
 
   .content-wrapper {
     margin-left: 0;
-    margin-top: 60px; /* Adjust based on your navbar height */
+    width: 100%;
+    margin-top: 250px; /* Adjust based on your navbar height */
   }
 
   .content-container {
