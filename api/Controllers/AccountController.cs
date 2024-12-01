@@ -199,7 +199,7 @@ public class AccountController : ControllerBase
     /// <example>
     /// Example usage:
     /// <code>
-    /// var token = GenerateJwtToken(user, new List<string> { "Administrator", "User" });
+    /// var token = GenerateJwtToken(user, new List&lt;string&gt; { "Administrator", "User" });
     /// Console.WriteLine(token); // Outputs the signed JWT token as a string
     /// </code>
     /// </example>
@@ -207,14 +207,14 @@ public class AccountController : ControllerBase
     {
         var authClaims = new List<Claim>
         {
-            new Claim("name", user.UserName),
+            new Claim("name", user.UserName ?? "unknownUser"),
             new Claim(ClaimTypes.NameIdentifier, user.Id),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 
         authClaims.AddRange(roles.Select(role => new Claim("role", role)));
 
-        var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
+        var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"] ?? string.Empty));
 
         var token = new JwtSecurityToken(
             issuer: _configuration["JWT:ValidIssuer"],

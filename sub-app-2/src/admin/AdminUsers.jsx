@@ -1,8 +1,10 @@
+
 import React, { useEffect, useState } from 'react'
 import "../styles/Account.css"
 import axios from 'axios';
 
 const AdminUsers = () => {
+  /* All is commend out, because its something wrong with the fetching of the API
   const [users, setUsers] = useState([]); // Save the list of users
   const [loading, setLoading] = useState(true); // handling loading state
   const [error, setError] = useState(null); // handling error state
@@ -88,6 +90,7 @@ const AdminUsers = () => {
       </table>
     </div>
   );
-};
+*/
+  };
 
 export default AdminUsers;
