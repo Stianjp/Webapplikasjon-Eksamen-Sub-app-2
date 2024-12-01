@@ -10,17 +10,14 @@ using System.Text;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
 
-/// <summary>
-/// Configures and runs the application.
-/// </summary>
+
+// Configures and runs the application.
 var builder = WebApplication.CreateBuilder(args);
 
 
 
 // Configure Serilog logging
-/// <summary>
-/// Sets up Serilog for logging, including configuration from appsettings.json and output to the console.
-/// </summary>
+// Sets up Serilog for logging, including configuration from appsettings.json and output to the console.
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
@@ -33,9 +30,8 @@ builder.Host.UseSerilog((context, services, configuration) => configuration
     .Enrich.FromLogContext()
     .WriteTo.Console());
 
-/// <summary>
-/// Adds essential services to the container, including controllers, JSON options, Swagger, and Identity services.
-/// </summary>
+
+// Adds essential services to the container, including controllers, JSON options, Swagger, and Identity services.
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -46,7 +42,7 @@ builder.Services.AddControllers()
 
 
 
-{/* Configures Swagger for API documentation. */ }
+// Configures Swagger for API documentation.
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -65,15 +61,13 @@ builder.Services.AddSwaggerGen(c =>
     c.SupportNonNullableReferenceTypes();
 });
 
-/// <summary>
-/// Adds the application database context using SQLite as the database provider.
-/// </summary>
+
+// Adds the application database context using SQLite as the database provider.
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-/// <summary>
-/// Configures ASP.NET Core Identity with custom password requirements.
-/// </summary>
+
+// Configures ASP.NET Core Identity with custom password requirements.
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 {
     options.Password.RequireDigit = true;
@@ -85,10 +79,10 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
 
-/// <summary>
-/// Configures JWT authentication with token validation parameters.
-/// Ensures secure authentication by validating the issuer, audience, lifetime, and signing key of JWT tokens.
-/// </summary>
+
+// Configures JWT authentication with token validation parameters.
+// Ensures secure authentication by validating the issuer, audience, lifetime, and signing key of JWT tokens.
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -104,16 +98,15 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-/// <summary>
-/// Configures the behavior of the application cookie for authentication.
-/// Ensures that unauthorized and forbidden requests return appropriate HTTP status codes
-/// instead of redirecting to login or access denied pages.
-/// </summary>
-/// <remarks>
-/// This configuration is essential for API-only applications like this where redirecting to login
-/// or access denied pages is not suitable, and the client (e.g., React frontend) expects
-/// proper HTTP status codes (401 for unauthorized and 403 for forbidden).
-/// </remarks>
+/*
+Configures the behavior of the application cookie for authentication.
+Ensures that unauthorized and forbidden requests return appropriate HTTP status codes
+instead of redirecting to login or access denied pages.
+
+This configuration is essential for API-only applications like this where redirecting to login
+or access denied pages is not suitable, and the client (e.g., React frontend) expects
+proper HTTP status codes (401 for unauthorized and 403 for forbidden).
+*/
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Events.OnRedirectToLogin = context =>
@@ -128,20 +121,18 @@ builder.Services.ConfigureApplicationCookie(options =>
     };
 });
 
-/// <summary>
-/// Registers the repository interfaces with their implementations.
-/// </summary>
+
+// Registers the repository interfaces with their implementations.
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
-/// <summary>
-/// Configures CORS policies to allow specific origins for the React frontend.
-/// </summary>
+
+// Configures CORS policies to allow specific origins for the React frontend.
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("ReactCorsPolicy", policy =>
     {
-        policy.WithOrigins(builder.Configuration["CORS:AllowedOrigins"].Split(','))
+        policy.WithOrigins((builder.Configuration["CORS:AllowedOrigins"] ?? "").Split(','))
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
@@ -150,9 +141,8 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-/// <summary>
-/// Ensures database creation and seeds initial data.
-/// </summary>
+
+// Ensures database creation and seeds initial data.
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
@@ -160,9 +150,8 @@ using (var scope = app.Services.CreateScope())
     await DBInit.SeedAsync(app);
 }
 
-/// <summary>
-/// Configures middleware for development and production environments.
-/// </summary>
+
+// Configures middleware for development and production environments.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -174,25 +163,21 @@ else
     app.UseHsts();
 }
 
-/// <summary>
-/// Configures middleware for routing, CORS, authentication, and authorization.
-/// </summary>
+
+// Configures middleware for routing, CORS, authentication, and authorization.
 app.UseRouting();
 app.UseCors("ReactCorsPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
 
-/// <summary>
-/// Maps controller routes.
-/// </summary>
+
+// Maps controller routes.
 app.MapControllers();
 
-/// <summary>
-/// Ensures Serilog flushes logs on application stop.
-/// </summary>
+
+// Ensures Serilog flushes logs on application stop.
 app.Lifetime.ApplicationStopped.Register(Log.CloseAndFlush);
 
-/// <summary>
-/// Runs the application.
-/// </summary>
+
+// Runs the application.
 app.Run();
