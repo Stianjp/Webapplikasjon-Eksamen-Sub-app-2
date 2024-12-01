@@ -276,55 +276,57 @@ const MyProducts = () => {
         <div className="text-center">Loading...</div>
       ) : (
         <Table striped bordered hover responsive>
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Description</th>
-      <th>Categories</th>
-      <th>Calories</th>
-      <th>Protein</th>
-      <th>Fat</th>
-      <th>Carbs</th>
-      <th>Allergens</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    {filteredProducts.map((product) => (
-      <tr key={product.id}>
-        <td>{product.name}</td>
-        <td>{product.description}</td>
-        <td>{product.categoryList.join(', ')}</td>
-        <td>{product.calories}</td>
-        <td>{product.protein}</td>
-        <td>{product.fat}</td>
-        <td>{product.carbohydrates}</td>
-        <td>{product.allergens}</td>
-        <td>
-          {canEditProduct(product) && (
-            <>
-              <Button
-                variant="outline-primary"
-                size="sm"
-                className="me-2"
-                onClick={() => handleEditProduct(product)}
-              >
-                Edit
-              </Button>
-              <Button
-                variant="outline-danger"
-                size="sm"
-                onClick={() => handleDeleteProduct(product)}
-              >
-                Delete
-              </Button>
-            </>
-          )}
-        </td>
-      </tr>
-    ))}
-  </tbody>
-</Table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Description</th>
+              <th>Categories</th>
+              <th>Calories</th>
+              <th>Protein</th>
+              <th>Fat</th>
+              <th>Carbs</th>
+              <th>Allergens</th>
+              {roles.includes('Administrator') && <th>Producer ID</th>}
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredProducts.map((product) => (
+              <tr key={product.id}>
+                <td>{product.name}</td>
+                <td>{product.description}</td>
+                <td>{product.categoryList.join(', ')}</td>
+                <td>{product.calories}</td>
+                <td>{product.protein}</td>
+                <td>{product.fat}</td>
+                <td>{product.carbohydrates}</td>
+                <td>{product.allergens}</td>
+                {roles.includes('Administrator') && <td>{product.producerId}</td>}
+                <td>
+                  {canEditProduct(product) && (
+                    <>
+                      <Button
+                        variant="outline-primary"
+                        size="sm"
+                        className="me-2"
+                        onClick={() => handleEditProduct(product)}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        variant="outline-danger"
+                        size="sm"
+                        onClick={() => handleDeleteProduct(product)}
+                      >
+                        Delete
+                      </Button>
+                    </>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
       )}
 
       <EditProductModal
