@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Container, Form, Alert, Button } from 'react-bootstrap';
+import { Container, Form, Alert, Button, Table } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
-import Tabell from '../shared/Tabell';
-import '../styles/ProductPage.css';
+import EditProductModal from './EditProductModal';
+import DeleteProductModal from './DeleteProductModal';
 
 const API_BASE_URL = 'http://localhost:7067';
 
@@ -14,35 +14,25 @@ const ProductPage = () => {
     const [error, setError] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('');
-    const [sortOrder, setSortOrder] = useState('Name');
-    const [sortDirection, setSortDirection] = useState('asc');
     const [user, setUser] = useState(null);
-    const [isAdmin, setIsAdmin] = useState(false);
-    const [isProducer, setIsProducer] = useState(false);
+    const [roles, setRoles] = useState([]);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState(null);
+    const [formData, setFormData] = useState(null);
     
     const navigate = useNavigate();
 
-    useEffect(() => {
-        const initializePage = async () => {
-            await Promise.all([
-                fetchUserData(),
-                fetchProducts(),
-                fetchCategories()
-            ]);
-        };
-        initializePage();
-    }, [selectedCategory, sortOrder, sortDirection]);
-
     const fetchUserData = async () => {
         try {
-            const authToken = localStorage.getItem('authToken');
-            if (!authToken) {
+            const token = localStorage.getItem('authToken');
+            if (!token) {
                 console.log('No auth token found');
                 navigate('/login');
                 return;
             }
 
-            const decodedToken = jwtDecode(authToken);
+            const decodedToken = jwtDecode(token);
             let userRoles = decodedToken['role'] || decodedToken['roles'];
             if (!Array.isArray(userRoles)) {
                 userRoles = [userRoles];
@@ -52,8 +42,7 @@ const ProductPage = () => {
                 id: decodedToken['sub'] || '',
                 name: decodedToken['name'] || ''
             });
-            setIsAdmin(userRoles.includes('Administrator'));
-            setIsProducer(userRoles.includes('FoodProducer'));
+            setRoles(userRoles);
 
         } catch (error) {
             console.error('Error decoding token:', error);
@@ -66,12 +55,11 @@ const ProductPage = () => {
         setError(null);
 
         try {
-            const authToken = localStorage.getItem('authToken');
+            const token = localStorage.getItem('authToken');
             const response = await fetch(
-                `${API_BASE_URL}/api/Products?category=${selectedCategory}&sortOrder=${sortOrder}&sortDirection=${sortDirection}`, {
-                method: 'GET',
+                `${API_BASE_URL}/api/Products/GetAllProducts`, {
                 headers: {
-                    'Authorization': `Bearer ${authToken}`,
+                    'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
                 credentials: 'include'
@@ -97,11 +85,10 @@ const ProductPage = () => {
 
     const fetchCategories = async () => {
         try {
-            const authToken = localStorage.getItem('authToken');
+            const token = localStorage.getItem('authToken');
             const response = await fetch(`${API_BASE_URL}/api/Products/categories`, {
-                method: 'GET',
                 headers: {
-                    'Authorization': `Bearer ${authToken}`,
+                    'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
                 credentials: 'include'
@@ -116,20 +103,109 @@ const ProductPage = () => {
         }
     };
 
-    const handleProductUpdated = () => {
-        fetchProducts();
+    useEffect(() => {
+        const initializePage = async () => {
+            await Promise.all([
+                fetchUserData(),
+                fetchProducts(),
+                fetchCategories()
+            ]);
+        };
+        initializePage();
+    }, [selectedCategory]);
+
+    const canEditProduct = (product) => {
+        return roles.includes('Administrator') || 
+               (roles.includes('FoodProducer') && product.producerId === user?.id);
     };
 
-    const handleSearchChange = (e) => {
-        setSearchQuery(e.target.value);
+    const handleEditProduct = (product) => {
+        if (!canEditProduct(product)) {
+            setError('You do not have permission to edit this product.');
+            return;
+        }
+        
+        setSelectedProduct(product);
+        setFormData({
+            ...product,
+            categoryList: Array.isArray(product.categoryList) ? product.categoryList : []
+        });
+        setShowEditModal(true);
     };
 
-    const handleCategoryChange = (e) => {
-        setSelectedCategory(e.target.value);
+    const handleSaveEdit = async () => {
+        if (!canEditProduct(selectedProduct)) {
+            setError('You do not have permission to edit this product.');
+            return;
+        }
+
+        try {
+            const token = localStorage.getItem('authToken');
+            const response = await fetch(`${API_BASE_URL}/api/Products/UpdateProduct${selectedProduct.id}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify(formData)
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || 'Failed to update product');
+            }
+
+            await fetchProducts();
+            handleCloseEditModal();
+        } catch (error) {
+            console.error('Error updating product:', error);
+            setError(error.message || 'Failed to update product');
+        }
     };
 
-    const clearCategoryFilter = () => {
-        setSelectedCategory('');
+    const handleDeleteProduct = (product) => {
+        if (!canEditProduct(product)) {
+            setError('You do not have permission to delete this product.');
+            return;
+        }
+        setSelectedProduct(product);
+        setShowDeleteModal(true);
+    };
+
+    const handleDeleteConfirmation = async () => {
+        try {
+            const token = localStorage.getItem('authToken');
+            const response = await fetch(`${API_BASE_URL}/api/Products/DeleteProduct${selectedProduct.id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to delete product');
+            }
+
+            await fetchProducts();
+            handleCloseDeleteModal();
+        } catch (error) {
+            console.error('Error deleting product:', error);
+            setError('Failed to delete product. Please try again.');
+        }
+    };
+
+    const handleCloseEditModal = () => {
+        setShowEditModal(false);
+        setSelectedProduct(null);
+        setFormData(null);
+    };
+
+    const handleCloseDeleteModal = () => {
+        setShowDeleteModal(false);
+        setSelectedProduct(null);
     };
 
     const filteredProducts = products.filter(product =>
@@ -137,19 +213,13 @@ const ProductPage = () => {
         product.description?.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    const userProducts = isProducer 
-        ? filteredProducts.filter(product => product.producerId === user?.id)
-        : filteredProducts;
-
-    const displayedProducts = isAdmin ? filteredProducts : userProducts;
-
     return (
         <Container>
             <div className="section-container">
                 <div className="d-flex justify-content-between align-items-center">
                     <h1>Products</h1>
                     <div className="d-flex align-items-center">
-                        {(isAdmin || isProducer) && (
+                        {(roles.includes('Administrator') || roles.includes('FoodProducer')) && (
                             <Button
                                 variant="primary"
                                 onClick={() => navigate('/products/add')}
@@ -159,7 +229,7 @@ const ProductPage = () => {
                             </Button>
                         )}
                         <span className="badge bg-warning">
-                            {displayedProducts.length} Products
+                            {filteredProducts.length} Products
                         </span>
                     </div>
                 </div>
@@ -167,10 +237,9 @@ const ProductPage = () => {
                 <p className="info mt-3">
                     Welcome to the product catalog. This page gives you a comprehensive view of all registered food products in our database. 
                     Each product displays essential information including nutritional content (calories, protein, fat, and carbohydrates), 
-                    categorization, and allergen details. Use the search function to find specific products, or click on any item for detailed information.
+                    categorization, and allergen details.
                 </p>
 
-                {/* Category Filter */}
                 <div className="mt-3">
                     <Form className="d-flex align-items-center">
                         <Form.Label htmlFor="category" className="me-2 fw-bold mb-0">
@@ -179,7 +248,7 @@ const ProductPage = () => {
                         <Form.Select
                             id="category"
                             value={selectedCategory}
-                            onChange={handleCategoryChange}
+                            onChange={(e) => setSelectedCategory(e.target.value)}
                             className="me-2"
                             style={{ width: 'auto' }}
                         >
@@ -190,31 +259,15 @@ const ProductPage = () => {
                                 </option>
                             ))}
                         </Form.Select>
-                        <Button
-                            variant="primary"
-                            onClick={fetchProducts}
-                            className="me-2"
-                        >
-                            Filter
-                        </Button>
-                        {selectedCategory && (
-                            <Button
-                                variant="secondary"
-                                onClick={clearCategoryFilter}
-                            >
-                                Clear Filter
-                            </Button>
-                        )}
                     </Form>
                 </div>
 
-                {/* Search Bar */}
                 <div className="search-container mt-3">
                     <Form.Control
                         type="text"
                         placeholder="Search for a product..."
                         value={searchQuery}
-                        onChange={handleSearchChange}
+                        onChange={(e) => setSearchQuery(e.target.value)}
                     />
                 </div>
 
@@ -224,35 +277,94 @@ const ProductPage = () => {
 
                 <hr />
 
-                <div className="mt-3">
-                    {error && (
-                        <Alert variant="danger" className="mb-4">
-                            {error}
-                        </Alert>
-                    )}
+                {error && (
+                    <Alert variant="danger" className="mb-4" onClose={() => setError(null)} dismissible>
+                        {error}
+                    </Alert>
+                )}
 
-                    {loading ? (
-                        <div className="text-center p-4">
-                            <p>Loading products...</p>
-                        </div>
-                    ) : (
-                        <>
-                            {displayedProducts.length === 0 ? (
-                                <Alert variant="info">
-                                    No products found.
-                                    {searchQuery && " Try adjusting your search criteria."}
-                                </Alert>
-                            ) : (
-                                <Tabell 
-                                    products={displayedProducts}
-                                    onProductUpdated={handleProductUpdated}
-                                    categories={categories}
-                                />
-                            )}
-                        </>
-                    )}
-                </div>
+                {loading ? (
+                    <div className="text-center p-4">
+                        <p>Loading products...</p>
+                    </div>
+                ) : (
+                    <>
+                        {filteredProducts.length === 0 ? (
+                            <Alert variant="info">
+                                No products found.
+                                {searchQuery && " Try adjusting your search criteria."}
+                            </Alert>
+                        ) : (
+                            <Table striped bordered hover responsive>
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Description</th>
+                                        <th>Categories</th>
+                                        <th>Calories</th>
+                                        <th>Protein</th>
+                                        <th>Fat</th>
+                                        <th>Carbs</th>
+                                        <th>Allergens</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {filteredProducts.map((product) => (
+                                        <tr key={product.id}>
+                                            <td>{product.name}</td>
+                                            <td>{product.description}</td>
+                                            <td>{product.categoryList.join(', ')}</td>
+                                            <td>{product.calories}</td>
+                                            <td>{product.protein}</td>
+                                            <td>{product.fat}</td>
+                                            <td>{product.carbohydrates}</td>
+                                            <td>{product.allergens}</td>
+                                            <td>
+                                                {canEditProduct(product) && (
+                                                    <>
+                                                        <Button
+                                                            variant="outline-primary"
+                                                            size="sm"
+                                                            className="me-2"
+                                                            onClick={() => handleEditProduct(product)}
+                                                        >
+                                                            Edit
+                                                        </Button>
+                                                        <Button
+                                                            variant="outline-danger"
+                                                            size="sm"
+                                                            onClick={() => handleDeleteProduct(product)}
+                                                        >
+                                                            Delete
+                                                        </Button>
+                                                    </>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </Table>
+                        )}
+                    </>
+                )}
             </div>
+
+            <EditProductModal
+                show={showEditModal}
+                onHide={handleCloseEditModal}
+                product={formData}
+                onChange={setFormData}
+                onSave={handleSaveEdit}
+                categories={categories}
+            />
+
+            <DeleteProductModal
+                show={showDeleteModal}
+                onHide={handleCloseDeleteModal}
+                onConfirm={handleDeleteConfirmation}
+                productName={selectedProduct?.name}
+            />
         </Container>
     );
 };

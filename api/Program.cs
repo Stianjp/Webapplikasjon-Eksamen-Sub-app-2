@@ -15,6 +15,8 @@ using System.Reflection;
 /// </summary>
 var builder = WebApplication.CreateBuilder(args);
 
+
+
 // Configure Serilog logging
 /// <summary>
 /// Sets up Serilog for logging, including configuration from appsettings.json and output to the console.
@@ -40,6 +42,8 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
         options.JsonSerializerOptions.WriteIndented = true; // Pretty JSON
     });
+
+
 
 /// <summary>
 /// Configures Swagger for API documentation.

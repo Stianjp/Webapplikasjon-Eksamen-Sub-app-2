@@ -1,247 +1,274 @@
-namespace api.Controllers;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using api.Models;
+using api.DTO;
 using api.DAL.Interfaces;
 
-/// <summary>
-/// Handles operations related to products, including creation, retrieval, updating, and deletion.
-/// </summary>
-[Route("api/[controller]")]
-[ApiController]
-public class ProductsController : ControllerBase
+namespace api.Controllers
 {
-    private readonly IProductRepository _productRepository;
-
-    // Define the list of available categories
-    private readonly List<string> _availableCategories = new List<string> {
-        "Meat", "Fish", "Vegetable", "Fruit", "Pasta", "Legume", "Drink"
-    };
-
-    private readonly List<string> _availableAllergens = new List<string>{
-        "Milk", "Egg", "Peanut", "Soy", "Wheat", "Tree Nut", "Shellfish", "Fish", "Sesame", "None"
-    };
-
-    public ProductsController(IProductRepository productRepository)
+    [Route("api/[controller]")]
+    [ApiController]
+    public class ProductsController : ControllerBase
     {
-        _productRepository = productRepository;
-    }
+        private readonly IProductRepository _productRepository;
 
-    /// <summary>
-    /// Checks if the current user has the Administrator role.
-    /// </summary>
-    /// <returns>True if the user is an administrator; otherwise, false.</returns>
-    private bool IsAdmin()
-    {
-        return User?.IsInRole(UserRoles.Administrator) ?? false;
-    }
+        private readonly List<string> _availableCategories = new List<string> {
+            "Meat", "Fish", "Vegetable", "Fruit", "Pasta", "Legume", "Drink"
+        };
 
-    /// <summary>
-    /// Retrieves all products.
-    /// </summary>
-    /// <returns>A list of all products.</returns>
-    /// <response code="200">Returns the list of all products.</response>
-    [HttpGet]
-    [AllowAnonymous]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetAllProducts()
-    {
-        var products = await _productRepository.GetAllProductsAsync();
-        return Ok(products);
-    }
+        private readonly List<string> _availableAllergens = new List<string>{
+            "Milk", "Egg", "Peanut", "Soy", "Wheat", "Tree Nut", "Shellfish", "Fish", "Sesame", "None"
+        };
 
-    /// <summary>
-    /// Retrieves details of a specific product by ID.
-    /// </summary>
-    /// <param name="id">The ID of the product.</param>
-    /// <returns>The product details if found; otherwise, a 404 response.</returns>
-    /// <response code="200">Returns the product details.</response>
-    /// <response code="404">Product not found.</response>
-    [HttpGet("{id:int}")]
-    [AllowAnonymous]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetProductDetails(int id)
-    {
-        var product = await _productRepository.GetProductByIdAsync(id);
-
-        if (product == null)
+        public ProductsController(IProductRepository productRepository)
         {
-            return NotFound(new { message = "Product not found." });
+            _productRepository = productRepository;
         }
-        return Ok(product);
-    }
 
-    /// <summary>
-    /// Creates a new product.
-    /// </summary>
-    /// <param name="product">The product to create.</param>
-    /// <returns>The created product details and its URI if successful.</returns>
-    /// <response code="201">Product created successfully.</response>
-    /// <response code="400">Invalid input data.</response>
-    /// <response code="500">An error occurred while creating the product.</response>
-    [HttpPost]
-    [Authorize]
-    [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> CreateProduct([FromBody] Product product)
-    {
-        try
+        private bool IsAdmin()
         {
-            product.ProducerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return User?.IsInRole(UserRoles.Administrator) ?? false;
+        }
 
-            if (string.IsNullOrEmpty(product.ProducerId))
+        [HttpGet("GetAllProducts")]
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(IEnumerable<ProductDTO>), 200)]
+        [ProducesResponseType(400)]
+        public async Task<IActionResult> GetAllProducts()
+        {
+            var products = await _productRepository.GetAllProductsAsync();
+            return Ok(products);
+        }
+
+        [HttpGet("{id:int}")]
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(ProductDTO), 200)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> GetProductDetails(int id)
+        {
+            var product = await _productRepository.GetProductByIdAsync(id);
+
+            if (product == null)
             {
-                return BadRequest(new { message = "Unable to determine your producer account. Please log in again." });
+                return NotFound(new { message = "Product not found." });
             }
 
-            await _productRepository.CreateProductAsync(product);
-            return CreatedAtAction(nameof(GetProductDetails), new { id = product.Id }, product);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error: {ex}");
-            return StatusCode(500, new { message = "An error occurred while creating the product." });
-        }
-    }
-
-    /// <summary>
-    /// Updates an existing product.
-    /// </summary>
-    /// <param name="id">The ID of the product to update.</param>
-    /// <param name="updatedProduct">The updated product details.</param>
-    /// <returns>A 204 response if successful; otherwise, an error response.</returns>
-    /// <response code="204">Product updated successfully.</response>
-    /// <response code="400">Product ID mismatch or invalid data.</response>
-    /// <response code="404">Product not found.</response>
-    /// <response code="403">User is not authorized to update the product.</response>
-    /// <response code="500">An error occurred while updating the product.</response>
-    [HttpPut("{id}")]
-    [Authorize]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> UpdateProduct(int id, [FromBody] Product updatedProduct)
-    {
-        if (id != updatedProduct.Id)
-        {
-            return BadRequest(new { message = "Product ID mismatch." });
+            return Ok(product);
         }
 
-        var product = await _productRepository.GetProductByIdAsync(id);
-
-        if (product == null)
+        [HttpPost("CreateProduct")]
+        [Authorize]
+        [ProducesResponseType(typeof(ProductDTO), 201)]
+        [ProducesResponseType(400)]
+        public async Task<IActionResult> CreateProduct([FromBody] ProductDTO productDto)
         {
-            return NotFound(new { message = "Product not found." });
+            try
+            {
+                productDto.ProducerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                if (string.IsNullOrEmpty(productDto.ProducerId))
+                {
+                    return BadRequest(new { message = "Unable to determine your producer account. Please log in again." });
+                }
+
+                await _productRepository.CreateProductAsync(productDto);
+                return CreatedAtAction(nameof(GetProductDetails), new { id = productDto.Id }, productDto);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex}");
+                return StatusCode(500, new { message = "An error occurred while creating the product." });
+            }
         }
 
-        if (!IsAdmin() && product.ProducerId != User.FindFirstValue(ClaimTypes.NameIdentifier))
+        [HttpPut("UpdateProduct{id}")]
+        [Authorize]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(403)]
+        public async Task<IActionResult> UpdateProduct(int id, [FromBody] ProductDTO productDto)
         {
-            return Forbid();
+            if (id != productDto.Id)
+            {
+                return BadRequest(new { message = "Product ID mismatch." });
+            }
+           
+            var existingProduct = await _productRepository.GetProductByIdAsync(id);
+
+            if (existingProduct == null)
+            {
+                return NotFound(new { message = "Product not found." });
+            }
+
+            if (!IsAdmin() && existingProduct.ProducerId != User.FindFirstValue(ClaimTypes.NameIdentifier))
+            {
+                return Forbid();
+            }
+
+            try
+            {
+                await _productRepository.UpdateProductAsync(id, productDto);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating product: {ex}");
+                return StatusCode(500, new { message = "An error occurred while updating the product." });
+            }
         }
 
-        try
+        [HttpDelete("DeleteProduct{id}")]
+        [Authorize]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(403)]
+        public async Task<IActionResult> DeleteProduct(int id)
         {
-            await _productRepository.UpdateProductAsync(updatedProduct);
+            var product = await _productRepository.GetProductByIdAsync(id);
+
+            if (product == null)
+            {
+                return NotFound(new { message = "Product not found." });
+            }
+
+            if (!IsAdmin() && product.ProducerId != User.FindFirstValue(ClaimTypes.NameIdentifier))
+            {
+                return Forbid();
+            }
+
+            var success = await _productRepository.DeleteProductAsync(id);
+
+            if (!success)
+            {
+                return BadRequest(new { message = "Unable to delete product." });
+            }
+
             return NoContent();
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error updating product: {ex}");
-            return StatusCode(500, new { message = "An error occurred while updating the product." });
-        }
-    }
 
-    /// <summary>
-    /// Deletes an existing product.
-    /// </summary>
-    /// <param name="id">The ID of the product to delete.</param>
-    /// <returns>A 204 response if successful; otherwise, an error response.</returns>
-    /// <response code="204">Product deleted successfully.</response>
-    /// <response code="404">Product not found.</response>
-    /// <response code="403">User is not authorized to delete the product.</response>
-    /// <response code="400">Unable to delete the product.</response>
-    [HttpDelete("{id}")]
-    [Authorize]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> DeleteProduct(int id)
-    {
-        var product = await _productRepository.GetProductByIdAsync(id);
-
-        if (product == null)
+        [HttpGet("categories")]
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(IEnumerable<string>), 200)]
+        public IActionResult GetAvailableCategories()
         {
-            return NotFound(new { message = "Product not found." });
+            return Ok(_availableCategories);
         }
 
-        if (!IsAdmin() && product.ProducerId != User.FindFirstValue(ClaimTypes.NameIdentifier))
+        [HttpGet("allergens")]
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(IEnumerable<string>), 200)]
+        public IActionResult GetAvailableAllergens()
         {
-            return Forbid();
+            return Ok(_availableAllergens);
         }
 
-        var success = await _productRepository.DeleteProductAsync(id);
-
-        if (!success)
+        [HttpGet("user-products")]
+        [Authorize]
+        [ProducesResponseType(typeof(IEnumerable<ProductDTO>), 200)]
+        [ProducesResponseType(400)]
+        public async Task<IActionResult> GetUserProducts([FromQuery] string? category = null)
         {
-            return BadRequest(new { message = "Unable to delete product." });
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                return BadRequest(new { message = "User ID is invalid." });
+            }
+
+            var products = await _productRepository.GetProductsByProducerIdAsync(currentUserId);
+
+            if (!string.IsNullOrEmpty(category))
+            {
+                products = products.Where(p => p.CategoryList.Contains(category)).ToList();
+            }
+
+            var allCategories = await _productRepository.GetAllCategoriesAsync();
+
+            return Ok(new
+            {
+                products = products,
+                categories = allCategories.OrderBy(c => c).ToList()
+            });
         }
 
-        return NoContent();
-    }
-
-    /// <summary>
-    /// Retrieves the list of available product categories.
-    /// </summary>
-    /// <returns>A list of available product categories.</returns>
-    /// <response code="200">Returns the list of product categories.</response>
-    [HttpGet("categories")]
-    [AllowAnonymous]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    public IActionResult GetAvailableCategories()
-    {
-        return Ok(_availableCategories);
-    }
-
-    /// <summary>
-    /// Retrieves products created by the current user.
-    /// </summary>
-    /// <param name="category">An optional category to filter the products by.</param>
-    /// <returns>A list of products created by the user, filtered by category if provided.</returns>
-    /// <response code="200">Returns the list of user-created products.</response>
-    /// <response code="400">Invalid user ID or input.</response>
-    [HttpGet("user-products")]
-    [Authorize]
-    public async Task<IActionResult> GetUserProducts([FromQuery] string? category = null)
-    {
-        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (string.IsNullOrEmpty(currentUserId))
+        [HttpPut("admin/products/{id}")]
+        [Authorize(Roles = "Administrator")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> AdminUpdateProduct(int id, [FromBody] ProductDTO productDto)
         {
-            return BadRequest(new { message = "User ID is invalid." });
+            if (id != productDto.Id)
+            {
+                return BadRequest(new { message = "Product ID mismatch." });
+            }
+
+            var existingProduct = await _productRepository.GetProductByIdAsync(id);
+            if (existingProduct == null)
+            {
+                return NotFound(new { message = "Product not found." });
+            }
+
+            try
+            {
+                await _productRepository.UpdateProductAsync(id, productDto);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating product: {ex}");
+                return StatusCode(500, new { message = "An error occurred while updating the product." });
+            }
         }
 
-        // Get user products
-        var products = await _productRepository.GetProductsByProducerIdAsync(currentUserId);
-
-        // Filter by category
-        if (!string.IsNullOrEmpty(category))
+        [HttpDelete("admin/products/{id}")]
+        [Authorize(Roles = "Administrator")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> AdminDeleteProduct(int id)
         {
-            products = products.Where(p => p.CategoryList.Contains(category)).ToList();
+            var product = await _productRepository.GetProductByIdAsync(id);
+            
+            if (product == null)
+            {
+                return NotFound(new { message = "Product not found." });
+            }
+
+            var success = await _productRepository.DeleteProductAsync(id);
+            
+            if (!success)
+            {
+                return StatusCode(500, new { message = "An error occurred while deleting the product." });
+            }
+
+            return NoContent();
         }
 
-        // Retrieve all categories
-        var allCategories = await _productRepository.GetAllCategoriesAsync();
-
-        return Ok(new
+        [HttpGet("admin/all-products")]
+        [Authorize(Roles = "Administrator")] // Ensures only admins can access
+        public async Task<IActionResult> GetAllProductsAdmin([FromQuery] string? sortBy = null, [FromQuery] string? category = null)
         {
-            products,
-            categories = allCategories.OrderBy(c => c).ToList()
-        });
+            var products = await _productRepository.GetAllProductsAsync();
+            
+            // Apply filters if provided
+            if (!string.IsNullOrEmpty(category))
+            {
+                products = products.Where(p => p.CategoryList.Contains(category)).ToList();
+            }
+
+            if (!string.IsNullOrEmpty(sortBy))
+            {
+                products = await _productRepository.GetSortedProductsAsync(sortBy);
+            }
+
+            var allCategories = await _productRepository.GetAllCategoriesAsync();
+
+            return Ok(new
+            {
+                products = products,
+                categories = allCategories.OrderBy(c => c).ToList()
+            });
+        }
     }
 }

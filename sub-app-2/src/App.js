@@ -5,7 +5,6 @@ import Home from './Home/Home';
 import ProductPage from './Products/ProductPage';
 import MyProducts from './Products/MyProducts';
 import CreateProduct from './Products/CreateProduct';
-import DeleteProduct from './Products/DeleteProduct';
 import ProductDetails from './Products/ProductDetails';
 import Account from './Home/Account';
 import ChangePassword from './Home/ChangePassword';
@@ -73,9 +72,7 @@ function App() {
               {/* Producer Routes */}
               <Route path="/products/my" element={<MyProducts />} />
               <Route path="/products/add" element={<CreateProduct />} />
-              <Route path="/edit-product/:id" element={<CreateProduct />} />
-              <Route path="/delete-product/:id" element={<DeleteProduct />} />
-
+        
               {/* Admin Routes */}
               <Route path="/admin/users" element={<AdminUsers />} />
             </Routes>
