@@ -47,6 +47,10 @@ public class AccountController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Login([FromBody] LoginRequest model)
     {
+        if(string.IsNullOrWhiteSpace(model.Username) || string.IsNullOrWhiteSpace(model.Password))
+        {
+            return BadRequest( new { message = "Username and password are required." });
+        }
         var result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, false, false);
         if (!result.Succeeded) return Unauthorized(new { message = "Invalid username or password." });
 
@@ -81,6 +85,10 @@ public class AccountController : ControllerBase
             return BadRequest(new { message = "The username is reserved and cannot be used." });
 
         var user = new IdentityUser { UserName = model.Username };
+        if(string.IsNullOrWhiteSpace(model.Password))
+        {
+            return BadRequest(new { message = "Password is required." });
+        }
         var result = await _userManager.CreateAsync(user, model.Password);
         if (!result.Succeeded) return BadRequest(new { errors = result.Errors });
 
@@ -137,6 +145,10 @@ public class AccountController : ControllerBase
         if (model.NewPassword != model.ConfirmPassword)
             return BadRequest(new { message = "Passwords do not match." });
 
+        if (string.IsNullOrWhiteSpace(model.CurrentPassword) || string.IsNullOrWhiteSpace(model.NewPassword))
+        {
+            return BadRequest(new { message = "Current and new passwords are required." });
+        }
         var result = await _userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
         if (!result.Succeeded) return BadRequest(new { errors = result.Errors });
 
@@ -163,6 +175,10 @@ public class AccountController : ControllerBase
         var user = await _userManager.GetUserAsync(User);
         if (user == null) return Unauthorized(new { message = "User not found." });
 
+        if (string.IsNullOrWhiteSpace(model.Password))
+        {
+            return BadRequest(new { message = "Password is required." });
+        }
         var passwordCheck = await _signInManager.CheckPasswordSignInAsync(user, model.Password, false);
         if (!passwordCheck.Succeeded) return BadRequest(new { message = "Incorrect password." });
 
