@@ -1,77 +1,73 @@
+import React, { useEffect, useState } from "react";
+import { Container, Table, Alert, Spinner } from "react-bootstrap";
 
-import React, { useEffect, useState } from 'react'
-import "../styles/Account.css"
-import axios from 'axios';
+const API_BASE_URL = "http://localhost:7067";
 
-const AdminUsers = () => {
-  /* All is commend out, because its something wrong with the fetching of the API
-  const [users, setUsers] = useState([]); // Save the list of users
-  const [loading, setLoading] = useState(true); // handling loading state
-  const [error, setError] = useState(null); // handling error state
+const AdminPage = () => {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Function for fetching users
-  const fetchUsers = async () => {
+  const fetchAdminUsers = async () => {
     try {
-      const token = localStorage.getItem('authToken');
-      const response = await axios.get('http://localhost:7067/api/Admin/usermanager', {
+      const token = localStorage.getItem("authToken");
+
+      if (!token) {
+        throw new Error("You must be logged in to view this page.");
+      }
+
+      const response = await fetch(`${API_BASE_URL}/api/Admin/usermanager`, {
         headers: {
           Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
       });
-      console.log(response.data); // The list of the users
-    } catch (error) {
-      console.error('Error fetching users:', error.response?.data || error.message);
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch user data.");
+      }
+
+      const data = await response.json();
+      console.log("Fetched users:", data);
+      setUsers(data);
+    } catch (err) {
+      console.error(err.message);
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
-  
   useEffect(() => {
-    fetchUsers();
+    fetchAdminUsers();
   }, []);
 
-  
-  const editRoles = (userId) => {
-    console.log(`Edit roles for user with ID: ${userId}`);
-    // This is where you would open a modal or navigate to a new page to edit roles
-  };
-
-  const deleteUser = async (userId) => {
-    try {
-      const token = localStorage.getItem('authToken');
-      await axios.delete(`http://localhost:7067/api/Admin/deleteuser/${userId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      // Update list of users after deleting the user
-      setUsers(users.filter((user) => user.userId !== userId));
-      console.log(`User with ID ${userId} deleted successfully.`);
-    } catch (err) {
-      console.error('Error deleting user:', err.response?.data || err.message);
-    }
-  };
-
-  // If there is an error
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
-
-  // If the data is still loading
   if (loading) {
-    return <div>Loading users...</div>;
+    return (
+      <div className="text-center mt-5">
+        <Spinner animation="border" />
+        <p>Loading...</p>
+      </div>
+    );
   }
 
-  // Render the list of users
+  if (error) {
+    return (
+      <Container className="mt-5">
+        <Alert variant="danger">{error}</Alert>
+      </Container>
+    );
+  }
+
   return (
-    <div className='account-container'>
+    <Container className="mt-5">
       <h1>Admin User Management</h1>
-      <table className="table">
+      <Table striped bordered hover className="mt-4">
         <thead>
           <tr>
             <th>ID</th>
             <th>Username</th>
             <th>Roles</th>
-            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -79,18 +75,13 @@ const AdminUsers = () => {
             <tr key={user.userId}>
               <td>{user.userId}</td>
               <td>{user.username}</td>
-              <td>{user.roles.join(', ')}</td>
-              <td>
-                <button onClick={() => editRoles(user.userId)}>Edit Roles</button>
-                <button onClick={() => deleteUser(user.userId)}>Delete</button>
-              </td>
+              <td>{user.roles.join(", ")}</td>
             </tr>
           ))}
         </tbody>
-      </table>
-    </div>
+      </Table>
+    </Container>
   );
-*/
-  };
+};
 
-export default AdminUsers;
+export default AdminPage;
