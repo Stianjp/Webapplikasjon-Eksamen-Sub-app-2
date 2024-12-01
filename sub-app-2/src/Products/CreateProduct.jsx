@@ -145,21 +145,6 @@ const CreateProduct = () => {
         }
     };
 
-    const validateForm = () => {
-        const errors = {};
-        if (!product?.name?.trim()) errors.name = 'Name is required';
-        if (!product?.description?.trim()) errors.description = 'Description is required';
-        if (!product?.categoryList?.length) errors.categoryList = 'At least one category is required';
-        if (product?.calories === undefined || product?.calories < 0) errors.calories = 'Valid calories value is required';
-        if (product?.protein === undefined || product?.protein < 0) errors.protein = 'Valid protein value is required';
-        if (product?.fat === undefined || product?.fat < 0) errors.fat = 'Valid fat value is required';
-        if (product?.carbohydrates === undefined || product?.carbohydrates < 0) errors.carbohydrates = 'Valid carbohydrates value is required';
-    
-        setValidationErrors(errors);
-        return Object.keys(errors).length === 0;
-      };
-    
-
     const currentAllergens = formData.allergens ? formData.allergens.split(',').map(a => a.trim()) : [];
 
     return (
