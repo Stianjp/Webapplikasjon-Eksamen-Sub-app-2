@@ -4,6 +4,7 @@ import { Container, Form, Alert, Button, Table, Badge } from 'react-bootstrap';
 import { jwtDecode } from 'jwt-decode';
 import EditProductModal from '../components/EditProductModal';
 import DeleteProductModal from '../components/DeleteProductModal';
+import ProductTable from '../components/ProductTable';
 
 const API_BASE_URL = 'http://localhost:7067';
 
@@ -14,7 +15,6 @@ const MyProducts = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [roles, setRoles] = useState([]);
   const [userId, setUserId] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -37,11 +37,6 @@ const MyProducts = () => {
     if (token) {
       try {
         const decodedToken = jwtDecode(token);
-        let userRoles = decodedToken['role'] || decodedToken['roles'];
-        if (!Array.isArray(userRoles)) {
-          userRoles = [userRoles];
-        }
-        setRoles(userRoles);
         setUserId(decodedToken['sub'] || decodedToken['nameidentifier']);
       } catch (error) {
         console.error('Error decoding token:', error);
@@ -62,10 +57,7 @@ const MyProducts = () => {
         return;
       }
 
-      // Use the correct endpoints based on role
-      const productsEndpoint = roles.includes('Administrator')
-        ? `${API_BASE_URL}/api/Products/GetAllProducts`
-        : `${API_BASE_URL}/api/Products/user-products`;
+      const productsEndpoint = `${API_BASE_URL}/api/Products/user-products`;
 
       const productsResponse = await fetch(productsEndpoint, {
         headers: {
@@ -75,7 +67,6 @@ const MyProducts = () => {
         credentials: 'include'
       });
 
-      // Fetch categories using the dedicated endpoint
       const categoriesResponse = await fetch(`${API_BASE_URL}/api/Products/categories`, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -111,14 +102,13 @@ const MyProducts = () => {
   }, []);
 
   useEffect(() => {
-    if (roles.length > 0) {
+    if (userId) {
       fetchProducts();
     }
-  }, [selectedCategory, roles]);
+  }, [selectedCategory, userId]);
 
   const canEditProduct = (product) => {
-    return roles.includes('Administrator') || 
-           (roles.includes('FoodProducer') && product.producerId === userId);
+    return product.producerId === userId;
   };
 
   const handleEditProduct = (product) => {
@@ -126,7 +116,7 @@ const MyProducts = () => {
       setError('You do not have permission to edit this product.');
       return;
     }
-    
+
     setSelectedProduct(product);
     setEditedProduct({
       ...product,
@@ -242,8 +232,8 @@ const MyProducts = () => {
 
       <div className="mb-4">
         <div className="d-flex justify-content-between align-items-center">
-          <h2>Products {roles.includes('Administrator') ? '(Admin View)' : ''}</h2>
-          <Badge bg="info">{roles.join(', ')}</Badge>
+          <h2>My Products</h2>
+          <Badge bg="info">Food Producer</Badge>
         </div>
         
         <div className="d-flex justify-content-between align-items-center mt-3">
@@ -275,56 +265,14 @@ const MyProducts = () => {
       {loading ? (
         <div className="text-center">Loading...</div>
       ) : (
-        <Table striped bordered hover responsive>
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Description</th>
-      <th>Categories</th>
-      <th>Calories</th>
-      <th>Protein</th>
-      <th>Fat</th>
-      <th>Carbs</th>
-      <th>Allergens</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    {filteredProducts.map((product) => (
-      <tr key={product.id}>
-        <td>{product.name}</td>
-        <td>{product.description}</td>
-        <td>{product.categoryList.join(', ')}</td>
-        <td>{product.calories}</td>
-        <td>{product.protein}</td>
-        <td>{product.fat}</td>
-        <td>{product.carbohydrates}</td>
-        <td>{product.allergens}</td>
-        <td>
-          {canEditProduct(product) && (
-            <>
-              <Button
-                variant="outline-primary"
-                size="sm"
-                className="me-2"
-                onClick={() => handleEditProduct(product)}
-              >
-                Edit
-              </Button>
-              <Button
-                variant="outline-danger"
-                size="sm"
-                onClick={() => handleDeleteProduct(product)}
-              >
-                Delete
-              </Button>
-            </>
-          )}
-        </td>
-      </tr>
-    ))}
-  </tbody>
-</Table>
+
+        <ProductTable
+          products={filteredProducts}
+          onEditProduct={handleEditProduct}
+          onDeleteProduct={handleDeleteProduct}
+          canEditProduct={canEditProduct} 
+      /> 
+
       )}
 
       <EditProductModal
