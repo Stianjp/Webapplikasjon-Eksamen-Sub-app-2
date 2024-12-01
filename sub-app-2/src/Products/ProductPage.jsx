@@ -219,7 +219,7 @@ const ProductPage = () => {
                                 Add new product
                             </Button>
                         )}
-                        <span className="badge bg-warning">
+                        <span className="badge bg-warning text-dark">
                             {filteredProducts.length} Products
                         </span>
                     </div>
