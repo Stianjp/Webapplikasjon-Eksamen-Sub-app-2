@@ -10,7 +10,7 @@ namespace api.DTO
         public double Protein { get; set; }
         public double Carbohydrates { get; set; }
         public double Fat { get; set; }
-        public string? Allergens { get; set; } 
+        public string? Allergens { get; set; } // Added to match the model
         public string? ProducerId { get; set; }
     }
 }

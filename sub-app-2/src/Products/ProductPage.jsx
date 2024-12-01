@@ -19,7 +19,7 @@ const ProductPage = () => {
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
-    const [editedProduct, setEditedProduct] = useState(null);
+    const [formData, setFormData] = useState(null);
     
     const navigate = useNavigate();
 
@@ -126,7 +126,7 @@ const ProductPage = () => {
         }
         
         setSelectedProduct(product);
-        setEditedProduct({
+        setFormData({
             ...product,
             categoryList: Array.isArray(product.categoryList) ? product.categoryList : []
         });
@@ -134,6 +134,11 @@ const ProductPage = () => {
     };
 
     const handleSaveEdit = async () => {
+        if (!canEditProduct(selectedProduct)) {
+            setError('You do not have permission to edit this product.');
+            return;
+        }
+
         try {
             const token = localStorage.getItem('authToken');
             const response = await fetch(`${API_BASE_URL}/api/Products/UpdateProduct${selectedProduct.id}`, {
@@ -143,21 +148,19 @@ const ProductPage = () => {
                     'Content-Type': 'application/json'
                 },
                 credentials: 'include',
-                body: JSON.stringify(editedProduct)
+                body: JSON.stringify(formData)
             });
 
             if (!response.ok) {
-                throw new Error('Failed to update product');
+                const errorText = await response.text();
+                throw new Error(errorText || 'Failed to update product');
             }
 
             await fetchProducts();
-            setShowEditModal(false);
-            setSelectedProduct(null);
-            setEditedProduct(null);
-
+            handleCloseEditModal();
         } catch (error) {
             console.error('Error updating product:', error);
-            setError('Failed to update product. Please try again.');
+            setError(error.message || 'Failed to update product');
         }
     };
 
@@ -187,19 +190,27 @@ const ProductPage = () => {
             }
 
             await fetchProducts();
-            setShowDeleteModal(false);
-            setSelectedProduct(null);
-
+            handleCloseDeleteModal();
         } catch (error) {
             console.error('Error deleting product:', error);
             setError('Failed to delete product. Please try again.');
         }
     };
 
+    const handleCloseEditModal = () => {
+        setShowEditModal(false);
+        setSelectedProduct(null);
+        setFormData(null);
+    };
+
+    const handleCloseDeleteModal = () => {
+        setShowDeleteModal(false);
+        setSelectedProduct(null);
+    };
+
     const filteredProducts = products.filter(product =>
-        (selectedCategory === '' || product.categoryList.includes(selectedCategory)) &&
-        (product.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-         product.description?.toLowerCase().includes(searchQuery.toLowerCase()))
+        product.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.description?.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     return (
@@ -224,12 +235,11 @@ const ProductPage = () => {
                 </div>
 
                 <p className="info mt-3">
-                    Welcome to the product catalog. Each product displays essential information including 
-                    nutritional content (calories, protein, fat, and carbohydrates), categorization, 
-                    and allergen details.
+                    Welcome to the product catalog. This page gives you a comprehensive view of all registered food products in our database. 
+                    Each product displays essential information including nutritional content (calories, protein, fat, and carbohydrates), 
+                    categorization, and allergen details.
                 </p>
 
-                {/* Category Filter */}
                 <div className="mt-3">
                     <Form className="d-flex align-items-center">
                         <Form.Label htmlFor="category" className="me-2 fw-bold mb-0">
@@ -252,7 +262,6 @@ const ProductPage = () => {
                     </Form>
                 </div>
 
-                {/* Search Bar */}
                 <div className="search-container mt-3">
                     <Form.Control
                         type="text"
@@ -276,9 +285,7 @@ const ProductPage = () => {
 
                 {loading ? (
                     <div className="text-center p-4">
-                        <div className="spinner-border" role="status">
-                            <span className="visually-hidden">Loading...</span>
-                        </div>
+                        <p>Loading products...</p>
                     </div>
                 ) : (
                     <>
@@ -295,9 +302,9 @@ const ProductPage = () => {
                                         <th>Description</th>
                                         <th>Categories</th>
                                         <th>Calories</th>
-                                        <th>Protein (g)</th>
-                                        <th>Fat (g)</th>
-                                        <th>Carbs (g)</th>
+                                        <th>Protein</th>
+                                        <th>Fat</th>
+                                        <th>Carbs</th>
                                         <th>Allergens</th>
                                         <th>Actions</th>
                                     </tr>
@@ -312,7 +319,7 @@ const ProductPage = () => {
                                             <td>{product.protein}</td>
                                             <td>{product.fat}</td>
                                             <td>{product.carbohydrates}</td>
-                                            <td>{product.allergens || 'None'}</td>
+                                            <td>{product.allergens}</td>
                                             <td>
                                                 {canEditProduct(product) && (
                                                     <>
@@ -345,18 +352,18 @@ const ProductPage = () => {
 
             <EditProductModal
                 show={showEditModal}
-                onHide={() => setShowEditModal(false)}
-                product={editedProduct}
-                onChange={setEditedProduct}
+                onHide={handleCloseEditModal}
+                product={formData}
+                onChange={setFormData}
                 onSave={handleSaveEdit}
                 categories={categories}
             />
 
             <DeleteProductModal
                 show={showDeleteModal}
-                onHide={() => setShowDeleteModal(false)}
+                onHide={handleCloseDeleteModal}
                 onConfirm={handleDeleteConfirmation}
-                product={selectedProduct}
+                productName={selectedProduct?.name}
             />
         </Container>
     );
