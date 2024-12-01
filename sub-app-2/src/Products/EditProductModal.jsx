@@ -61,6 +61,7 @@ const EditProductModal = ({ show, onHide, product, onChange, onSave, categories 
     }));
   };
 
+  //Må inn i Create Product!
   const validateForm = () => {
     const errors = {};
     if (!product?.name?.trim()) errors.name = 'Name is required';

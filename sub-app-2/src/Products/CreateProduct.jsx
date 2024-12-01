@@ -31,6 +31,25 @@ const CreateProduct = () => {
         allergens: ''
     });
 
+    const validateForm = () => {
+        const errors = {};
+        if (!formData?.name?.trim()) errors.name = 'Name is required';
+        if (!formData?.description?.trim()) errors.description = 'Description is required';
+        if (!formData?.categoryList?.length) errors.categoryList = 'At least one category is required';
+        if (formData?.calories === "" || formData?.calories < 0) errors.calories = 'Calories must be a positive number';
+        if (formData?.protein === "" || formData?.protein < 0) errors.protein = 'Protein must be a positive number';
+        if (formData?.fat === "" || formData?.fat < 0) errors.fat = 'Fat must be a positive number';
+        if (formData?.carbohydrates === "" || formData?.carbohydrates < 0) errors.carbohydrates = 'Carbohydrates must be a positive number';
+    
+        setValidationErrors(errors);
+        return Object.keys(errors).length === 0;
+    };
+    
+    
+
+
+    const [validationErrors, setValidationErrors] = useState({});
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({
@@ -80,6 +99,11 @@ const CreateProduct = () => {
         setLoading(true);
         setError(null);
         setSuccess(false);
+
+        if (!validateForm()) {
+            setLoading(false);
+            return;
+        }
 
         try {
             const token = localStorage.getItem('authToken');
@@ -136,7 +160,7 @@ const CreateProduct = () => {
                         </Alert>
                     )}
 
-                    <Form onSubmit={handleSubmit}>
+                    <Form onSubmit={handleSubmit} noValidate>
                         <Form.Group className="mb-3">
                             <Form.Label>Name*</Form.Label>
                             <Form.Control
@@ -147,6 +171,9 @@ const CreateProduct = () => {
                                 required
                                 placeholder="Enter product name"
                             />
+                            {validationErrors.name && (
+                                <Form.Text className="text-danger">{validationErrors.name}</Form.Text>
+                            )}
                         </Form.Group>
 
                         <Form.Group className="mb-3">
@@ -160,6 +187,9 @@ const CreateProduct = () => {
                                 placeholder="Enter product description"
                                 rows={3}
                             />
+                            {validationErrors.description && (
+                                <Form.Text className="text-danger">{validationErrors.description}</Form.Text>
+                            )}
                         </Form.Group>
 
                         <Form.Group className="mb-3">
@@ -180,6 +210,9 @@ const CreateProduct = () => {
                             <Form.Text className="text-muted">
                                 Hold Ctrl (Windows) or Command (Mac) to select multiple categories
                             </Form.Text>
+                            {validationErrors.categoryList && (
+                                <Form.Text className="text-danger">{validationErrors.categoryList}</Form.Text>
+                            )}
                         </Form.Group>
 
                         <Form.Group className="mb-3">
@@ -194,6 +227,9 @@ const CreateProduct = () => {
                                 step="0.1"
                                 placeholder="Enter calories"
                             />
+                            {validationErrors.calories && (
+                                <Form.Text className="text-danger">{validationErrors.calories}</Form.Text>
+                            )}
                         </Form.Group>
 
                         <Form.Group className="mb-3">
@@ -208,6 +244,9 @@ const CreateProduct = () => {
                                 step="0.1"
                                 placeholder="Enter protein content"
                             />
+                            {validationErrors.protein && (
+                                <Form.Text className="text-danger">{validationErrors.protein}</Form.Text>
+                            )}
                         </Form.Group>
 
                         <Form.Group className="mb-3">
@@ -222,6 +261,9 @@ const CreateProduct = () => {
                                 step="0.1"
                                 placeholder="Enter fat content"
                             />
+                            {validationErrors.fat && (
+                                <Form.Text className="text-danger">{validationErrors.fat}</Form.Text>
+                            )}
                         </Form.Group>
 
                         <Form.Group className="mb-3">
@@ -236,6 +278,9 @@ const CreateProduct = () => {
                                 step="0.1"
                                 placeholder="Enter carbohydrates content"
                             />
+                            {validationErrors.carbohydrates && (
+                                <Form.Text className="text-danger">{validationErrors.carbohydrates}</Form.Text>
+                            )}
                         </Form.Group>
 
                         <Form.Group className="mb-3">
