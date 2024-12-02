@@ -15,11 +15,12 @@ const CreateProduct = () => {
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(false);
 
-    // Available categories - should match your backend
+    // Available categories availebale
     const availableCategories = [
         "Meat", "Fish", "Vegetable", "Fruit", "Pasta", "Legume", "Drink"
     ];
 
+    // Makes the formdata structure like the api call
     const [formData, setFormData] = useState({
         name: '',
         description: '',
@@ -31,6 +32,8 @@ const CreateProduct = () => {
         allergens: ''
     });
 
+    // Validation form, se rapport for this
+    // Uses trim method
     const validateForm = () => {
         const errors = {};
         if (!formData?.name?.trim()) errors.name = 'Name is required';
@@ -45,11 +48,10 @@ const CreateProduct = () => {
         return Object.keys(errors).length === 0;
     };
     
-    
-
-
+    // Store the validations , and erros field
     const [validationErrors, setValidationErrors] = useState({});
 
+    // Handle changes in the form, se that many of the methods are also used in EditModal component
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({
@@ -58,6 +60,7 @@ const CreateProduct = () => {
         }));
     };
 
+    // Same metod as in EditModal component for handling the allergen changes in the form
     const handleAllergenChange = (allergen) => {
         setFormData(prev => {
             let currentAllergens = prev.allergens ? prev.allergens.split(',').map(a => a.trim()) : [];
@@ -86,6 +89,7 @@ const CreateProduct = () => {
         });
     };
 
+    // Handles categoru changes
     const handleCategoryChange = (e) => {
         const selectedOptions = Array.from(e.target.selectedOptions).map(option => option.value);
         setFormData(prev => ({
@@ -94,8 +98,10 @@ const CreateProduct = () => {
         }));
     };
 
+
+    // A funciont for summit and storing a new form
     const handleSubmit = async (e) => {
-        e.preventDefault();
+        e.preventDefault(); 
         setLoading(true);
         setError(null);
         setSuccess(false);
@@ -105,6 +111,7 @@ const CreateProduct = () => {
             return;
         }
 
+        //Fetches and post the new product, could be moved to a service layer
         try {
             const token = localStorage.getItem('authToken');
             if (!token) {
@@ -119,6 +126,8 @@ const CreateProduct = () => {
                     'Content-Type': 'application/json'
                 },
                 credentials: 'include',
+                // Dobbelcheck and convert strings to numbers
+                // Maybe not need when DTO handle this, but this worked after many erros 
                 body: JSON.stringify({
                     ...formData,
                     calories: parseFloat(formData.calories),
@@ -133,6 +142,7 @@ const CreateProduct = () => {
                 throw new Error(errorData.message || 'Failed to create product');
             }
 
+            // If sucess you get navigated to products side
             setSuccess(true);
             setTimeout(() => {
                 navigate('/products');
@@ -145,6 +155,8 @@ const CreateProduct = () => {
         }
     };
 
+    // Checks for currenet allergens the same metod as in Edit Model, a helping metod
+    // Check report, uses trim, split, and map method
     const currentAllergens = formData.allergens ? formData.allergens.split(',').map(a => a.trim()) : [];
 
     return (

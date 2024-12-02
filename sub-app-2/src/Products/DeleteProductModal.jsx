@@ -1,7 +1,9 @@
 import React from 'react';
 import { Modal, Button } from 'react-bootstrap';
 
-const DeleteProductModal = ({ show, onHide, onConfirm, productName }) => {
+const DeleteProductModal = ({ 
+  //Metodes used in different components for showing the Module
+  show, onHide, onConfirm, productName }) => {
   return (
     <Modal show={show} onHide={onHide}>
       <Modal.Header closeButton>
