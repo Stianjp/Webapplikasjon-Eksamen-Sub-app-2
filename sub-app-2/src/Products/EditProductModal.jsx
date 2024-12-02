@@ -5,37 +5,54 @@ const AVAILABLE_ALLERGENS = [
   "Milk", "Egg", "Peanut", "Soy", "Wheat", "Tree Nut", "Shellfish", "Fish", "Sesame", "None"
 ];
 
-const EditProductModal = ({ show, onHide, product, onChange, onSave, categories }) => {
+const EditProductModal = ({ 
+  // methods used in the different componetns used for showing the modal and its functions
+  show, onHide, product, onChange, onSave, categories }) => {
   const [validationErrors, setValidationErrors] = useState({});
 
+  // Handes the input changes , runs when input is changed
   const handleInputChange = (e) => {
+
+    // This gest info from the input form 
     const { name, value, type } = e.target;
-    setValidationErrors(prev => ({ ...prev, [name]: undefined }));
+
+    //Clearing previus erros 
+    setValidationErrors(prev => ({ 
+      ...prev, 
+      [name]: undefined 
+    }));
     
+    // We start with the input valuer
     let processedValue = value;
+    // Check for special inputs and handling of this
     if (type === 'number') {
       processedValue = value === '' ? 0 : parseFloat(value);
+      //Use 0 if not a calid number 
       if (isNaN(processedValue)) processedValue = 0;
     }
     
+    // Updates the product object with new value uses chaning
     onChange(prev => ({
       ...prev,
       [name]: processedValue
     }));
   };
 
+
+  // Handels allregens changes
+  // Uses split method, map ,trim and push, this to the object of allergens or the list
   const handleAllergenChange = (allergen) => {
     onChange(prev => {
       let currentAllergens = prev.allergens ? prev.allergens.split(',').map(a => a.trim()) : [];
       
       if (allergen === 'None') {
-        // If 'None' is selected, clear all other allergens
+        // If 'None' is selected, this clear all other allergens
         return {
           ...prev,
           allergens: 'None'
         };
       } else {
-        // If any other allergen is selected, remove 'None'
+        // If any other allergen is selected it removse 'None' allergen check
         currentAllergens = currentAllergens.filter(a => a !== 'None');
         
         if (currentAllergens.includes(allergen)) {
@@ -52,16 +69,29 @@ const EditProductModal = ({ show, onHide, product, onChange, onSave, categories 
     });
   };
 
+  // Handles category changes in the form
+  // Uses chaining for the object se raport for more info
   const handleCategoryChange = (e) => {
-    const selectedCategories = Array.from(e.target.selectedOptions, option => option.value);
-    setValidationErrors(prev => ({ ...prev, categoryList: undefined }));
+    const selectedCategories = Array.from(
+      e.target.selectedOptions, 
+      option => option.value);
+
+    // Clears any previus validation erros from categories
+    setValidationErrors(prev => ({ 
+      ...prev, 
+      categoryList: undefined 
+    }));
+
+    // Updates the product with new categories
     onChange(prev => ({
       ...prev,
       categoryList: selectedCategories
     }));
   };
 
-  //Må inn i Create Product!
+  //Metode for validating the form and object
+  // Se report for the compactform 
+  // Uses trim method 
   const validateForm = () => {
     const errors = {};
     if (!product?.name?.trim()) errors.name = 'Name is required';
@@ -82,6 +112,10 @@ const EditProductModal = ({ show, onHide, product, onChange, onSave, categories 
     }
   };
 
+  //Checks if product exist, and if it has allergens property, 
+  //then splits the string with comma and uses map method and trim to go tro the list, and remove spaces
+  // No allergens returns a empty list
+  // Commpacted formed with som help se report
   const currentAllergens = product?.allergens ? product.allergens.split(',').map(a => a.trim()) : [];
 
   return (

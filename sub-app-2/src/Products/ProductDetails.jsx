@@ -15,10 +15,9 @@ const ProductDetails = () => {
     const [loading, setLoading] = useState(true);        // Tracks loading state
     const [error, setError] = useState(null);            // Stores error messages
 
-    /**
-     * Effect hook to fetch product details when component mounts
-     * or when the product ID changes
-     */
+    
+     //Effect hook to fetch product details when component mounts
+     //or when the product ID changes, could be moved to a service layer
     useEffect(() => {
         const fetchProduct = async () => {
             try {
