@@ -114,6 +114,14 @@ const ProductPage = () => {
         initializePage();
     }, [selectedCategory]);
 
+    const handleRowClick = (productId, event) => {
+        if (event.target.tagName.toLowerCase() === 'button' || 
+            event.target.closest('button')) {
+            return;
+        }
+        navigate(`/product-details/${productId}`);
+    };
+
     const canEditProduct = (product) => {
         return roles.includes('Administrator') || 
                (roles.includes('FoodProducer') && product.producerId === user?.id);
@@ -306,7 +314,8 @@ const ProductPage = () => {
                                 </thead>
                                 <tbody>
                                     {filteredProducts.map((product) => (
-                                        <tr key={product.id}>
+                                        <tr key={product.id}
+                                        onClick={(e) => handleRowClick(product.id, e)}>
                                             <td>{product.name}</td>
                                             <td>{product.description}</td>
                                             <td>{product.categoryList.join(', ')}</td>
@@ -315,7 +324,7 @@ const ProductPage = () => {
                                             <td>{product.fat}</td>
                                             <td>{product.carbohydrates}</td>
                                             <td>{product.allergens || 'None'}</td>
-                                            <td>
+                                            <td onClick={(e) => e.stopPropagation()}>
                                                 {canEditProduct(product) && (
                                                     <>
                                                         <Button
