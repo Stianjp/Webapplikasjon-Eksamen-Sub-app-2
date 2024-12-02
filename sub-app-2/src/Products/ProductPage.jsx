@@ -24,6 +24,7 @@ const ProductPage = () => {
     
     const navigate = useNavigate();
 
+    // Authentication based on tokens that gets stored in localStorage
     const fetchUserData = async () => {
         try {
             const token = localStorage.getItem('authToken');
@@ -43,7 +44,7 @@ const ProductPage = () => {
                 id: decodedToken['sub'] || '',
                 name: decodedToken['name'] || ''
             });
-            setRoles(userRoles);
+            setRoles(userRoles); // UserRoles used for checking how can edit, delet products 
 
         } catch (error) {
             console.error('Error decoding token:', error);
@@ -51,6 +52,7 @@ const ProductPage = () => {
         }
     };
 
+    // Fecthes allProducts in the databes, should be moved to APi Service Layer 
     const fetchProducts = async () => {
         setLoading(true);
         setError(null);
@@ -84,6 +86,7 @@ const ProductPage = () => {
         }
     };
 
+    // Fetches alos products category, shoulde maybe be more generic, and put in a service layer
     const fetchCategories = async () => {
         try {
             const token = localStorage.getItem('authToken');
@@ -104,6 +107,8 @@ const ProductPage = () => {
         }
     };
 
+    // Makes sshur that all request happens at the same time
+    // Maybe not a need for fecthing products when we are fecthing selectedCatecgory?
     useEffect(() => {
         const initializePage = async () => {
             await Promise.all([
@@ -123,6 +128,8 @@ const ProductPage = () => {
         navigate(`/product-details/${productId}`);
     };
 
+    // Seperate method for checking who can edit, do not work that well when logged in as Foodproducer
+    // Maybe becaus this is cheked on server-side, needs to dobbel check api and controller
     const canEditProduct = (product) => {
         return roles.includes('Administrator') || 
                (roles.includes('FoodProducer') && product.producerId === user?.id);
@@ -142,6 +149,8 @@ const ProductPage = () => {
         setShowEditModal(true);
     };
 
+     // Saved edited product also should be seperated in a service layer 
+    // This fetch are also used in other components, does the same as handleEditSave
     const handleSaveEdit = async () => {
         try {
             const token = localStorage.getItem('authToken');
@@ -179,6 +188,9 @@ const ProductPage = () => {
         setShowDeleteModal(true);
     };
 
+
+    /// Delet selected product also should be seperated in a service layer 
+    // This fetch are also used in other components but this has a differnt name does the same as the handleDeletConfirmation
     const handleDeleteConfirmation = async () => {
         try {
             const token = localStorage.getItem('authToken');
@@ -205,12 +217,15 @@ const ProductPage = () => {
         }
     };
 
-    const filteredProducts = products.filter(product =>
-        (selectedCategory === '' || product.categoryList.includes(selectedCategory)) &&
-        (product.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-         product.description?.toLowerCase().includes(searchQuery.toLowerCase()))
-    );
+    //Filters products based on search query and the selected category for this component
+    const filteredProducts = products.filter(product => {
+        const matchesSearch = product.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                            product.description?.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesCategory = !selectedCategory || product.categoryList?.includes(selectedCategory);
+        return matchesSearch && matchesCategory;
+    });
 
+    
     return (
         <Container>
             <Card>
@@ -219,7 +234,7 @@ const ProductPage = () => {
                 <div className="d-flex justify-content-between align-items-center">
                     <h1>Products</h1>
                     <div className="d-flex align-items-center">
-                        {(roles.includes('Administrator') || roles.includes('FoodProducer')) && (
+                        {(roles.includes('Administrator') || roles.includes('FoodProducer')) && ( // Test If you are a regularuser this would be importen for functionality, they cant click
                             <Button
                                 variant="success"
                                 onClick={() => navigate('/products/add')}
