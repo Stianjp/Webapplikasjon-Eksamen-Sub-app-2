@@ -220,15 +220,15 @@ const ProductPage = () => {
                     <div className="d-flex align-items-center">
                         {(roles.includes('Administrator') || roles.includes('FoodProducer')) && (
                             <Button
-                                variant="primary"
+                                variant="success"
                                 onClick={() => navigate('/products/add')}
                                 className="me-3"
                             >
                                 Add new product
                             </Button>
                         )}
-                        <span className="badge bg-warning text-dark">
-                            {filteredProducts.length} Products
+                        <span className="badge bg-primary">
+                            {filteredProducts.length} Product
                         </span>
                     </div>
                 </div>
@@ -328,7 +328,7 @@ const ProductPage = () => {
                                                 {canEditProduct(product) && (
                                                     <>
                                                         <Button
-                                                            variant="outline-primary"
+                                                            variant="warning"
                                                             size="sm"
                                                             className="me-2"
                                                             onClick={() => handleEditProduct(product)}
@@ -336,7 +336,7 @@ const ProductPage = () => {
                                                             Edit
                                                         </Button>
                                                         <Button
-                                                            variant="outline-danger"
+                                                            variant="danger"
                                                             size="sm"
                                                             onClick={() => handleDeleteProduct(product)}
                                                         >
