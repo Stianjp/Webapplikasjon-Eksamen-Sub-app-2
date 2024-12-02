@@ -8,42 +8,54 @@ using api.DAL.Interfaces;
 namespace api.Controllers
 {
     /// <summary>
-/// Provides products functionalities for products, add also some admin product finctionalites.
-/// Requires the user to have one of the 3 roles, this dependes what method
-/// </summary>
+    /// Controller for managing products in the system.
+    /// Provides endpoints for CRUD operations on products with role-based access control.
+    /// Various endpoints require different authentication levels (Anonymous, Authenticated, Admin).
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class ProductsController : ControllerBase
     {
         private readonly IProductRepository _productRepository;
 
+        /// <summary>
+        /// List of valid product categories supported by the system
+        /// </summary>
         private readonly List<string> _availableCategories = new List<string> {
             "Meat", "Fish", "Vegetable", "Fruit", "Pasta", "Legume", "Drink"
         };
 
+        /// <summary>
+        /// List of valid allergens that can be assigned to products
+        /// </summary>
         private readonly List<string> _availableAllergens = new List<string>{
             "Milk", "Egg", "Peanut", "Soy", "Wheat", "Tree Nut", "Shellfish", "Fish", "Sesame", "None"
         };
 
+        /// <summary>
+        /// Constructor that initializes the product repository dependency
+        /// </summary>
+        /// <param name="productRepository">Repository for product data operations</param>
         public ProductsController(IProductRepository productRepository)
         {
             _productRepository = productRepository;
         }
-    /// <summary>
-/// Checks user roles isAdmin ir not
-/// </summary>
+
+        /// <summary>
+        /// Checks if the current user has Administrator role
+        /// </summary>
+        /// <returns>True if user is admin, false otherwise</returns>
         private bool IsAdmin()
         {
             return User?.IsInRole(UserRoles.Administrator) ?? false;
         }
 
-           /// <summary>
+        /// <summary>
         /// Gets a list of all products from the database.
-        /// Returns a collection of ProductDTO objects.
-        /// No authentication required due to [AllowAnonymous] attribute.
+        /// No authentication required.
         /// </summary>
         /// <returns>
-        /// 200 OK with a list of ProductDTO objects if successful
+        /// 200 OK with list of ProductDTO objects if successful
         /// 400 Bad Request if the operation fails
         /// </returns>
         [HttpGet("GetAllProducts")]
@@ -56,6 +68,15 @@ namespace api.Controllers
             return Ok(products);
         }
 
+        /// <summary>
+        /// Gets details of a specific product by ID.
+        /// No authentication required.
+        /// </summary>
+        /// <param name="id">Product ID to retrieve</param>
+        /// <returns>
+        /// 200 OK with product details
+        /// 404 Not Found if product doesn't exist
+        /// </returns>
         [HttpGet("{id:int}")]
         [AllowAnonymous]
         [ProducesResponseType(typeof(ProductDTO), 200)]
@@ -72,6 +93,16 @@ namespace api.Controllers
             return Ok(product);
         }
 
+        /// <summary>
+        /// Creates a new product in the system.
+        /// Requires authenticated user.
+        /// Sets current user as the producer.
+        /// </summary>
+        /// <param name="productDto">Product data</param>
+        /// <returns>
+        /// 201 Created with product details
+        /// 400 Bad Request if input is invalid
+        /// </returns>
         [HttpPost("CreateProduct")]
         [Authorize]
         [ProducesResponseType(typeof(ProductDTO), 201)]
@@ -97,6 +128,18 @@ namespace api.Controllers
             }
         }
 
+        /// <summary>
+        /// Updates an existing product.
+        /// Requires authentication and user must be admin or original producer.
+        /// </summary>
+        /// <param name="id">Product ID to update</param>
+        /// <param name="productDto">Updated product data</param>
+        /// <returns>
+        /// 204 NoContent if successful
+        /// 400 Bad Request if input invalid
+        /// 404 Not Found if product doesn't exist
+        /// 403 Forbidden if user unauthorized
+        /// </returns>
         [HttpPut("UpdateProduct{id}")]
         [Authorize]
         [ProducesResponseType(204)]
@@ -134,6 +177,16 @@ namespace api.Controllers
             }
         }
 
+        /// <summary>
+        /// Deletes a product from the system.
+        /// Requires authentication and user must be admin or original producer.
+        /// </summary>
+        /// <param name="id">Product ID to delete</param>
+        /// <returns>
+        /// 204 NoContent if successful
+        /// 404 Not Found if product doesn't exist
+        /// 403 Forbidden if user unauthorized
+        /// </returns>
         [HttpDelete("DeleteProduct{id}")]
         [Authorize]
         [ProducesResponseType(204)]
@@ -163,6 +216,11 @@ namespace api.Controllers
             return NoContent();
         }
 
+        /// <summary>
+        /// Gets list of available product categories.
+        /// No authentication required.
+        /// </summary>
+        /// <returns>200 OK with list of categories</returns>
         [HttpGet("categories")]
         [AllowAnonymous]
         [ProducesResponseType(typeof(IEnumerable<string>), 200)]
@@ -171,6 +229,11 @@ namespace api.Controllers
             return Ok(_availableCategories);
         }
 
+        /// <summary>
+        /// Gets list of available allergens.
+        /// No authentication required.
+        /// </summary>
+        /// <returns>200 OK with list of allergens</returns>
         [HttpGet("allergens")]
         [AllowAnonymous]
         [ProducesResponseType(typeof(IEnumerable<string>), 200)]
@@ -179,6 +242,16 @@ namespace api.Controllers
             return Ok(_availableAllergens);
         }
 
+        /// <summary>
+        /// Gets products created by the current user.
+        /// Optionally filtered by category.
+        /// Requires authentication.
+        /// </summary>
+        /// <param name="category">Optional category to filter by</param>
+        /// <returns>
+        /// 200 OK with products and categories
+        /// 400 Bad Request if user ID invalid
+        /// </returns>
         [HttpGet("user-products")]
         [Authorize]
         [ProducesResponseType(typeof(IEnumerable<ProductDTO>), 200)]
@@ -207,6 +280,17 @@ namespace api.Controllers
             });
         }
 
+        /// <summary>
+        /// Admin-only endpoint to update any product.
+        /// Bypasses producer ownership check.
+        /// </summary>
+        /// <param name="id">Product ID to update</param>
+        /// <param name="productDto">Updated product data</param>
+        /// <returns>
+        /// 204 NoContent if successful
+        /// 400 Bad Request if input invalid
+        /// 404 Not Found if product doesn't exist
+        /// </returns>
         [HttpPut("admin/products/{id}")]
         [Authorize(Roles = "Administrator")]
         [ProducesResponseType(204)]
@@ -237,6 +321,15 @@ namespace api.Controllers
             }
         }
 
+        /// <summary>
+        /// Admin-only endpoint to delete any product.
+        /// Bypasses producer ownership check.
+        /// </summary>
+        /// <param name="id">Product ID to delete</param>
+        /// <returns>
+        /// 204 NoContent if successful
+        /// 404 Not Found if product doesn't exist
+        /// </returns>
         [HttpDelete("admin/products/{id}")]
         [Authorize(Roles = "Administrator")]
         [ProducesResponseType(204)]
@@ -260,13 +353,18 @@ namespace api.Controllers
             return NoContent();
         }
 
+        /// <summary>
+        /// Admin-only endpoint to get all products with sorting and filtering options.
+        /// </summary>
+        /// <param name="sortBy">Optional parameter to sort results</param>
+        /// <param name="category">Optional category to filter by</param>
+        /// <returns>200 OK with products and categories</returns>
         [HttpGet("admin/all-products")]
-        [Authorize(Roles = "Administrator")] // Ensures only admins can access
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> GetAllProductsAdmin([FromQuery] string? sortBy = null, [FromQuery] string? category = null)
         {
             var products = await _productRepository.GetAllProductsAsync();
             
-            // Apply filters if provided
             if (!string.IsNullOrEmpty(category))
             {
                 products = products.Where(p => p.CategoryList.Contains(category)).ToList();

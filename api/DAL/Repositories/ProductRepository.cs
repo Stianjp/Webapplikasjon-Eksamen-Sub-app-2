@@ -5,15 +5,28 @@ using api.DTO;
 
 namespace api.DAL.Repositories
 {
+    /// <summary>
+    /// Repository implementation for managing Product entities in the database.
+    /// Handles all database operations for products including CRUD operations.
+    /// </summary>
     public class ProductRepository : IProductRepository
     {
         private readonly ApplicationDbContext _context;
 
+        /// <summary>
+        /// Initializes a new instance of the ProductRepository
+        /// </summary>
+        /// <param name="context">Database context for product operations</param>
         public ProductRepository(ApplicationDbContext context)
         {
             _context = context;
         }
 
+        /// <summary>
+        /// Maps a Product entity to a ProductDTO
+        /// </summary>
+        /// <param name="product">Product entity to convert</param>
+        /// <returns>Converted ProductDTO object</returns>
         private ProductDTO MapToDTO(Product product)
         {
             return new ProductDTO
@@ -31,6 +44,11 @@ namespace api.DAL.Repositories
             };
         }
 
+        /// <summary>
+        /// Maps a ProductDTO to a Product entity
+        /// </summary>
+        /// <param name="productDTO">ProductDTO to convert</param>
+        /// <returns>Converted Product entity</returns>
         private Product MapToModel(ProductDTO productDTO)
         {
             return new Product
@@ -48,18 +66,31 @@ namespace api.DAL.Repositories
             };
         }
 
+        /// <summary>
+        /// Retrieves all products from the database
+        /// </summary>
+        /// <returns>Collection of all products as DTOs</returns>
         public async Task<IEnumerable<ProductDTO>> GetAllProductsAsync()
         {
             var products = await _context.Products.ToListAsync();
             return products.Select(MapToDTO);
         }
 
+        /// <summary>
+        /// Retrieves a specific product by its ID
+        /// </summary>
+        /// <param name="id">ID of the product to retrieve</param>
+        /// <returns>ProductDTO if found, null if not found</returns>
         public async Task<ProductDTO?> GetProductByIdAsync(int id)
         {
             var product = await _context.Products.FindAsync(id);
             return product == null ? null : MapToDTO(product);
         }
 
+        /// <summary>
+        /// Creates a new product in the database
+        /// </summary>
+        /// <param name="productDTO">Product data to create</param>
         public async Task CreateProductAsync(ProductDTO productDTO)
         {
             var product = MapToModel(productDTO);
@@ -67,6 +98,11 @@ namespace api.DAL.Repositories
             await _context.SaveChangesAsync();
         }
 
+        /// <summary>
+        /// Updates an existing product in the database
+        /// </summary>
+        /// <param name="id">ID of product to update</param>
+        /// <param name="productDTO">Updated product data</param>
         public async Task UpdateProductAsync(int id, ProductDTO productDTO)
         {
             var product = await _context.Products.FindAsync(id);
@@ -85,6 +121,11 @@ namespace api.DAL.Repositories
             await _context.SaveChangesAsync();
         }
 
+        /// <summary>
+        /// Deletes a product from the database
+        /// </summary>
+        /// <param name="id">ID of product to delete</param>
+        /// <returns>True if product was deleted, false if not found</returns>
         public async Task<bool> DeleteProductAsync(int id)
         {
             var product = await _context.Products.FindAsync(id);
@@ -95,6 +136,11 @@ namespace api.DAL.Repositories
             return true;
         }
 
+        /// <summary>
+        /// Retrieves all products for a specific producer
+        /// </summary>
+        /// <param name="producerId">ID of the producer</param>
+        /// <returns>Collection of products created by the producer</returns>
         public async Task<IEnumerable<ProductDTO>> GetProductsByProducerIdAsync(string producerId)
         {
             var products = await _context.Products
@@ -104,6 +150,10 @@ namespace api.DAL.Repositories
             return products.Select(MapToDTO);
         }
 
+        /// <summary>
+        /// Retrieves all unique categories from existing products
+        /// </summary>
+        /// <returns>Collection of unique category names</returns>
         public async Task<IEnumerable<string>> GetAllCategoriesAsync()
         {
             var products = await _context.Products.AsNoTracking().ToListAsync();
@@ -113,6 +163,11 @@ namespace api.DAL.Repositories
                           .ToList();
         }
 
+        /// <summary>
+        /// Retrieves all products in a specific category
+        /// </summary>
+        /// <param name="category">Category to filter by</param>
+        /// <returns>Collection of products in the specified category</returns>
         public async Task<IEnumerable<ProductDTO>> GetProductsByCategoryAsync(string category)
         {
             var products = await _context.Products
@@ -121,6 +176,11 @@ namespace api.DAL.Repositories
             return products.Select(MapToDTO);
         }
 
+        /// <summary>
+        /// Retrieves products sorted by a specified property
+        /// </summary>
+        /// <param name="sortBy">Property to sort by (name, calories, protein, fat, carbohydrates)</param>
+        /// <returns>Collection of sorted products</returns>
         public async Task<IEnumerable<ProductDTO>> GetSortedProductsAsync(string sortBy)
         {
             IQueryable<Product> query = _context.Products;
