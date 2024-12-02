@@ -7,6 +7,10 @@ using api.DAL.Interfaces;
 
 namespace api.Controllers
 {
+    /// <summary>
+/// Provides products functionalities for products, add also some admin product finctionalites.
+/// Requires the user to have one of the 3 roles, this dependes what method
+/// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class ProductsController : ControllerBase
@@ -25,12 +29,23 @@ namespace api.Controllers
         {
             _productRepository = productRepository;
         }
-
+    /// <summary>
+/// Checks user roles isAdmin ir not
+/// </summary>
         private bool IsAdmin()
         {
             return User?.IsInRole(UserRoles.Administrator) ?? false;
         }
 
+           /// <summary>
+        /// Gets a list of all products from the database.
+        /// Returns a collection of ProductDTO objects.
+        /// No authentication required due to [AllowAnonymous] attribute.
+        /// </summary>
+        /// <returns>
+        /// 200 OK with a list of ProductDTO objects if successful
+        /// 400 Bad Request if the operation fails
+        /// </returns>
         [HttpGet("GetAllProducts")]
         [AllowAnonymous]
         [ProducesResponseType(typeof(IEnumerable<ProductDTO>), 200)]
