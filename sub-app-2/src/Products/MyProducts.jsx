@@ -14,11 +14,13 @@ const MyProducts = () => {
     const [error, setError] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('');
+    // For Modal states
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [editedProduct, setEditedProduct] = useState(null);
 
+    // Fetch product from the api with optional category filter
     const fetchMyProducts = async () => {
         setLoading(true);
         setError(null);
@@ -61,10 +63,12 @@ const MyProducts = () => {
         }
     };
 
+    // Fetch products when the component in react mounts or category changes 
     useEffect(() => {
         fetchMyProducts();
     }, [selectedCategory]);
 
+    //Hanlde row cliks for navigation to product details
     const handleRowClick = (productId, event) => {
         if (event.target.tagName.toLowerCase() === 'button' || 
             event.target.closest('button')) {
@@ -73,6 +77,8 @@ const MyProducts = () => {
         navigate(`/product-details/${productId}`);
     };
 
+    // Handling Model for edit and delet would be smart to have this maybe in 
+    // a seperate file that every component that have buttons for edit and delet products needs this
     const handleEditClick = (product) => {
         setSelectedProduct(product);
         setEditedProduct({ ...product });
@@ -84,6 +90,8 @@ const MyProducts = () => {
         setShowDeleteModal(true);
     };
 
+    // Saved edited product also should be seperated in a service layer 
+    // This fetch are also ues in other components
     const handleEditSave = async () => {
         try {
             const token = localStorage.getItem('authToken');
@@ -111,6 +119,8 @@ const MyProducts = () => {
         }
     };
 
+    /// Delet selected product also should be seperated in a service layer 
+    // This fetch are also used in other components
     const handleDeleteConfirm = async () => {
         try {
             const token = localStorage.getItem('authToken');
@@ -136,6 +146,7 @@ const MyProducts = () => {
         }
     };
 
+    //Filters products based on search query and the selected category for this component
     const filteredProducts = products.filter(product => {
         const matchesSearch = product.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
                             product.description?.toLowerCase().includes(searchQuery.toLowerCase());
@@ -147,11 +158,14 @@ const MyProducts = () => {
         <Container>
             <Card>
                 <Card.Body>
+                    {/*Header section */}
                     <div className="d-flex justify-content-between align-items-center mb-4">
                         <h1>My Products</h1>
                         <Badge bg="primary">{products.length} Products</Badge>
                     </div>
 
+
+                    {/* Add new product button */}
                     <Button 
                         variant="success" 
                         className="mb-3"
@@ -160,6 +174,7 @@ const MyProducts = () => {
                         Add New Product
                     </Button>
 
+                    {/* Search and filter section */}
                     <div className="mb-4">
                         <Form.Group className="mb-3">
                             <Form.Control
@@ -184,12 +199,15 @@ const MyProducts = () => {
                         </Form.Group>
                     </div>
 
+                    {/* Display error */}
+
                     {error && (
                         <Alert variant="danger" className="mb-4" dismissible onClose={() => setError(null)}>
                             {error}
                         </Alert>
                     )}
 
+                    {/* Loading spinner or products table useful if many products, takes time to load */}
                     {loading ? (
                         <div className="text-center">
                             <div className="spinner-border" role="status">
