@@ -17,7 +17,7 @@
       username: '',
       password: '',
       confirmPassword: '',
-      role: 'RegularUser', // Changed from accountType to role
+      role: 'RegularUser', 
     });
 
     const [errors, setErrors] = useState([]);

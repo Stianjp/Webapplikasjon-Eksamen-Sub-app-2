@@ -54,6 +54,7 @@ const ChangePassword = () => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`, // <-- Include Authorization header
         },
+        credentials: 'include',
         body: JSON.stringify(formData),
       });
 

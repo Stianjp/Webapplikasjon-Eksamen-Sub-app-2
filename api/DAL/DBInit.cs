@@ -161,7 +161,7 @@ public static class DBInit
                 UserName = producerUsername,
             };
 
-            var result = await userManager.CreateAsync(producerUser, "SecurePassword123!");
+            var result = await userManager.CreateAsync(producerUser, "OsloMet2024");
             if (!result.Succeeded)
             {
                 var errors = string.Join(", ", result.Errors.Select(e => e.Description));

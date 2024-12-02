@@ -167,7 +167,7 @@ const Sidebar = ({ isAuthenticated = false, roles = [], onLogout }) => {
             </li>
          
 
-          {/* Admin Page */}
+          {/* Admin Page 
           <li className="nav-item">
           {(isAdmin) && (
             <Link className={`nav-link ${getActiveClass('/admin/users')}`} to="/admin/users" onClick={closeNavbar}>
@@ -175,7 +175,7 @@ const Sidebar = ({ isAuthenticated = false, roles = [], onLogout }) => {
               <span>User Admin</span>
             </Link>
           )}
-          </li>
+          </li>*/}
           </ul>
 
           {/* Auth Section */}

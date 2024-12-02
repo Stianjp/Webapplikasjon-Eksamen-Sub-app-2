@@ -31,10 +31,12 @@ const MyProducts = () => {
             }
 
             const response = await fetch(`${API_BASE_URL}/api/Products/user-products`, {
+                method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',
-                }
+                },
+                credentials: 'include'
             });
 
             if (!response.ok) {
@@ -81,7 +83,8 @@ const MyProducts = () => {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(editedProduct)
+                body: JSON.stringify(editedProduct),
+                credentials: 'include'
             });
 
             if (!response.ok) {
@@ -106,7 +109,8 @@ const MyProducts = () => {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
-                }
+                },
+                credentials: 'include'
             });
 
             if (!response.ok) {
